@@ -246,10 +246,8 @@
                         reel.targetPosition = randomStop;
                         
                         const startTime = Date.now();
-                        const fastDuration = 800; // 0.8 секунды быстрого вращения
+                        const fastDuration = 500; // 0.5 секунды СУПЕР быстрого вращения
                         const totalDuration = 2000; // 2 секунды общее время
-                        
-                        let maxSpeedReached = false;
                         
                         function animate() {
                             const currentTime = Date.now();
@@ -259,19 +257,18 @@
                                 let speed;
                                 
                                 if (elapsed < fastDuration) {
-                                    // Быстрое вращение - линейная скорость
-                                    speed = 0.6;
+                                    // СУПЕР быстрое вращение
+                                    speed = 1.2;
                                     
-                                    // Рандомизация на максимальной скорости (в середине быстрого вращения)
-                                    if (!reel.randomized && elapsed > 400 && elapsed < 600) {
+                                    // Рандомизация в САМОМ НАЧАЛЕ быстрого вращения
+                                    if (!reel.randomized && elapsed > 50 && elapsed < 100) {
                                         randomizeReelFruits(reelIndex);
-                                        maxSpeedReached = true;
                                     }
                                 } else {
                                     // Замедление - плавное уменьшение скорости
                                     const slowProgress = (elapsed - fastDuration) / (totalDuration - fastDuration);
-                                    const easeOut = 1 - Math.pow(1 - slowProgress, 2);
-                                    speed = 0.6 * (1 - easeOut);
+                                    const easeOut = 1 - Math.pow(1 - slowProgress, 3);
+                                    speed = 1.2 * (1 - easeOut);
                                 }
                                 
                                 reel.position = (reel.position + speed) % 9;
