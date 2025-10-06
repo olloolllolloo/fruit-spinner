@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎰 Fruit Spinner</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial; }
+        body { background: linear-gradient(135deg, #667eea, #764ba2); min-height: 100vh; padding: 20px; }
+        .container { background: white; border-radius: 20px; padding: 30px; max-width: 400px; margin: 0 auto; text-align: center; }
+        h1 { color: #333; margin-bottom: 20px; }
+        .btn { background: #667eea; color: white; border: none; padding: 15px 30px; border-radius: 10px; font-size: 18px; cursor: pointer; margin: 10px; width: 200px; }
+        .fruits-list { background: #f8f9fa; padding: 15px; border-radius: 10px; margin: 20px 0; }
+        .result { font-size: 24px; font-weight: bold; color: #ff6b6b; margin: 20px 0; padding: 15px; background: #fff5f5; border-radius: 10px; }
+        .stats { text-align: left; background: #f8f9fa; padding: 15px; border-radius: 10px; margin: 15px 0; max-height: 300px; overflow-y: auto; }
+        .spinner { border: 4px solid #f3f3f3; border-top: 4px solid #667eea; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 20px auto; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎰 Fruit Spinner</h1>
+        
+        <div id="mainScreen">
+            <p>Нажми "Крутить" чтобы испытать удачу!</p>
+            <button class="btn" onclick="spin()">🎰 Крутить</button>
+            <button class="btn" onclick="showStats()">📊 Статистика</button>
+        </div>
+        
+        <div id="spinScreen" class="hidden">
+            <div class="spinner"></div>
+            <p>Кручу...</p>
+            <div id="fruitsList" class="fruits-list"></div>
+        </div>
+        
+        <div id="resultScreen" class="hidden">
+            <div class="result" id="resultText"></div>
+            <div id="resultFruits" class="fruits-list"></div>
+            <button class="btn" onclick="backToMain()">🔙 В меню</button>
+        </div>
+        
+        <div id="statsScreen" class="hidden">
+            <h3>📊 Статистика</h3>
+            <div id="statsList" class="stats"></div>
+            <button class="btn" onclick="backToMain()">🔙 Назад</button>
+        </div>
+    </div>
+
+    <script>
+        let tg = window.Telegram.WebApp;
+        tg.expand();
+        
+        let statistics = {};
+        let totalSpins = 0;
+        const fruits = {
+            "Ракета": 30.0000, "Вращение": 28.5000, "Клинок": 27.0000, "Пружина": 25.5000,
+            "Бомба": 24.0000, "Дым": 22.5000, "Шипы": 21.0000, "Пламя": 19.6000,
+            "Лёд": 18.2000, "Песок": 16.9000, "Тьма": 15.6000, "Орёл": 14.4000,
+            "Алмаз": 13.2000, "Свет": 12.1000, "Резина": 11.0000, "Призрак": 10.0000,
+            "Магма": 9.1000, "Дрожь": 8.2000, "Будда": 7.4000, "Любовь": 6.6000,
+            "Творение": 5.9000, "Паук": 5.2000, "Звук": 4.6000, "Феникс": 4.0000,
+            "Портал": 3.5000, "Молния": 3.0000, "Боль": 2.6000, "Метель": 2.2000,
+            "Гравитация": 1.0000, "Мамонт": 0.7500, "Т-Рекс": 0.5600, "Тесто": 0.4200,
+            "Тень": 0.3100, "Яд": 0.2300, "Контроль": 0.1700, "Газ": 0.1250,
+            "Дух": 0.0920, "Леопард": 0.0670, "Йети": 0.0480, "Кицунэ": 0.0320,
+            "Дракон": 0.0100
+        };
+        
+        function initStats() {
+            Object.keys(fruits).forEach(fruit => statistics[fruit] = 0);
+        }
+        
+        function showScreen(screenId) {
+            ['mainScreen', 'spinScreen', 'resultScreen', 'statsScreen'].forEach(id => {
+                document.getElementById(id).classList.add('hidden');
+            });
+            document.getElementById(screenId).classList.remove('hidden');
+        }
+        
+        function spin() {
+            showScreen('spinScreen');
+            const threeFruits = getThreeFruits();
+            const finalFruit = threeFruits[Math.floor(Math.random() * 3)];
+            
+            document.getElementById('fruitsList').innerHTML = threeFruits.join('<br>');
+            
+            setTimeout(() => {
+                showScreen('resultScreen');
+                document.getElementById('resultText').innerText = `Вам выпал: ${finalFruit}`;
+                document.getElementById('resultFruits').innerHTML = threeFruits.join('<br>');
+                statistics[finalFruit]++;
+                totalSpins++;
+            }, 2000);
+        }
+        
+        function getThreeFruits() {
+            const availableFruits = Object.keys(fruits);
+            const selected = [];
+            
+            for (let i = 0; i < 3; i++) {
+                if (availableFruits.length === 0) break;
+                const weights = availableFruits.map(fruit => fruits[fruit]);
+                const totalWeight = weights.reduce((sum, weight) => sum + weight, 0);
+                let random = Math.random() * totalWeight;
+                let selectedIndex = 0;
+                
+                for (let j = 0; j < weights.length; j++) {
+                    random -= weights[j];
+                    if (random <= 0) {
+                        selectedIndex = j;
+                        break;
+                    }
+                }
+                
+                selected.push(availableFruits[selectedIndex]);
+                availableFruits.splice(selectedIndex, 1);
+            }
+            
+            return selected;
+        }
+        
+        function showStats() {
+            showScreen('statsScreen');
+            let statsHTML = '';
+            const sortedStats = Object.entries(statistics)
+                .filter(([_, count]) => count > 0)
+                .sort((a, b) => b[1] - a[1]);
+            
+            if (sortedStats.length === 0) {
+                statsHTML = '<p>Еще не было кручений</p>';
+            } else {
+                sortedStats.forEach(([fruit, count]) => {
+                    const percentage = totalSpins > 0 ? ((count / totalSpins) * 100).toFixed(1) : 0;
+                    statsHTML += `<p><b>${fruit}</b> - ${count} (${percentage}%)</p>`;
+                });
+            }
+            
+            document.getElementById('statsList').innerHTML = statsHTML;
+        }
+        
+        function backToMain() {
+            showScreen('mainScreen');
+        }
+        
+        initStats();
+        showScreen('mainScreen');
+    </script>
+</body>
+  </html>
