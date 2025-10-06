@@ -3,48 +3,223 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🎰 Fruit Spinner</title>
+    <title>🎰 Fruit Slots</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial; }
-        body { background: linear-gradient(135deg, #667eea, #764ba2); min-height: 100vh; padding: 20px; }
-        .container { background: white; border-radius: 20px; padding: 30px; max-width: 400px; margin: 0 auto; text-align: center; }
-        h1 { color: #333; margin-bottom: 20px; }
-        .btn { background: #667eea; color: white; border: none; padding: 15px 30px; border-radius: 10px; font-size: 18px; cursor: pointer; margin: 10px; width: 200px; }
-        .fruits-list { background: #f8f9fa; padding: 15px; border-radius: 10px; margin: 20px 0; }
-        .result { font-size: 24px; font-weight: bold; color: #ff6b6b; margin: 20px 0; padding: 15px; background: #fff5f5; border-radius: 10px; }
-        .stats { text-align: left; background: #f8f9fa; padding: 15px; border-radius: 10px; margin: 15px 0; max-height: 300px; overflow-y: auto; }
-        .spinner { border: 4px solid #f3f3f3; border-top: 4px solid #667eea; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 20px auto; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        .hidden { display: none; }
+        * { 
+            margin: 0; 
+            padding: 0; 
+            box-sizing: border-box; 
+        }
+        
+        body {
+            background: #000;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+        }
+        
+        .game-container {
+            background: #1a1a1a;
+            border: 3px solid #333;
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 500px;
+            width: 100%;
+            text-align: center;
+        }
+        
+        .slots-machine {
+            background: #2d2d2d;
+            border: 2px solid #444;
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .reels-container {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+        
+        .reel {
+            width: 60px;
+            height: 180px;
+            background: #000;
+            border: 2px solid #555;
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .reel-content {
+            position: absolute;
+            width: 100%;
+            transition: transform 0.1s linear;
+        }
+        
+        .symbol {
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 30px;
+            background: #000;
+        }
+        
+        .visible-symbols {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin: 20px 0;
+        }
+        
+        .visible-symbol {
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            background: #333;
+            border-radius: 10px;
+            border: 2px solid #555;
+        }
+        
+        .spin-btn {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 25px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            margin: 10px 0;
+            width: 200px;
+            transition: all 0.3s ease;
+        }
+        
+        .spin-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 107, 107, 0.4);
+        }
+        
+        .spin-btn:active {
+            transform: translateY(0);
+        }
+        
+        .spin-btn:disabled {
+            background: #666;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .stats-btn {
+            background: #444;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 15px;
+            font-size: 14px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        
+        .screen {
+            display: none;
+        }
+        
+        .screen.active {
+            display: block;
+            animation: fadeIn 0.5s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .stats-container {
+            background: #2d2d2d;
+            padding: 20px;
+            border-radius: 15px;
+            margin: 20px 0;
+            max-height: 400px;
+            overflow-y: auto;
+            text-align: left;
+        }
+        
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #444;
+            color: white;
+        }
+        
+        .stat-item:last-child {
+            border-bottom: none;
+        }
+        
+        h1 {
+            color: white;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+        
+        .subtitle {
+            color: #888;
+            margin-bottom: 20px;
+        }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>🎰 Fruit Spinner</h1>
-        
-        <div id="mainScreen">
-            <p>Нажми "Крутить" чтобы испытать удачу!</p>
-            <button class="btn" onclick="spin()">🎰 Крутить</button>
-            <button class="btn" onclick="showStats()">📊 Статистика</button>
+    <div class="game-container">
+        <!-- Главный экран -->
+        <div id="mainScreen" class="screen active">
+            <h1>🎰 Fruit Slots</h1>
+            <p class="subtitle">5 барабанов • 9 фруктов</p>
+            
+            <div class="slots-machine">
+                <div class="reels-container" id="reelsContainer">
+                    <!-- 5 барабанов будут созданы через JS -->
+                </div>
+                
+                <div class="visible-symbols" id="visibleSymbols">
+                    <!-- Видимые символы будут здесь -->
+                </div>
+            </div>
+            
+            <button class="spin-btn" onclick="startSpin()" id="spinBtn">
+                🎰 КРУТИТЬ
+            </button>
+            
+            <button class="stats-btn" onclick="showStats()">
+                📊 Статистика
+            </button>
         </div>
         
-        <div id="spinScreen" class="hidden">
-            <div class="spinner"></div>
-            <p>Кручу...</p>
-            <div id="fruitsList" class="fruits-list"></div>
-        </div>
-        
-        <div id="resultScreen" class="hidden">
-            <div class="result" id="resultText"></div>
-            <div id="resultFruits" class="fruits-list"></div>
-            <button class="btn" onclick="backToMain()">🔙 В меню</button>
-        </div>
-        
-        <div id="statsScreen" class="hidden">
-            <h3>📊 Статистика</h3>
-            <div id="statsList" class="stats"></div>
-            <button class="btn" onclick="backToMain()">🔙 Назад</button>
+        <!-- Экран статистики -->
+        <div id="statsScreen" class="screen">
+            <h1>📊 Статистика</h1>
+            
+            <div class="stats-container" id="statsList">
+                <!-- Статистика будет здесь -->
+            </div>
+            
+            <button class="spin-btn" onclick="backToMain()">
+                🔙 Назад
+            </button>
         </div>
     </div>
 
@@ -52,100 +227,173 @@
         let tg = window.Telegram.WebApp;
         tg.expand();
         
+        // Фрукты для слотов
+        const symbols = ['🍋', '🍌', '🍉', '🍇', '🍓', '🫐', '🍍', '🥥', '🥝'];
         let statistics = {};
         let totalSpins = 0;
-        const fruits = {
-            "Ракета": 30.0000, "Вращение": 28.5000, "Клинок": 27.0000, "Пружина": 25.5000,
-            "Бомба": 24.0000, "Дым": 22.5000, "Шипы": 21.0000, "Пламя": 19.6000,
-            "Лёд": 18.2000, "Песок": 16.9000, "Тьма": 15.6000, "Орёл": 14.4000,
-            "Алмаз": 13.2000, "Свет": 12.1000, "Резина": 11.0000, "Призрак": 10.0000,
-            "Магма": 9.1000, "Дрожь": 8.2000, "Будда": 7.4000, "Любовь": 6.6000,
-            "Творение": 5.9000, "Паук": 5.2000, "Звук": 4.6000, "Феникс": 4.0000,
-            "Портал": 3.5000, "Молния": 3.0000, "Боль": 2.6000, "Метель": 2.2000,
-            "Гравитация": 1.0000, "Мамонт": 0.7500, "Т-Рекс": 0.5600, "Тесто": 0.4200,
-            "Тень": 0.3100, "Яд": 0.2300, "Контроль": 0.1700, "Газ": 0.1250,
-            "Дух": 0.0920, "Леопард": 0.0670, "Йети": 0.0480, "Кицунэ": 0.0320,
-            "Дракон": 0.0100
-        };
+        let isSpinning = false;
         
-        function initStats() {
-            Object.keys(fruits).forEach(fruit => statistics[fruit] = 0);
-        }
-        
-        function showScreen(screenId) {
-            ['mainScreen', 'spinScreen', 'resultScreen', 'statsScreen'].forEach(id => {
-                document.getElementById(id).classList.add('hidden');
+        // Инициализация
+        function init() {
+            // Создаем статистику
+            symbols.forEach(symbol => {
+                statistics[symbol] = 0;
             });
-            document.getElementById(screenId).classList.remove('hidden');
+            
+            // Создаем 5 барабанов
+            createReels();
+            // Показываем начальные символы
+            updateVisibleSymbols();
         }
         
-        function spin() {
-            showScreen('spinScreen');
-            const threeFruits = getThreeFruits();
-            const finalFruit = threeFruits[Math.floor(Math.random() * 3)];
+        // Создание барабанов
+        function createReels() {
+            const reelsContainer = document.getElementById('reelsContainer');
+            reelsContainer.innerHTML = '';
             
-            document.getElementById('fruitsList').innerHTML = threeFruits.join('<br>');
-            
-            setTimeout(() => {
-                showScreen('resultScreen');
-                document.getElementById('resultText').innerText = `Вам выпал: ${finalFruit}`;
-                document.getElementById('resultFruits').innerHTML = threeFruits.join('<br>');
-                statistics[finalFruit]++;
-                totalSpins++;
-            }, 2000);
+            for (let i = 0; i < 5; i++) {
+                const reel = document.createElement('div');
+                reel.className = 'reel';
+                reel.innerHTML = `
+                    <div class="reel-content" id="reel${i}">
+                        ${Array(20).fill(0).map(() => 
+                            `<div class="symbol">${symbols[Math.floor(Math.random() * symbols.length)]}</div>`
+                        ).join('')}
+                    </div>
+                `;
+                reelsContainer.appendChild(reel);
+            }
         }
         
-        function getThreeFruits() {
-            const availableFruits = Object.keys(fruits);
-            const selected = [];
+        // Обновление видимых символов
+        function updateVisibleSymbols() {
+            const visibleSymbols = document.getElementById('visibleSymbols');
+            visibleSymbols.innerHTML = '';
             
-            for (let i = 0; i < 3; i++) {
-                if (availableFruits.length === 0) break;
-                const weights = availableFruits.map(fruit => fruits[fruit]);
-                const totalWeight = weights.reduce((sum, weight) => sum + weight, 0);
-                let random = Math.random() * totalWeight;
-                let selectedIndex = 0;
-                
-                for (let j = 0; j < weights.length; j++) {
-                    random -= weights[j];
-                    if (random <= 0) {
-                        selectedIndex = j;
-                        break;
-                    }
-                }
-                
-                selected.push(availableFruits[selectedIndex]);
-                availableFruits.splice(selectedIndex, 1);
+            for (let i = 0; i < 5; i++) {
+                const symbol = document.createElement('div');
+                symbol.className = 'visible-symbol';
+                symbol.id = `visibleSymbol${i}`;
+                symbol.textContent = symbols[Math.floor(Math.random() * symbols.length)];
+                visibleSymbols.appendChild(symbol);
+            }
+        }
+        
+        // Запуск вращения
+        function startSpin() {
+            if (isSpinning) return;
+            
+            isSpinning = true;
+            document.getElementById('spinBtn').disabled = true;
+            totalSpins++;
+            
+            // Анимация вращения каждого барабана
+            for (let i = 0; i < 5; i++) {
+                setTimeout(() => {
+                    spinReel(i);
+                }, i * 300); // Задержка между барабанами
             }
             
-            return selected;
+            // Завершение вращения
+            setTimeout(() => {
+                isSpinning = false;
+                document.getElementById('spinBtn').disabled = false;
+                updateStatistics();
+            }, 2500);
         }
         
+        // Вращение одного барабана
+        function spinReel(reelIndex) {
+            const reel = document.getElementById(`reel${reelIndex}`);
+            const duration = 1500 + Math.random() * 500; // Случайная длительность
+            const spins = 30 + Math.floor(Math.random() * 20); // Количество прокруток
+            
+            // Анимация вращения
+            let startTime = null;
+            
+            function animate(time) {
+                if (!startTime) startTime = time;
+                const progress = (time - startTime) / duration;
+                
+                if (progress < 1) {
+                    // Плавное замедление
+                    const easeOut = 1 - Math.pow(1 - progress, 3);
+                    const translateY = -easeOut * spins * 60;
+                    reel.style.transform = `translateY(${translateY}px)`;
+                    requestAnimationFrame(animate);
+                } else {
+                    // Завершение вращения
+                    const finalSymbol = symbols[Math.floor(Math.random() * symbols.length)];
+                    document.getElementById(`visibleSymbol${reelIndex}`).textContent = finalSymbol;
+                    reel.style.transform = 'translateY(0)';
+                    
+                    // Обновляем содержимое барабана для следующего вращения
+                    updateReelContent(reelIndex);
+                }
+            }
+            
+            requestAnimationFrame(animate);
+        }
+        
+        // Обновление содержимого барабана
+        function updateReelContent(reelIndex) {
+            const reel = document.getElementById(`reel${reelIndex}`);
+            reel.innerHTML = `
+                <div class="reel-content">
+                    ${Array(20).fill(0).map(() => 
+                        `<div class="symbol">${symbols[Math.floor(Math.random() * symbols.length)]}</div>`
+                    ).join('')}
+                </div>
+            `;
+        }
+        
+        // Обновление статистики
+        function updateStatistics() {
+            const visibleSymbols = document.getElementById('visibleSymbols');
+            const symbolsArray = Array.from(visibleSymbols.children).map(child => child.textContent);
+            
+            symbolsArray.forEach(symbol => {
+                statistics[symbol]++;
+            });
+        }
+        
+        // Показать статистику
         function showStats() {
-            showScreen('statsScreen');
+            document.getElementById('mainScreen').classList.remove('active');
+            document.getElementById('statsScreen').classList.add('active');
+            
+            const statsList = document.getElementById('statsList');
             let statsHTML = '';
+            
             const sortedStats = Object.entries(statistics)
                 .filter(([_, count]) => count > 0)
                 .sort((a, b) => b[1] - a[1]);
             
             if (sortedStats.length === 0) {
-                statsHTML = '<p>Еще не было кручений</p>';
+                statsHTML = '<div class="stat-item" style="color: #888; text-align: center;">Еще не было кручений</div>';
             } else {
-                sortedStats.forEach(([fruit, count]) => {
+                sortedStats.forEach(([symbol, count]) => {
                     const percentage = totalSpins > 0 ? ((count / totalSpins) * 100).toFixed(1) : 0;
-                    statsHTML += `<p><b>${fruit}</b> - ${count} (${percentage}%)</p>`;
+                    statsHTML += `
+                        <div class="stat-item">
+                            <span>${symbol}</span>
+                            <span>${count} (${percentage}%)</span>
+                        </div>
+                    `;
                 });
             }
             
-            document.getElementById('statsList').innerHTML = statsHTML;
+            statsList.innerHTML = statsHTML;
         }
         
+        // Вернуться в главное меню
         function backToMain() {
-            showScreen('mainScreen');
+            document.getElementById('statsScreen').classList.remove('active');
+            document.getElementById('mainScreen').classList.add('active');
         }
         
-        initStats();
-        showScreen('mainScreen');
+        // Инициализация при загрузке
+        document.addEventListener('DOMContentLoaded', init);
     </script>
 </body>
-  </html>
+</html>
