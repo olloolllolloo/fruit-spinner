@@ -237,6 +237,9 @@
                         const reel = reels[reelIndex];
                         reel.spinning = true;
                         
+                        // МГНОВЕННАЯ рандомизация при старте вращения
+                        randomizeReelFruits(reelIndex);
+                        
                         // Генерируем случайную позицию для остановки
                         const randomStop = Math.floor(Math.random() * 9);
                         reel.targetPosition = randomStop;
@@ -278,11 +281,6 @@
                         
                         // Запускаем анимацию
                         animate();
-                        
-                        // Рандомизируем фрукты через 10ms после начала вращения этого колеса
-                        setTimeout(() => {
-                            randomizeReelFruits(reelIndex);
-                        }, 10);
                         
                     }, startDelay);
                 });
