@@ -137,7 +137,7 @@
 </head>
 <body>
     <div class="container">
-        <h1>🍒 ФРУКТОВЫЙ АВТОМАТ 🍒</h1>
+        <h1>🎰 РОЛЛ ФРУКТА 🎰</h1>
         
         <div class="slot-machine">
             <div class="reels-container" id="reelsContainer">
@@ -209,7 +209,8 @@
                         spinning: false,
                         targetPosition: 0,
                         fruits: shuffledFruits,
-                        animationId: null
+                        animationId: null,
+                        randomized: false
                     });
                 }
             }
@@ -228,6 +229,8 @@
                 for (let j = 0; j < 3; j++) {
                     reelItems.children[j + 9].textContent = shuffledFruits[j];
                 }
+                
+                reel.randomized = true;
             }
             
             // Функция вращения барабана
@@ -236,17 +239,15 @@
                     setTimeout(() => {
                         const reel = reels[reelIndex];
                         reel.spinning = true;
-                        
-                        // МГНОВЕННАЯ рандомизация при старте вращения
-                        randomizeReelFruits(reelIndex);
+                        reel.randomized = false;
                         
                         // Генерируем случайную позицию для остановки
                         const randomStop = Math.floor(Math.random() * 9);
                         reel.targetPosition = randomStop;
                         
                         const startTime = Date.now();
-                        const fastDuration = 1200; // 1.2 секунды быстрого вращения
-                        const totalDuration = 1800; // 1.8 секунды общее время
+                        const fastDuration = 1000; // 1 секунда быстрого вращения
+                        const totalDuration = 3000; // 3 секунды общее время (замедление в 2 раза дольше)
                         
                         function animate() {
                             const currentTime = Date.now();
@@ -257,12 +258,17 @@
                                 
                                 if (elapsed < fastDuration) {
                                     // Быстрое вращение - линейная скорость
-                                    speed = 0.4;
+                                    speed = 0.5;
+                                    
+                                    // Рандомизация в процессе быстрого вращения на максимальной скорости
+                                    if (!reel.randomized && elapsed > 300) {
+                                        randomizeReelFruits(reelIndex);
+                                    }
                                 } else {
                                     // Замедление - плавное уменьшение скорости
                                     const slowProgress = (elapsed - fastDuration) / (totalDuration - fastDuration);
                                     const easeOut = 1 - Math.pow(1 - slowProgress, 2);
-                                    speed = 0.4 * (1 - easeOut);
+                                    speed = 0.5 * (1 - easeOut);
                                 }
                                 
                                 reel.position = (reel.position + speed) % 9;
