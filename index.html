@@ -53,7 +53,7 @@
             width: 60px;
             height: 180px;
             background: #000;
-            border: 1px solid rgba(85, 85, 85, 0.3); /* Прозрачная рамка */
+            border: 1px solid rgba(85, 85, 85, 0.3);
             border-radius: 8px;
             overflow: hidden;
             position: relative;
@@ -62,7 +62,8 @@
         .reel-content {
             position: absolute;
             width: 100%;
-            transition: transform 0.1s linear;
+            top: 0;
+            left: 0;
         }
         
         .symbol {
@@ -182,7 +183,6 @@
             margin-bottom: 20px;
         }
         
-        /* Границы для визуального разделения барабанов */
         .reel-divider {
             width: 1px;
             height: 180px;
@@ -265,7 +265,7 @@
                 
                 // Создаем случайную последовательность символов
                 let reelContent = '';
-                for (let j = 0; j < 20; j++) {
+                for (let j = 0; j < 10; j++) { // Меньше символов для плавной анимации
                     const randomSymbol = symbols[Math.floor(Math.random() * symbols.length)];
                     reelContent += `<div class="symbol">${randomSymbol}</div>`;
                 }
@@ -308,48 +308,74 @@
             document.getElementById('spinBtn').disabled = true;
             totalSpins++;
             
-            // Анимация вращения каждого барабана
+            // Сначала все барабаны показывают начальные символы
+            updateVisibleSymbols();
+            
+            // Запускаем анимацию для каждого барабана с задержкой
+            const spinPromises = [];
             for (let i = 0; i < 5; i++) {
-                setTimeout(() => {
-                    spinReel(i);
-                }, i * 300); // Задержка между барабанами
+                spinPromises.push(new Promise(resolve => {
+                    setTimeout(() => {
+                        spinReel(i, resolve);
+                    }, i * 400); // Задержка 400мс между запуском барабанов
+                }));
             }
             
-            // Завершение вращения
-            setTimeout(() => {
+            // Когда все барабаны остановились
+            Promise.all(spinPromises).then(() => {
                 isSpinning = false;
                 document.getElementById('spinBtn').disabled = false;
                 updateStatistics();
-            }, 2500);
+            });
         }
         
         // Вращение одного барабана
-        function spinReel(reelIndex) {
+        function spinReel(reelIndex, onComplete) {
             const reel = document.getElementById(`reel${reelIndex}`);
-            const duration = 1500 + Math.random() * 500; // Случайная длительность
-            const spins = 30 + Math.floor(Math.random() * 20); // Количество прокруток
+            const visibleSymbol = document.getElementById(`visibleSymbol${reelIndex}`);
             
-            // Анимация вращения
+            // Длительность вращения (3 секунды)
+            const spinDuration = 3000;
+            // Замедление начинается через 2 секунды
+            const slowdownStart = 2000;
+            // Общее количество прокруток
+            const totalSpins = 20;
+            
             let startTime = null;
+            let finalSymbol = symbols[Math.floor(Math.random() * symbols.length)];
             
             function animate(time) {
                 if (!startTime) startTime = time;
-                const progress = (time - startTime) / duration;
+                const elapsed = time - startTime;
                 
-                if (progress < 1) {
-                    // Плавное замедление
-                    const easeOut = 1 - Math.pow(1 - progress, 3);
-                    const translateY = -easeOut * spins * 60;
+                if (elapsed < spinDuration) {
+                    let progress;
+                    
+                    if (elapsed < slowdownStart) {
+                        // Быстрое вращение
+                        progress = (elapsed / slowdownStart) * 0.8;
+                    } else {
+                        // Замедление
+                        const slowdownProgress = (elapsed - slowdownStart) / (spinDuration - slowdownStart);
+                        progress = 0.8 + (slowdownProgress * 0.2);
+                    }
+                    
+                    // Плавное движение с easing
+                    const easedProgress = 1 - Math.pow(1 - progress, 3);
+                    const translateY = -easedProgress * totalSpins * 60;
                     reel.style.transform = `translateY(${translateY}px)`;
+                    
                     requestAnimationFrame(animate);
                 } else {
                     // Завершение вращения
-                    const finalSymbol = symbols[Math.floor(Math.random() * symbols.length)];
-                    document.getElementById(`visibleSymbol${reelIndex}`).textContent = finalSymbol;
                     reel.style.transform = 'translateY(0)';
+                    visibleSymbol.textContent = finalSymbol;
                     
-                    // Обновляем содержимое барабана для следующего вращения
-                    updateReelContent(reelIndex);
+                    // Плавное обновление содержимого барабана
+                    setTimeout(() => {
+                        updateReelContent(reelIndex);
+                        onComplete();
+                    }, 100);
                 }
             }
             
@@ -362,7 +388,7 @@
             
             // Создаем новую случайную последовательность
             let newContent = '';
-            for (let j = 0; j < 20; j++) {
+            for (let j = 0; j < 10; j++) {
                 const randomSymbol = symbols[Math.floor(Math.random() * symbols.length)];
                 newContent += `<div class="symbol">${randomSymbol}</div>`;
             }
@@ -419,4 +445,4 @@
         document.addEventListener('DOMContentLoaded', init);
     </script>
 </body>
-</html>
+    </html>
