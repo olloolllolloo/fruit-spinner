@@ -73,7 +73,6 @@
             top: 0;
             left: 0;
             width: 100%;
-            transition: top 8s cubic-bezier(0.1, 0.3, 0.1, 1);
         }
 
         .reel-item {
@@ -138,7 +137,7 @@
 </head>
 <body>
     <div class="container">
-        <h1>🍒 ФРУКТОВЫЙ оаоАВТОМАТ 🍒</h1>
+        <h1>🍒 ФРУКТОВЫЙ АВТОМАТ 🍒</h1>
         
         <div class="slot-machine">
             <div class="reels-container" id="reelsContainer">
@@ -209,13 +208,14 @@
                         position: 0,
                         spinning: false,
                         targetPosition: 0,
-                        fruits: shuffledFruits
+                        fruits: shuffledFruits,
+                        animationId: null
                     });
                 }
             }
             
             // Функция вращения барабана
-            function spinReel(reelIndex, delay) {
+            function spinReel(reelIndex, startDelay, stopDelay) {
                 return new Promise(resolve => {
                     setTimeout(() => {
                         const reel = reels[reelIndex];
@@ -225,74 +225,58 @@
                         const randomStop = Math.floor(Math.random() * 9);
                         reel.targetPosition = randomStop;
                         
-                        // Начальная быстрая анимация
                         const startTime = Date.now();
                         const fastDuration = 3000; // 3 секунды быстрого вращения
-                        const slowDuration = 3000; // 3 секунды замедления
+                        const totalDuration = 4000; // 4 секунды общее время
                         
                         function animate() {
                             const currentTime = Date.now();
                             const elapsed = currentTime - startTime;
                             
-                            if (elapsed < fastDuration) {
-                                // Быстрое вращение
-                                reel.position = (reel.position + 0.3) % 9;
-                                reel.element.style.top = `-${reel.position * 100}px`;
-                                requestAnimationFrame(animate);
-                            } else if (elapsed < fastDuration + slowDuration) {
-                                // Плавное замедление
-                                const slowProgress = (elapsed - fastDuration) / slowDuration;
-                                const easeOut = 1 - Math.pow(1 - slowProgress, 4); // Более плавное замедление
+                            if (elapsed < totalDuration) {
+                                let speed;
                                 
-                                const currentPos = (reel.position + easeOut * (reel.targetPosition - reel.position + 9)) % 9;
-                                reel.element.style.top = `-${currentPos * 100}px`;
-                                requestAnimationFrame(animate);
+                                if (elapsed < fastDuration) {
+                                    // Быстрое вращение - линейная скорость
+                                    speed = 0.4;
+                                } else {
+                                    // Замедление - плавное уменьшение скорости
+                                    const slowProgress = (elapsed - fastDuration) / (totalDuration - fastDuration);
+                                    const easeOut = 1 - Math.pow(1 - slowProgress, 3);
+                                    speed = 0.4 * (1 - easeOut);
+                                }
+                                
+                                reel.position = (reel.position + speed) % 9;
+                                reel.element.style.top = `-${reel.position * 100}px`;
+                                
+                                reel.animationId = requestAnimationFrame(animate);
                             } else {
                                 // Финальная позиция
+                                cancelAnimationFrame(reel.animationId);
                                 reel.position = reel.targetPosition;
                                 reel.element.style.top = `-${reel.position * 100}px`;
                                 reel.spinning = false;
                                 resolve();
                             }
                         }
+                        
+                        // Случайно перемешиваем фрукты в процессе быстрого вращения
+                        setTimeout(() => {
+                            const shuffledFruits = shuffleArray(allFruits);
+                            reel.fruits = shuffledFruits;
+                            
+                            // Обновляем отображаемые фрукты
+                            const reelItems = reel.element;
+                            for (let j = 0; j < 9; j++) {
+                                reelItems.children[j].textContent = shuffledFruits[j];
+                            }
+                            for (let j = 0; j < 3; j++) {
+                                reelItems.children[j + 9].textContent = shuffledFruits[j];
+                            }
+                        }, 500); // Рандомизация через 0.5 секунды после начала
                         
                         animate();
-                    }, delay);
-                });
-            }
-            
-            // Функция остановки барабана
-            function stopReel(reelIndex, delay) {
-                return new Promise(resolve => {
-                    setTimeout(() => {
-                        const reel = reels[reelIndex];
-                        
-                        // Анимация плавной остановки
-                        const startTime = Date.now();
-                        const stopDuration = 2000; // 2 секунды на остановку
-                        
-                        function animateStop() {
-                            const currentTime = Date.now();
-                            const elapsed = currentTime - startTime;
-                            
-                            if (elapsed < stopDuration) {
-                                const progress = elapsed / stopDuration;
-                                const easeOut = 1 - Math.pow(1 - progress, 3);
-                                
-                                const currentPos = (reel.position + easeOut * (reel.targetPosition - reel.position + 9)) % 9;
-                                reel.element.style.top = `-${currentPos * 100}px`;
-                                requestAnimationFrame(animateStop);
-                            } else {
-                                // Финальная позиция
-                                reel.position = reel.targetPosition;
-                                reel.element.style.top = `-${reel.position * 100}px`;
-                                reel.spinning = false;
-                                resolve();
-                            }
-                        }
-                        
-                        animateStop();
-                    }, delay);
+                    }, startDelay);
                 });
             }
             
@@ -303,38 +287,14 @@
                 isSpinning = true;
                 spinButton.disabled = true;
                 
-                // Перемешиваем последовательности фруктов для каждого барабана
-                for (let i = 0; i < 5; i++) {
-                    const shuffledFruits = shuffleArray(allFruits);
-                    reels[i].fruits = shuffledFruits;
-                    
-                    // Обновляем отображаемые фрукты
-                    const reelItems = reels[i].element;
-                    for (let j = 0; j < 9; j++) {
-                        reelItems.children[j].textContent = shuffledFruits[j];
-                    }
-                    for (let j = 0; j < 3; j++) {
-                        reelItems.children[j + 9].textContent = shuffledFruits[j];
-                    }
-                }
-                
-                // Запускаем вращение всех барабанов с задержкой 200ms между ними
+                // Запускаем вращение всех барабанов с задержкой 100ms между ними
                 const spinPromises = [];
                 for (let i = 0; i < 5; i++) {
-                    spinPromises.push(spinReel(i, i * 200));
+                    spinPromises.push(spinReel(i, i * 100, i * 100));
                 }
                 
-                // Ждем начала вращения всех барабанов
+                // Ждем завершения всех анимаций
                 await Promise.all(spinPromises);
-                
-                // Останавливаем барабаны с задержкой 200ms между ними
-                const stopPromises = [];
-                for (let i = 0; i < 5; i++) {
-                    stopPromises.push(stopReel(i, i * 200));
-                }
-                
-                // Ждем остановки всех барабанов
-                await Promise.all(stopPromises);
                 
                 isSpinning = false;
                 spinButton.disabled = false;
