@@ -1,322 +1,448 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Фруктовый игровой автомат</title>
+    <title>🎰 Fruit Slots</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        * { 
+            margin: 0; 
+            padding: 0; 
+            box-sizing: border-box; 
         }
-
+        
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #0a192f 0%, #0f2a4a 100%);
-            color: #e0e0e0;
+            background: #000;
             min-height: 100vh;
             display: flex;
-            flex-direction: column;
             align-items: center;
             justify-content: center;
             padding: 20px;
+            font-family: Arial, sans-serif;
         }
-
-        .container {
-            max-width: 800px;
+        
+        .game-container {
+            background: #1a1a1a;
+            border: 3px solid #333;
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 500px;
             width: 100%;
             text-align: center;
         }
-
-        h1 {
-            font-size: 2.5rem;
-            margin-bottom: 20px;
-            color: #64ffda;
-            text-shadow: 0 0 10px rgba(100, 255, 218, 0.5);
+        
+        .slots-machine {
+            background: #2d2d2d;
+            border: 2px solid #444;
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+            position: relative;
+            overflow: hidden;
         }
-
-        .slot-machine {
-            background: linear-gradient(145deg, #112240, #0a192f);
-            border-radius: 20px;
-            padding: 30px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-            margin-bottom: 30px;
-            border: 1px solid #233554;
-        }
-
+        
         .reels-container {
             display: flex;
             justify-content: center;
-            gap: 15px;
+            gap: 5px;
             margin-bottom: 30px;
         }
-
+        
         .reel {
-            width: 100px;
-            height: 300px;
-            background: #0a192f;
-            border-radius: 15px;
+            width: 60px;
+            height: 180px;
+            background: #000;
+            border: 1px solid rgba(85, 85, 85, 0.3);
+            border-radius: 8px;
             overflow: hidden;
             position: relative;
-            border: 2px solid #64ffda;
-            box-shadow: 0 0 15px rgba(100, 255, 218, 0.3);
         }
-
-        .reel-items {
+        
+        .reel-content {
             position: absolute;
+            width: 100%;
             top: 0;
             left: 0;
-            width: 100%;
-            transition: top 0.1s ease-out;
         }
-
-        .reel-item {
-            height: 100px;
+        
+        .symbol {
+            width: 60px;
+            height: 60px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 50px;
-            border-bottom: 1px solid #233554;
+            font-size: 30px;
+            background: #000;
         }
-
-        .reel-item:last-child {
-            border-bottom: none;
+        
+        .visible-symbols {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin: 20px 0;
         }
-
-        .spin-button {
-            background: linear-gradient(145deg, #64ffda, #52d4b4);
-            color: #0a192f;
+        
+        .visible-symbol {
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            background: #333;
+            border-radius: 8px;
+            border: 1px solid rgba(85, 85, 85, 0.5);
+        }
+        
+        .spin-btn {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            color: white;
             border: none;
-            border-radius: 50px;
-            padding: 15px 50px;
-            font-size: 1.5rem;
+            padding: 15px 40px;
+            border-radius: 25px;
+            font-size: 18px;
             font-weight: bold;
             cursor: pointer;
+            margin: 10px 0;
+            width: 200px;
             transition: all 0.3s ease;
-            box-shadow: 0 5px 15px rgba(100, 255, 218, 0.4);
-            margin-top: 10px;
         }
-
-        .spin-button:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 20px rgba(100, 255, 218, 0.6);
+        
+        .spin-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 107, 107, 0.4);
         }
-
-        .spin-button:active {
-            transform: translateY(1px);
+        
+        .spin-btn:active {
+            transform: translateY(0);
         }
-
-        .spin-button:disabled {
-            background: #4a5568;
+        
+        .spin-btn:disabled {
+            background: #666;
             cursor: not-allowed;
             transform: none;
-            box-shadow: none;
         }
-
-        .win-message {
-            margin-top: 20px;
-            font-size: 1.2rem;
-            min-height: 30px;
-            color: #64ffda;
+        
+        .stats-btn {
+            background: #444;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 15px;
+            font-size: 14px;
+            cursor: pointer;
+            margin: 5px;
         }
-
-        @keyframes glow {
-            0% { box-shadow: 0 0 5px rgba(100, 255, 218, 0.5); }
-            50% { box-shadow: 0 0 20px rgba(100, 255, 218, 0.8); }
-            100% { box-shadow: 0 0 5px rgba(100, 255, 218, 0.5); }
+        
+        .screen {
+            display: none;
         }
-
-        .winning-reel {
-            animation: glow 1s infinite;
+        
+        .screen.active {
+            display: block;
+            animation: fadeIn 0.5s ease-in;
         }
-
-        @media (max-width: 600px) {
-            .reel {
-                width: 70px;
-                height: 210px;
-            }
-            
-            .reel-item {
-                height: 70px;
-                font-size: 35px;
-            }
-            
-            h1 {
-                font-size: 2rem;
-            }
-            
-            .spin-button {
-                padding: 12px 40px;
-                font-size: 1.2rem;
-            }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .stats-container {
+            background: #2d2d2d;
+            padding: 20px;
+            border-radius: 15px;
+            margin: 20px 0;
+            max-height: 400px;
+            overflow-y: auto;
+            text-align: left;
+        }
+        
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #444;
+            color: white;
+        }
+        
+        .stat-item:last-child {
+            border-bottom: none;
+        }
+        
+        h1 {
+            color: white;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+        
+        .subtitle {
+            color: #888;
+            margin-bottom: 20px;
+        }
+        
+        .reel-divider {
+            width: 1px;
+            height: 180px;
+            background: rgba(85, 85, 85, 0.2);
+            margin: 0 2px;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>🍒 ФРУКТОВЫЙ АВТОМАТ 🍒</h1>
-        
-        <div class="slot-machine">
-            <div class="reels-container" id="reelsContainer">
-                <!-- Барабаны будут созданы через JavaScript -->
+    <div class="game-container">
+        <!-- Главный экран -->
+        <div id="mainScreen" class="screen active">
+            <h1>🎰 Fruit Slots</h1>
+            <p class="subtitle">5 барабанов • 9 фруктов</p>
+            
+            <div class="slots-machine">
+                <div class="reels-container" id="reelsContainer">
+                    <!-- 5 барабанов будут созданы через JS -->
+                </div>
+                
+                <div class="visible-symbols" id="visibleSymbols">
+                    <!-- Видимые символы будут здесь -->
+                </div>
             </div>
             
-            <button class="spin-button" id="spinButton">КРУТИТЬ</button>
-            <div class="win-message" id="winMessage"></div>
+            <button class="spin-btn" onclick="startSpin()" id="spinBtn">
+                🎰 КРУТИТЬ
+            </button>
+            
+            <button class="stats-btn" onclick="showStats()">
+                📊 Статистика
+            </button>
+        </div>
+        
+        <!-- Экран статистики -->
+        <div id="statsScreen" class="screen">
+            <h1>📊 Статистика</h1>
+            
+            <div class="stats-container" id="statsList">
+                <!-- Статистика будет здесь -->
+            </div>
+            
+            <button class="spin-btn" onclick="backToMain()">
+                🔙 Назад
+            </button>
         </div>
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Эмодзи фруктов и ягод
-            const fruits = ['🍒', '🍋', '🍊', '🍇', '🍓', '🍑', '🍍', '🥭', '🍎'];
+        let tg = window.Telegram.WebApp;
+        tg.expand();
+        
+        // Фрукты для слотов
+        const symbols = ['🍋', '🍌', '🍉', '🍇', '🍓', '🫐', '🍍', '🥥', '🥝'];
+        let statistics = {};
+        let totalSpins = 0;
+        let isSpinning = false;
+        
+        // Инициализация
+        function init() {
+            // Создаем статистику
+            symbols.forEach(symbol => {
+                statistics[symbol] = 0;
+            });
             
+            // Создаем 5 барабанов
+            createReels();
+            // Показываем начальные символы
+            updateVisibleSymbols();
+        }
+        
+        // Создание барабанов
+        function createReels() {
             const reelsContainer = document.getElementById('reelsContainer');
-            const spinButton = document.getElementById('spinButton');
-            const winMessage = document.getElementById('winMessage');
+            reelsContainer.innerHTML = '';
             
-            let isSpinning = false;
-            let reels = [];
-            
-            // Создаем барабаны
-            function createReels() {
-                reelsContainer.innerHTML = '';
-                reels = [];
+            for (let i = 0; i < 5; i++) {
+                const reel = document.createElement('div');
+                reel.className = 'reel';
                 
-                for (let i = 0; i < 5; i++) {
-                    const reel = document.createElement('div');
-                    reel.className = 'reel';
+                // Создаем случайную последовательность символов
+                let reelContent = '';
+                for (let j = 0; j < 10; j++) { // Меньше символов для плавной анимации
+                    const randomSymbol = symbols[Math.floor(Math.random() * symbols.length)];
+                    reelContent += `<div class="symbol">${randomSymbol}</div>`;
+                }
+                
+                reel.innerHTML = `
+                    <div class="reel-content" id="reel${i}">
+                        ${reelContent}
+                    </div>
+                `;
+                reelsContainer.appendChild(reel);
+                
+                // Добавляем прозрачный разделитель между барабанами (кроме последнего)
+                if (i < 4) {
+                    const divider = document.createElement('div');
+                    divider.className = 'reel-divider';
+                    reelsContainer.appendChild(divider);
+                }
+            }
+        }
+        
+        // Обновление видимых символов
+        function updateVisibleSymbols() {
+            const visibleSymbols = document.getElementById('visibleSymbols');
+            visibleSymbols.innerHTML = '';
+            
+            for (let i = 0; i < 5; i++) {
+                const symbol = document.createElement('div');
+                symbol.className = 'visible-symbol';
+                symbol.id = `visibleSymbol${i}`;
+                symbol.textContent = symbols[Math.floor(Math.random() * symbols.length)];
+                visibleSymbols.appendChild(symbol);
+            }
+        }
+        
+        // Запуск вращения
+        function startSpin() {
+            if (isSpinning) return;
+            
+            isSpinning = true;
+            document.getElementById('spinBtn').disabled = true;
+            totalSpins++;
+            
+            // Сначала все барабаны показывают начальные символы
+            updateVisibleSymbols();
+            
+            // Запускаем анимацию для каждого барабана с задержкой
+            const spinPromises = [];
+            for (let i = 0; i < 5; i++) {
+                spinPromises.push(new Promise(resolve => {
+                    setTimeout(() => {
+                        spinReel(i, resolve);
+                    }, i * 400); // Задержка 400мс между запуском барабанов
+                }));
+            }
+            
+            // Когда все барабаны остановились
+            Promise.all(spinPromises).then(() => {
+                isSpinning = false;
+                document.getElementById('spinBtn').disabled = false;
+                updateStatistics();
+            });
+        }
+        
+        // Вращение одного барабана
+        function spinReel(reelIndex, onComplete) {
+            const reel = document.getElementById(`reel${reelIndex}`);
+            const visibleSymbol = document.getElementById(`visibleSymbol${reelIndex}`);
+            
+            // Длительность вращения (3 секунды)
+            const spinDuration = 3000;
+            // Замедление начинается через 2 секунды
+            const slowdownStart = 2000;
+            // Общее количество прокруток
+            const totalSpins = 20;
+            
+            let startTime = null;
+            let finalSymbol = symbols[Math.floor(Math.random() * symbols.length)];
+            
+            function animate(time) {
+                if (!startTime) startTime = time;
+                const elapsed = time - startTime;
+                
+                if (elapsed < spinDuration) {
+                    let progress;
                     
-                    const reelItems = document.createElement('div');
-                    reelItems.className = 'reel-items';
-                    reelItems.id = `reel${i}`;
-                    
-                    // Создаем 9 элементов в каждом барабане
-                    for (let j = 0; j < 9; j++) {
-                        const reelItem = document.createElement('div');
-                        reelItem.className = 'reel-item';
-                        reelItem.textContent = fruits[j];
-                        reelItems.appendChild(reelItem);
+                    if (elapsed < slowdownStart) {
+                        // Быстрое вращение
+                        progress = (elapsed / slowdownStart) * 0.8;
+                    } else {
+                        // Замедление
+                        const slowdownProgress = (elapsed - slowdownStart) / (spinDuration - slowdownStart);
+                        progress = 0.8 + (slowdownProgress * 0.2);
                     }
                     
-                    reel.appendChild(reelItems);
-                    reelsContainer.appendChild(reel);
-                    reels.push({
-                        element: reelItems,
-                        position: 0,
-                        spinning: false
-                    });
-                }
-            }
-            
-            // Функция вращения барабана
-            function spinReel(reelIndex, delay) {
-                return new Promise(resolve => {
-                    setTimeout(() => {
-                        const reel = reels[reelIndex];
-                        reel.spinning = true;
-                        
-                        // Анимация быстрого вращения
-                        let spinCount = 0;
-                        const maxSpins = 30 + Math.floor(Math.random() * 20);
-                        
-                        const spinInterval = setInterval(() => {
-                            reel.position = (reel.position + 1) % 9;
-                            reel.element.style.top = `-${reel.position * 100}px`;
-                            
-                            spinCount++;
-                            if (spinCount >= maxSpins) {
-                                clearInterval(spinInterval);
-                                
-                                // Медленная остановка
-                                let slowSpins = 0;
-                                const maxSlowSpins = 3 + Math.floor(Math.random() * 3);
-                                
-                                const slowInterval = setInterval(() => {
-                                    reel.position = (reel.position + 1) % 9;
-                                    reel.element.style.top = `-${reel.position * 100}px`;
-                                    
-                                    slowSpins++;
-                                    if (slowSpins >= maxSlowSpins) {
-                                        clearInterval(slowInterval);
-                                        reel.spinning = false;
-                                        resolve();
-                                    }
-                                }, 300);
-                            }
-                        }, 50);
-                    }, delay);
-                });
-            }
-            
-            // Основная функция вращения
-            async function spinAllReels() {
-                if (isSpinning) return;
-                
-                isSpinning = true;
-                spinButton.disabled = true;
-                winMessage.textContent = '';
-                
-                // Убираем подсветку выигрышных барабанов
-                document.querySelectorAll('.reel').forEach(reel => {
-                    reel.classList.remove('winning-reel');
-                });
-                
-                // Запускаем вращение барабанов с задержкой
-                await spinReel(0, 0);
-                await spinReel(1, 200);
-                await spinReel(2, 400);
-                await spinReel(3, 600);
-                await spinReel(4, 800);
-                
-                // Проверяем результат
-                checkResult();
-                
-                isSpinning = false;
-                spinButton.disabled = false;
-            }
-            
-            // Проверка результата
-            function checkResult() {
-                const result = [];
-                
-                // Получаем средние символы каждого барабана
-                for (let i = 0; i < 5; i++) {
-                    const middleIndex = (reels[i].position + 1) % 9;
-                    result.push(fruits[middleIndex]);
-                }
-                
-                // Проверяем, есть ли совпадения
-                const counts = {};
-                result.forEach(fruit => {
-                    counts[fruit] = (counts[fruit] || 0) + 1;
-                });
-                
-                // Находим максимальное количество совпадений
-                const maxCount = Math.max(...Object.values(counts));
-                
-                if (maxCount >= 3) {
-                    winMessage.textContent = `Поздравляем! У вас ${maxCount} одинаковых символа!`;
+                    // Плавное движение с easing
+                    const easedProgress = 1 - Math.pow(1 - progress, 3);
+                    const translateY = -easedProgress * totalSpins * 60;
+                    reel.style.transform = `translateY(${translateY}px)`;
                     
-                    // Подсвечиваем выигрышные барабаны
-                    document.querySelectorAll('.reel').forEach((reel, index) => {
-                        const fruit = result[index];
-                        if (counts[fruit] >= 3) {
-                            reel.classList.add('winning-reel');
-                        }
-                    });
+                    requestAnimationFrame(animate);
                 } else {
-                    winMessage.textContent = 'Попробуйте ещё раз!';
+                    // Завершение вращения
+                    reel.style.transform = 'translateY(0)';
+                    visibleSymbol.textContent = finalSymbol;
+                    
+                    // Плавное обновление содержимого барабана
+                    setTimeout(() => {
+                        updateReelContent(reelIndex);
+                        onComplete();
+                    }, 100);
                 }
             }
             
-            // Инициализация
-            createReels();
+            requestAnimationFrame(animate);
+        }
+        
+        // Обновление содержимого барабана
+        function updateReelContent(reelIndex) {
+            const reel = document.getElementById(`reel${reelIndex}`);
             
-            // Обработчик кнопки
-            spinButton.addEventListener('click', spinAllReels);
-        });
+            // Создаем новую случайную последовательность
+            let newContent = '';
+            for (let j = 0; j < 10; j++) {
+                const randomSymbol = symbols[Math.floor(Math.random() * symbols.length)];
+                newContent += `<div class="symbol">${randomSymbol}</div>`;
+            }
+            
+            reel.innerHTML = newContent;
+        }
+        
+        // Обновление статистики
+        function updateStatistics() {
+            const visibleSymbols = document.getElementById('visibleSymbols');
+            const symbolsArray = Array.from(visibleSymbols.children).map(child => child.textContent);
+            
+            symbolsArray.forEach(symbol => {
+                statistics[symbol]++;
+            });
+        }
+        
+        // Показать статистику
+        function showStats() {
+            document.getElementById('mainScreen').classList.remove('active');
+            document.getElementById('statsScreen').classList.add('active');
+            
+            const statsList = document.getElementById('statsList');
+            let statsHTML = '';
+            
+            const sortedStats = Object.entries(statistics)
+                .filter(([_, count]) => count > 0)
+                .sort((a, b) => b[1] - a[1]);
+            
+            if (sortedStats.length === 0) {
+                statsHTML = '<div class="stat-item" style="color: #888; text-align: center;">Еще не было кручений</div>';
+            } else {
+                sortedStats.forEach(([symbol, count]) => {
+                    const percentage = totalSpins > 0 ? ((count / totalSpins) * 100).toFixed(1) : 0;
+                    statsHTML += `
+                        <div class="stat-item">
+                            <span>${symbol}</span>
+                            <span>${count} (${percentage}%)</span>
+                        </div>
+                    `;
+                });
+            }
+            
+            statsList.innerHTML = statsHTML;
+        }
+        
+        // Вернуться в главное меню
+        function backToMain() {
+            document.getElementById('statsScreen').classList.remove('active');
+            document.getElementById('mainScreen').classList.add('active');
+        }
+        
+        // Инициализация при загрузке
+        document.addEventListener('DOMContentLoaded', init);
     </script>
 </body>
 </html>
