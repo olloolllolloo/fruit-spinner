@@ -215,7 +215,7 @@
             }
             
             // Функция вращения барабана
-            function spinReel(reelIndex, startDelay, stopDelay) {
+            function spinReel(reelIndex, startDelay) {
                 return new Promise(resolve => {
                     setTimeout(() => {
                         const reel = reels[reelIndex];
@@ -226,8 +226,8 @@
                         reel.targetPosition = randomStop;
                         
                         const startTime = Date.now();
-                        const fastDuration = 3000; // 3 секунды быстрого вращения
-                        const totalDuration = 4000; // 4 секунды общее время
+                        const fastDuration = 1500; // 1.5 секунды быстрого вращения
+                        const totalDuration = 2000; // 2 секунды общее время
                         
                         function animate() {
                             const currentTime = Date.now();
@@ -260,7 +260,10 @@
                             }
                         }
                         
-                        // Случайно перемешиваем фрукты в процессе быстрого вращения
+                        // Запускаем анимацию
+                        animate();
+                        
+                        // Случайно перемешиваем фрукты через 0.2 секунды после начала вращения
                         setTimeout(() => {
                             const shuffledFruits = shuffleArray(allFruits);
                             reel.fruits = shuffledFruits;
@@ -273,9 +276,8 @@
                             for (let j = 0; j < 3; j++) {
                                 reelItems.children[j + 9].textContent = shuffledFruits[j];
                             }
-                        }, 500); // Рандомизация через 0.5 секунды после начала
+                        }, 200);
                         
-                        animate();
                     }, startDelay);
                 });
             }
@@ -290,7 +292,7 @@
                 // Запускаем вращение всех барабанов с задержкой 100ms между ними
                 const spinPromises = [];
                 for (let i = 0; i < 5; i++) {
-                    spinPromises.push(spinReel(i, i * 100, i * 100));
+                    spinPromises.push(spinReel(i, i * 100));
                 }
                 
                 // Ждем завершения всех анимаций
