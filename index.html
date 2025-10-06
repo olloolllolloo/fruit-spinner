@@ -45,7 +45,7 @@
         .reels-container {
             display: flex;
             justify-content: center;
-            gap: 10px;
+            gap: 5px;
             margin-bottom: 30px;
         }
         
@@ -53,8 +53,8 @@
             width: 60px;
             height: 180px;
             background: #000;
-            border: 2px solid #555;
-            border-radius: 10px;
+            border: 1px solid rgba(85, 85, 85, 0.3); /* Прозрачная рамка */
+            border-radius: 8px;
             overflow: hidden;
             position: relative;
         }
@@ -78,7 +78,7 @@
         .visible-symbols {
             display: flex;
             justify-content: center;
-            gap: 10px;
+            gap: 8px;
             margin: 20px 0;
         }
         
@@ -90,8 +90,8 @@
             justify-content: center;
             font-size: 24px;
             background: #333;
-            border-radius: 10px;
-            border: 2px solid #555;
+            border-radius: 8px;
+            border: 1px solid rgba(85, 85, 85, 0.5);
         }
         
         .spin-btn {
@@ -181,6 +181,14 @@
             color: #888;
             margin-bottom: 20px;
         }
+        
+        /* Границы для визуального разделения барабанов */
+        .reel-divider {
+            width: 1px;
+            height: 180px;
+            background: rgba(85, 85, 85, 0.2);
+            margin: 0 2px;
+        }
     </style>
 </head>
 <body>
@@ -254,14 +262,27 @@
             for (let i = 0; i < 5; i++) {
                 const reel = document.createElement('div');
                 reel.className = 'reel';
+                
+                // Создаем случайную последовательность символов
+                let reelContent = '';
+                for (let j = 0; j < 20; j++) {
+                    const randomSymbol = symbols[Math.floor(Math.random() * symbols.length)];
+                    reelContent += `<div class="symbol">${randomSymbol}</div>`;
+                }
+                
                 reel.innerHTML = `
                     <div class="reel-content" id="reel${i}">
-                        ${Array(20).fill(0).map(() => 
-                            `<div class="symbol">${symbols[Math.floor(Math.random() * symbols.length)]}</div>`
-                        ).join('')}
+                        ${reelContent}
                     </div>
                 `;
                 reelsContainer.appendChild(reel);
+                
+                // Добавляем прозрачный разделитель между барабанами (кроме последнего)
+                if (i < 4) {
+                    const divider = document.createElement('div');
+                    divider.className = 'reel-divider';
+                    reelsContainer.appendChild(divider);
+                }
             }
         }
         
@@ -338,13 +359,15 @@
         // Обновление содержимого барабана
         function updateReelContent(reelIndex) {
             const reel = document.getElementById(`reel${reelIndex}`);
-            reel.innerHTML = `
-                <div class="reel-content">
-                    ${Array(20).fill(0).map(() => 
-                        `<div class="symbol">${symbols[Math.floor(Math.random() * symbols.length)]}</div>`
-                    ).join('')}
-                </div>
-            `;
+            
+            // Создаем новую случайную последовательность
+            let newContent = '';
+            for (let j = 0; j < 20; j++) {
+                const randomSymbol = symbols[Math.floor(Math.random() * symbols.length)];
+                newContent += `<div class="symbol">${randomSymbol}</div>`;
+            }
+            
+            reel.innerHTML = newContent;
         }
         
         // Обновление статистики
