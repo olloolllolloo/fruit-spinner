@@ -221,19 +221,23 @@
                         reel.targetPosition = randomStop;
                         
                         const startTime = Date.now();
-                        const fastDuration = 800;
+                        const fastDuration = 800; // фаза быстрого вращения
                         const totalDuration = 2500;
-                        
-                        // РАНДОМИЗАЦИЯ СРАЗУ ПРИ СТАРТЕ - ДО НАЧАЛА АНИМАЦИИ
-                        randomizeReelFruits(reelIndex);
-                        
+                        let randomized = false; // флаг, чтобы рандомизировать только один раз
+
                         function animate() {
                             const currentTime = Date.now();
                             const elapsed = currentTime - startTime;
                             
                             if (elapsed < totalDuration) {
+                                // === РАНДОМИЗАЦИЯ В МОМЕНТ МАКСИМАЛЬНОЙ СКОРОСТИ ===
+                                if (!randomized && elapsed >= 400 && elapsed < fastDuration) {
+                                    // Примерно в середине быстрой фазы — идеальный момент
+                                    randomizeReelFruits(reelIndex);
+                                    randomized = true;
+                                }
+
                                 let speed;
-                                
                                 if (elapsed < fastDuration) {
                                     speed = 0.8;
                                 } else {
