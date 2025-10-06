@@ -226,8 +226,8 @@
                         reel.targetPosition = randomStop;
                         
                         const startTime = Date.now();
-                        const fastDuration = 1500; // 1.5 секунды быстрого вращения
-                        const totalDuration = 2000; // 2 секунды общее время
+                        const fastDuration = 800; // 0.8 секунды быстрого вращения
+                        const totalDuration = 1200; // 1.2 секунды общее время
                         
                         function animate() {
                             const currentTime = Date.now();
@@ -238,12 +238,12 @@
                                 
                                 if (elapsed < fastDuration) {
                                     // Быстрое вращение - линейная скорость
-                                    speed = 0.4;
+                                    speed = 0.5;
                                 } else {
                                     // Замедление - плавное уменьшение скорости
                                     const slowProgress = (elapsed - fastDuration) / (totalDuration - fastDuration);
-                                    const easeOut = 1 - Math.pow(1 - slowProgress, 3);
-                                    speed = 0.4 * (1 - easeOut);
+                                    const easeOut = 1 - Math.pow(1 - slowProgress, 2);
+                                    speed = 0.5 * (1 - easeOut);
                                 }
                                 
                                 reel.position = (reel.position + speed) % 9;
@@ -263,23 +263,26 @@
                         // Запускаем анимацию
                         animate();
                         
-                        // Случайно перемешиваем фрукты через 0.2 секунды после начала вращения
-                        setTimeout(() => {
-                            const shuffledFruits = shuffleArray(allFruits);
-                            reel.fruits = shuffledFruits;
-                            
-                            // Обновляем отображаемые фрукты
-                            const reelItems = reel.element;
-                            for (let j = 0; j < 9; j++) {
-                                reelItems.children[j].textContent = shuffledFruits[j];
-                            }
-                            for (let j = 0; j < 3; j++) {
-                                reelItems.children[j + 9].textContent = shuffledFruits[j];
-                            }
-                        }, 200);
-                        
                     }, startDelay);
                 });
+            }
+            
+            // Функция для мгновенной замены всех фруктов
+            function randomizeAllFruits() {
+                for (let i = 0; i < 5; i++) {
+                    const reel = reels[i];
+                    const shuffledFruits = shuffleArray(allFruits);
+                    reel.fruits = shuffledFruits;
+                    
+                    // Обновляем отображаемые фрукты
+                    const reelItems = reel.element;
+                    for (let j = 0; j < 9; j++) {
+                        reelItems.children[j].textContent = shuffledFruits[j];
+                    }
+                    for (let j = 0; j < 3; j++) {
+                        reelItems.children[j + 9].textContent = shuffledFruits[j];
+                    }
+                }
             }
             
             // Основная функция вращения
@@ -289,11 +292,16 @@
                 isSpinning = true;
                 spinButton.disabled = true;
                 
-                // Запускаем вращение всех барабанов с задержкой 100ms между ними
+                // Запускаем вращение всех барабанов с задержкой 300ms между ними
                 const spinPromises = [];
                 for (let i = 0; i < 5; i++) {
-                    spinPromises.push(spinReel(i, i * 100));
+                    spinPromises.push(spinReel(i, i * 300));
                 }
+                
+                // Мгновенно заменяем все фрукты, когда начинает крутиться последнее колесо
+                setTimeout(() => {
+                    randomizeAllFruits();
+                }, 4 * 300 + 10); // 4 колеса * 300ms + 10ms микроскопическая задержка
                 
                 // Ждем завершения всех анимаций
                 await Promise.all(spinPromises);
