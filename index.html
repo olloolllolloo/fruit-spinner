@@ -3,285 +3,836 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Фруктовый игровой автомат</title>
+    <title>Trade Bot - Веб-версия</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        :root {
+            --primary: #ff9a76;
+            --primary-dark: #e68a66;
+            --secondary: #6a89cc;
+            --accent: #fad390;
+            --light: #fff9e6;
+            --dark: #4a4a4a;
+            --success: #78e08f;
+            --warning: #f6b93b;
+            --danger: #e55039;
+            --gray: #dfe6e9;
+            --shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #0a192f 0%, #0f2a4a 100%);
-            color: #e0e0e0;
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            color: var(--dark);
             min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
             padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
 
         .container {
-            max-width: 800px;
             width: 100%;
-            text-align: center;
-        }
-
-        h1 {
-            font-size: 2.5rem;
-            margin-bottom: 20px;
-            color: #64ffda;
-            text-shadow: 0 0 10px rgba(100, 255, 218, 0.5);
-        }
-
-        .slot-machine {
-            background: linear-gradient(145deg, #2d3748, #4a5568);
+            max-width: 400px;
+            background-color: white;
             border-radius: 20px;
-            padding: 30px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-            margin-bottom: 30px;
-            border: 2px solid #a0aec0;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            animation: fadeIn 0.5s ease;
         }
 
-        .reels-container {
-            display: flex;
-            justify-content: center;
-            gap: 0;
-            margin-bottom: 30px;
-            background: rgba(74, 85, 104, 0.7);
-            border-radius: 15px;
-            padding: 15px;
-            position: relative;
-            overflow: hidden;
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
-        .reel {
-            width: 100px;
-            height: 300px;
-            overflow: hidden;
+        .header {
+            background: linear-gradient(to right, var(--primary), var(--primary-dark));
+            color: white;
+            padding: 20px;
+            text-align: center;
             position: relative;
         }
 
-        .reel:not(:last-child) {
-            border-right: 1px solid #718096;
+        .header h1 {
+            font-size: 1.5rem;
+            margin-bottom: 5px;
         }
 
-        .reel-items {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
+        .header p {
+            font-size: 0.9rem;
+            opacity: 0.9;
         }
 
-        .reel-item {
-            height: 100px;
+        .avatar {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background-color: var(--accent);
+            margin: 0 auto 15px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 50px;
+            font-size: 1.8rem;
+            color: var(--primary-dark);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
         }
 
-        .spin-button {
-            background: linear-gradient(145deg, #64ffda, #52d4b4);
-            color: #0a192f;
-            border: none;
-            border-radius: 50px;
-            padding: 15px 50px;
-            font-size: 1.5rem;
-            font-weight: bold;
+        .tabs {
+            display: flex;
+            background-color: var(--light);
+            border-bottom: 1px solid var(--gray);
+        }
+
+        .tab {
+            flex: 1;
+            text-align: center;
+            padding: 15px 0;
             cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 5px 15px rgba(100, 255, 218, 0.4);
-            margin-top: 10px;
+            transition: var(--transition);
+            font-weight: 600;
+            color: var(--dark);
+            position: relative;
         }
 
-        .spin-button:hover {
+        .tab.active {
+            color: var(--primary);
+        }
+
+        .tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background-color: var(--primary);
+        }
+
+        .tab:hover {
+            background-color: rgba(255, 154, 118, 0.1);
+        }
+
+        .content {
+            padding: 20px;
+            min-height: 400px;
+            overflow-y: auto;
+            max-height: 500px;
+        }
+
+        .section {
+            display: none;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(10px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        .card {
+            background-color: white;
+            border-radius: 15px;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            border: 1px solid var(--gray);
+            transition: var(--transition);
+        }
+
+        .card:hover {
             transform: translateY(-3px);
-            box-shadow: 0 8px 20px rgba(100, 255, 218, 0.6);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
         }
 
-        .spin-button:active {
-            transform: translateY(1px);
+        .card-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: var(--primary-dark);
+            display: flex;
+            align-items: center;
         }
 
-        .spin-button:disabled {
-            background: #4a5568;
+        .card-title i {
+            margin-right: 10px;
+        }
+
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 12px 15px;
+            border: none;
+            border-radius: 10px;
+            background: linear-gradient(to right, var(--primary), var(--primary-dark));
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            text-align: center;
+            margin-top: 10px;
+            box-shadow: 0 4px 10px rgba(255, 154, 118, 0.3);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(255, 154, 118, 0.4);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(to right, var(--secondary), #5a79bc);
+            box-shadow: 0 4px 10px rgba(106, 137, 204, 0.3);
+        }
+
+        .btn-secondary:hover {
+            box-shadow: 0 6px 15px rgba(106, 137, 204, 0.4);
+        }
+
+        .btn-success {
+            background: linear-gradient(to right, var(--success), #67d17e);
+            box-shadow: 0 4px 10px rgba(120, 224, 143, 0.3);
+        }
+
+        .btn-warning {
+            background: linear-gradient(to right, var(--warning), #e5a732);
+            box-shadow: 0 4px 10px rgba(246, 185, 59, 0.3);
+        }
+
+        .btn-danger {
+            background: linear-gradient(to right, var(--danger), #d44832);
+            box-shadow: 0 4px 10px rgba(229, 80, 57, 0.3);
+        }
+
+        .profile-info {
+            margin-bottom: 20px;
+        }
+
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--gray);
+        }
+
+        .info-item:last-child {
+            border-bottom: none;
+        }
+
+        .info-label {
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .info-value {
+            color: var(--primary-dark);
+        }
+
+        .trade-item {
+            display: flex;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--gray);
+        }
+
+        .trade-item:last-child {
+            border-bottom: none;
+        }
+
+        .trade-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            background-color: var(--accent);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            color: var(--primary-dark);
+        }
+
+        .trade-details {
+            flex: 1;
+        }
+
+        .trade-title {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .trade-description {
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .notification {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: white;
+            padding: 15px 20px;
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+            display: flex;
+            align-items: center;
+            z-index: 1000;
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateX(-50%) translateY(20px); }
+            to { opacity: 1; transform: translateX(-50%) translateY(0); }
+        }
+
+        .notification.hide {
+            animation: slideDown 0.3s ease forwards;
+        }
+
+        @keyframes slideDown {
+            from { opacity: 1; transform: translateX(-50%) translateY(0); }
+            to { opacity: 0; transform: translateX(-50%) translateY(20px); }
+        }
+
+        .notification-icon {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background-color: var(--success);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 10px;
+            color: white;
+        }
+
+        .notification-message {
+            flex: 1;
+        }
+
+        .search-bar {
+            display: flex;
+            margin-bottom: 15px;
+        }
+
+        .search-input {
+            flex: 1;
+            padding: 12px 15px;
+            border: 1px solid var(--gray);
+            border-radius: 10px 0 0 10px;
+            outline: none;
+            transition: var(--transition);
+        }
+
+        .search-input:focus {
+            border-color: var(--primary);
+        }
+
+        .search-btn {
+            padding: 0 15px;
+            background: linear-gradient(to right, var(--primary), var(--primary-dark));
+            color: white;
+            border: none;
+            border-radius: 0 10px 10px 0;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .search-btn:hover {
+            background: linear-gradient(to right, var(--primary-dark), #d67a5a);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 30px 0;
+            color: #888;
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            color: var(--gray);
+        }
+
+        .loader {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 154, 118, 0.3);
+            border-radius: 50%;
+            border-top-color: var(--primary);
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            margin-left: 5px;
+        }
+
+        .badge-success {
+            background-color: var(--success);
+            color: white;
+        }
+
+        .badge-warning {
+            background-color: var(--warning);
+            color: white;
+        }
+
+        .badge-danger {
+            background-color: var(--danger);
+            color: white;
+        }
+
+        .admin-badge {
+            background-color: var(--secondary);
+            color: white;
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 5px;
+        }
+
+        .status-online {
+            background-color: var(--success);
+        }
+
+        .status-offline {
+            background-color: var(--danger);
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 15px;
+        }
+
+        .pagination-btn {
+            padding: 8px 15px;
+            background-color: var(--light);
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: var(--transition);
+            color: var(--dark);
+        }
+
+        .pagination-btn:hover {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .pagination-btn:disabled {
+            opacity: 0.5;
             cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
         }
 
-        @media (max-width: 600px) {
-            .reel {
-                width: 70px;
-                height: 210px;
-            }
-            
-            .reel-item {
-                height: 70px;
-                font-size: 35px;
-            }
-            
-            h1 {
-                font-size: 2rem;
-            }
-            
-            .spin-button {
-                padding: 12px 40px;
-                font-size: 1.2rem;
-            }
+        .pagination-btn:disabled:hover {
+            background-color: var(--light);
+            color: var(--dark);
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>🎰 РОЛЛ ФРУКТА 🎰</h1>
-        
-        <div class="slot-machine">
-            <div class="reels-container" id="reelsContainer">
-                <!-- Барабаны будут созданы через JavaScript -->
+        <div class="header">
+            <div class="avatar">
+                <i class="fas fa-robot"></i>
             </div>
-            
-            <button class="spin-button" id="spinButton">КРУТИТЬ</button>
+            <h1>Trade Bot</h1>
+            <p>Торговая площадка для Roblox</p>
+        </div>
+
+        <div class="tabs">
+            <div class="tab active" data-tab="profile">
+                <i class="fas fa-user"></i> Профиль
+            </div>
+            <div class="tab" data-tab="trades">
+                <i class="fas fa-exchange-alt"></i> Обмены
+            </div>
+            <div class="tab" data-tab="sales">
+                <i class="fas fa-shopping-cart"></i> Продажи
+            </div>
+            <div class="tab" data-tab="search">
+                <i class="fas fa-search"></i> Поиск
+            </div>
+            <div class="tab" data-tab="settings">
+                <i class="fas fa-cog"></i> Настройки
+            </div>
+        </div>
+
+        <div class="content">
+            <!-- Профиль -->
+            <div class="section active" id="profile-section">
+                <div class="card">
+                    <div class="card-title">
+                        <i class="fas fa-id-card"></i> Информация профиля
+                    </div>
+                    <div class="profile-info">
+                        <div class="info-item">
+                            <span class="info-label">Внутренний ник:</span>
+                            <span class="info-value">Justazero</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Roblox аккаунт:</span>
+                            <span class="info-value">Justazero_RBLX</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Telegram:</span>
+                            <span class="info-value">@Justazero</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Статус:</span>
+                            <span class="info-value">
+                                <span class="status-indicator status-online"></span>
+                                Онлайн <span class="badge admin-badge">Админ</span>
+                            </span>
+                        </div>
+                    </div>
+                    <button class="btn btn-secondary">
+                        <i class="fas fa-edit"></i> Редактировать профиль
+                    </button>
+                </div>
+
+                <div class="card">
+                    <div class="card-title">
+                        <i class="fas fa-chart-line"></i> Статистика
+                    </div>
+                    <div class="profile-info">
+                        <div class="info-item">
+                            <span class="info-label">Активные трейды:</span>
+                            <span class="info-value">3</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Активные продажи:</span>
+                            <span class="info-value">2</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Успешные сделки:</span>
+                            <span class="info-value">12</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Рейтинг:</span>
+                            <span class="info-value">4.8/5.0</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Обмены -->
+            <div class="section" id="trades-section">
+                <div class="card">
+                    <div class="card-title">
+                        <i class="fas fa-exchange-alt"></i> Мои трейды
+                    </div>
+                    <div class="trade-item">
+                        <div class="trade-icon">
+                            <i class="fas fa-gamepad"></i>
+                        </div>
+                        <div class="trade-details">
+                            <div class="trade-title">Предметы Roblox</div>
+                            <div class="trade-description">Обменяю Dominus за несколько редких шапок</div>
+                        </div>
+                        <span class="badge badge-success">Активен</span>
+                    </div>
+                    <div class="trade-item">
+                        <div class="trade-icon">
+                            <i class="fas fa-user-shield"></i>
+                        </div>
+                        <div class="trade-details">
+                            <div class="trade-title">Буст аккаунта</div>
+                            <div class="trade-description">Прокачаю ваш аккаунт за ограниченные предметы</div>
+                        </div>
+                        <span class="badge badge-warning">На модерации</span>
+                    </div>
+                    <button class="btn">
+                        <i class="fas fa-plus"></i> Создать новый трейд
+                    </button>
+                </div>
+
+                <div class="card">
+                    <div class="card-title">
+                        <i class="fas fa-search"></i> Найти трейды
+                    </div>
+                    <div class="search-bar">
+                        <input type="text" class="search-input" placeholder="Что ищете?">
+                        <button class="search-btn">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                    <button class="btn btn-secondary">
+                        <i class="fas fa-filter"></i> Расширенный поиск
+                    </button>
+                </div>
+            </div>
+
+            <!-- Продажи -->
+            <div class="section" id="sales-section">
+                <div class="card">
+                    <div class="card-title">
+                        <i class="fas fa-shopping-cart"></i> Мои продажи
+                    </div>
+                    <div class="trade-item">
+                        <div class="trade-icon">
+                            <i class="fas fa-key"></i>
+                        </div>
+                        <div class="trade-details">
+                            <div class="trade-title">Аккаунт Roblox</div>
+                            <div class="trade-description">Продаю аккаунт с ограниченными предметами</div>
+                        </div>
+                        <span class="badge badge-success">2 500 RUB</span>
+                    </div>
+                    <div class="trade-item">
+                        <div class="trade-icon">
+                            <i class="fas fa-tools"></i>
+                        </div>
+                        <div class="trade-details">
+                            <div class="trade-title">Игровая помощь</div>
+                            <div class="trade-description">Помощь с прохождением сложных уровней</div>
+                        </div>
+                        <span class="badge badge-success">500 RUB/час</span>
+                    </div>
+                    <button class="btn">
+                        <i class="fas fa-plus"></i> Добавить продажу
+                    </button>
+                </div>
+
+                <div class="card">
+                    <div class="card-title">
+                        <i class="fas fa-search"></i> Найти продажи
+                    </div>
+                    <div class="search-bar">
+                        <input type="text" class="search-input" placeholder="Что ищете?">
+                        <button class="search-btn">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                    <button class="btn btn-secondary">
+                        <i class="fas fa-filter"></i> По категориям
+                    </button>
+                </div>
+            </div>
+
+            <!-- Поиск -->
+            <div class="section" id="search-section">
+                <div class="card">
+                    <div class="card-title">
+                        <i class="fas fa-users"></i> Поиск пользователей
+                    </div>
+                    <div class="search-bar">
+                        <input type="text" class="search-input" placeholder="Введите никнейм">
+                        <button class="search-btn">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                    <div class="empty-state">
+                        <i class="fas fa-search"></i>
+                        <p>Введите никнейм для поиска пользователей</p>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-title">
+                        <i class="fas fa-history"></i> Недавние поиски
+                    </div>
+                    <div class="trade-item">
+                        <div class="trade-icon">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <div class="trade-details">
+                            <div class="trade-title">RobloxTrader</div>
+                            <div class="trade-description">Активный трейдер, 25 сделок</div>
+                        </div>
+                    </div>
+                    <div class="trade-item">
+                        <div class="trade-icon">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <div class="trade-details">
+                            <div class="trade-title">ItemCollector</div>
+                            <div class="trade-description">Коллекционер редких предметов</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Настройки -->
+            <div class="section" id="settings-section">
+                <div class="card">
+                    <div class="card-title">
+                        <i class="fas fa-language"></i> Язык
+                    </div>
+                    <button class="btn">
+                        <i class="fas fa-globe"></i> Русский
+                    </button>
+                    <button class="btn btn-secondary">
+                        <i class="fas fa-globe"></i> English
+                    </button>
+                </div>
+
+                <div class="card">
+                    <div class="card-title">
+                        <i class="fas fa-bell"></i> Уведомления
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Сообщения</span>
+                        <span class="info-value">
+                            <input type="checkbox" checked>
+                        </span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Новые трейды</span>
+                        <span class="info-value">
+                            <input type="checkbox" checked>
+                        </span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Обновления системы</span>
+                        <span class="info-value">
+                            <input type="checkbox">
+                        </span>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-title">
+                        <i class="fas fa-shield-alt"></i> Безопасность
+                    </div>
+                    <button class="btn">
+                        <i class="fas fa-key"></i> Сменить пароль
+                    </button>
+                    <button class="btn btn-secondary">
+                        <i class="fas fa-history"></i> История входов
+                    </button>
+                </div>
+
+                <div class="card">
+                    <div class="card-title">
+                        <i class="fas fa-cogs"></i> Админ-панель
+                    </div>
+                    <button class="btn btn-warning">
+                        <i class="fas fa-user-shield"></i> Модерация
+                    </button>
+                    <button class="btn btn-secondary">
+                        <i class="fas fa-chart-bar"></i> Статистика
+                    </button>
+                    <button class="btn btn-danger">
+                        <i class="fas fa-ban"></i> Управление пользователями
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="notification" id="notification">
+        <div class="notification-icon">
+            <i class="fas fa-check"></i>
+        </div>
+        <div class="notification-message">
+            Добро пожаловать в Trade Bot!
         </div>
     </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const allFruits = ['🍒', '🍋', '🍊', '🍇', '🍓', '🍑', '🍍', '🥭', '🍎'];
-            const reelsContainer = document.getElementById('reelsContainer');
-            const spinButton = document.getElementById('spinButton');
+            // Инициализация вкладок
+            const tabs = document.querySelectorAll('.tab');
+            const sections = document.querySelectorAll('.section');
             
-            let isSpinning = false;
-            let reels = [];
-
-            function shuffleArray(array) {
-                const newArray = [...array];
-                for (let i = newArray.length - 1; i > 0; i--) {
-                    const j = Math.floor(Math.random() * (i + 1));
-                    [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
-                }
-                return newArray;
-            }
-            
-            function createReels() {
-                reelsContainer.innerHTML = '';
-                reels = [];
-                
-                for (let i = 0; i < 5; i++) {
-                    const reel = document.createElement('div');
-                    reel.className = 'reel';
+            tabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    const tabId = this.getAttribute('data-tab');
                     
-                    const reelItems = document.createElement('div');
-                    reelItems.className = 'reel-items';
-                    reelItems.id = `reel${i}`;
+                    // Убираем активный класс у всех вкладок и секций
+                    tabs.forEach(t => t.classList.remove('active'));
+                    sections.forEach(s => s.classList.remove('active'));
                     
-                    const shuffledFruits = shuffleArray(allFruits);
-                    
-                    for (let j = 0; j < 12; j++) {
-                        const reelItem = document.createElement('div');
-                        reelItem.className = 'reel-item';
-                        reelItem.textContent = shuffledFruits[j % 9];
-                        reelItems.appendChild(reelItem);
-                    }
-                    
-                    reel.appendChild(reelItems);
-                    reelsContainer.appendChild(reel);
-                    reels.push({
-                        element: reelItems,
-                        position: 0,
-                        spinning: false,
-                        targetPosition: 0,
-                        fruits: shuffledFruits,
-                        animationId: null
-                    });
-                }
-            }
-            
-            function randomizeReelFruits(reelIndex) {
-                const reel = reels[reelIndex];
-                const shuffledFruits = shuffleArray(allFruits);
-                reel.fruits = shuffledFruits;
-                
-                const reelItems = reel.element;
-                for (let j = 0; j < 12; j++) {
-                    reelItems.children[j].textContent = shuffledFruits[j % 9];
-                }
-            }
-            
-            function spinReel(reelIndex, startDelay) {
-                return new Promise(resolve => {
-                    setTimeout(() => {
-                        const reel = reels[reelIndex];
-                        reel.spinning = true;
-                        
-                        const randomStop = Math.floor(Math.random() * 9);
-                        reel.targetPosition = randomStop;
-                        
-                        const startTime = Date.now();
-                        const fastDuration = 800; // фаза быстрого вращения
-                        const totalDuration = 2500;
-                        let randomized = false; // флаг, чтобы рандомизировать только один раз
-
-                        function animate() {
-                            const currentTime = Date.now();
-                            const elapsed = currentTime - startTime;
-                            
-                            if (elapsed < totalDuration) {
-                                // === РАНДОМИЗАЦИЯ В МОМЕНТ МАКСИМАЛЬНОЙ СКОРОСТИ ===
-                                if (!randomized && elapsed >= 400 && elapsed < fastDuration) {
-                                    // Примерно в середине быстрой фазы — идеальный момент
-                                    randomizeReelFruits(reelIndex);
-                                    randomized = true;
-                                }
-
-                                let speed;
-                                if (elapsed < fastDuration) {
-                                    speed = 0.8;
-                                } else {
-                                    const slowProgress = (elapsed - fastDuration) / (totalDuration - fastDuration);
-                                    const easeOut = 1 - Math.pow(1 - slowProgress, 3);
-                                    speed = 0.8 * (1 - easeOut);
-                                }
-                                
-                                reel.position = (reel.position + speed) % 9;
-                                reel.element.style.top = `-${reel.position * 100}px`;
-                                reel.animationId = requestAnimationFrame(animate);
-                            } else {
-                                cancelAnimationFrame(reel.animationId);
-                                reel.position = reel.targetPosition;
-                                reel.element.style.top = `-${reel.position * 100}px`;
-                                reel.spinning = false;
-                                resolve();
-                            }
-                        }
-                        
-                        animate();
-                    }, startDelay);
+                    // Добавляем активный класс текущей вкладке и секции
+                    this.classList.add('active');
+                    document.getElementById(`${tabId}-section`).classList.add('active');
                 });
-            }
+            });
             
-            async function spinAllReels() {
-                if (isSpinning) return;
-                
-                isSpinning = true;
-                spinButton.disabled = true;
-                
-                const spinPromises = [];
-                for (let i = 0; i < 5; i++) {
-                    spinPromises.push(spinReel(i, i * 200));
+            // Показываем уведомление при загрузке
+            setTimeout(() => {
+                const notification = document.getElementById('notification');
+                notification.classList.add('hide');
+                setTimeout(() => {
+                    notification.style.display = 'none';
+                }, 300);
+            }, 3000);
+            
+            // Анимация кнопок
+            const buttons = document.querySelectorAll('.btn');
+            buttons.forEach(button => {
+                button.addEventListener('click', function(e) {
+                    // Создаем эффект пульсации
+                    const ripple = document.createElement('span');
+                    const rect = this.getBoundingClientRect();
+                    const size = Math.max(rect.width, rect.height);
+                    const x = e.clientX - rect.left - size / 2;
+                    const y = e.clientY - rect.top - size / 2;
+                    
+                    ripple.style.width = ripple.style.height = size + 'px';
+                    ripple.style.left = x + 'px';
+                    ripple.style.top = y + 'px';
+                    ripple.classList.add('ripple');
+                    
+                    this.appendChild(ripple);
+                    
+                    setTimeout(() => {
+                        ripple.remove();
+                    }, 600);
+                });
+            });
+            
+            // Добавляем стили для эффекта пульсации
+            const style = document.createElement('style');
+            style.textContent = `
+                .ripple {
+                    position: absolute;
+                    border-radius: 50%;
+                    background-color: rgba(255, 255, 255, 0.7);
+                    transform: scale(0);
+                    animation: ripple-animation 0.6s linear;
                 }
                 
-                await Promise.all(spinPromises);
-                isSpinning = false;
-                spinButton.disabled = false;
-            }
-            
-            createReels();
-            spinButton.addEventListener('click', spinAllReels);
+                @keyframes ripple-animation {
+                    to {
+                        transform: scale(4);
+                        opacity: 0;
+                    }
+                }
+                
+                .btn {
+                    position: relative;
+                    overflow: hidden;
+                }
+            `;
+            document.head.appendChild(style);
         });
     </script>
 </body>
-</html>
+                                                         </html>
