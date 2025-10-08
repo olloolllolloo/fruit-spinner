@@ -1,332 +1,690 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>💀 EBANUTYI CASINO 💀</title>
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: 'Segoe UI', sans-serif;
-    }
-    body {
-      background: #000;
-      color: #0ff;
-      min-height: 100vh;
-      overflow-x: hidden;
-      background-image: 
-        radial-gradient(circle at 10% 20%, rgba(255,0,255,0.1) 0%, transparent 20%),
-        radial-gradient(circle at 90% 80%, rgba(0,255,255,0.1) 0%, transparent 20%);
-    }
-    .container {
-      max-width: 1000px;
-      margin: 0 auto;
-      padding: 20px;
-    }
-    header {
-      text-align: center;
-      margin: 20px 0 30px;
-      text-shadow: 0 0 15px #f0f;
-    }
-    h1 {
-      font-size: 4em;
-      background: linear-gradient(90deg, #ff00ff, #00ffff);
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
-      letter-spacing: 4px;
-      animation: titleGlow 3s infinite alternate;
-    }
-    @keyframes titleGlow {
-      0% { text-shadow: 0 0 10px #f0f; }
-      100% { text-shadow: 0 0 30px #0ff, 0 0 60px #f0f; }
-    }
-
-    .slot-machine {
-      display: flex;
-      justify-content: center;
-      gap: 10px;
-      margin: 40px 0;
-      perspective: 1000px;
-    }
-    .reel-container {
-      width: 100px;
-      height: 120px;
-      position: relative;
-      overflow: hidden;
-      border: 3px solid #f0f;
-      border-radius: 12px;
-      box-shadow: 0 0 20px rgba(255,0,255,0.5);
-      background: #050510;
-    }
-    .reel {
-      display: flex;
-      flex-direction: column;
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      transition: transform 4s cubic-bezier(0.2, 0.8, 0.4, 1);
-    }
-    .symbol {
-      height: 120px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 50px;
-      text-shadow: 0 0 10px currentColor;
-    }
-
-    #spin-btn {
-      display: block;
-      margin: 20px auto;
-      padding: 15px 40px;
-      font-size: 1.5em;
-      background: linear-gradient(45deg, #ff00ff, #00ffff);
-      color: black;
-      border: none;
-      border-radius: 50px;
-      cursor: pointer;
-      font-weight: bold;
-      box-shadow: 0 0 25px rgba(255,0,255,0.7);
-      transition: all 0.2s;
-    }
-    #spin-btn:hover {
-      transform: scale(1.1);
-      box-shadow: 0 0 40px #0ff;
-    }
-    #spin-btn:disabled {
-      opacity: 0.6;
-      transform: none;
-      cursor: not-allowed;
-    }
-
-    .win-shake {
-      animation: screenShake 0.5s;
-    }
-    @keyframes screenShake {
-      0%, 100% { transform: translateX(0); }
-      10%, 30%, 50%, 70%, 90% { transform: translateX(-10px); }
-      20%, 40%, 60%, 80% { transform: translateX(10px); }
-    }
-
-    .jackpot {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0,0,0,0.8);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 1000;
-      pointer-events: none;
-      opacity: 0;
-    }
-    .jackpot.show {
-      opacity: 1;
-      pointer-events: all;
-      animation: jackpotPulse 2s infinite;
-    }
-    .jackpot h2 {
-      font-size: 6em;
-      color: gold;
-      text-shadow: 0 0 30px gold;
-    }
-    @keyframes jackpotPulse {
-      0%, 100% { transform: scale(1); }
-      50% { transform: scale(1.1); }
-    }
-
-    .auth, .dashboard {
-      background: rgba(10,10,30,0.7);
-      padding: 25px;
-      border-radius: 15px;
-      margin-bottom: 25px;
-      border: 1px solid #f0f;
-    }
-    input, button {
-      padding: 12px;
-      margin: 8px;
-      border: none;
-      border-radius: 8px;
-      font-size: 16px;
-      background: #111;
-      color: white;
-    }
-    button {
-      background: linear-gradient(45deg, #f0f, #0ff);
-      color: black;
-      font-weight: bold;
-      cursor: pointer;
-    }
-    .hidden { display: none; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QuizMaster - создание онлайн тестов</title>
+    <style>
+        :root {
+            --primary-color: #1abc9c;
+            --primary-dark: #16a085;
+            --primary-light: #a3e4d7;
+            --secondary-color: #3498db;
+            --text-color: #2c3e50;
+            --light-bg: #ecf0f1;
+            --white: #ffffff;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: var(--light-bg);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 1rem 0;
+            box-shadow: var(--shadow);
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+        }
+        
+        nav ul {
+            display: flex;
+            list-style: none;
+        }
+        
+        nav li {
+            margin-left: 1.5rem;
+        }
+        
+        nav a {
+            color: white;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            transition: background-color 0.3s ease;
+        }
+        
+        nav a:hover {
+            background-color: var(--primary-dark);
+        }
+        
+        .tabs {
+            display: flex;
+            background-color: var(--white);
+            border-radius: 8px 8px 0 0;
+            overflow: hidden;
+            margin-top: 2rem;
+            box-shadow: var(--shadow);
+        }
+        
+        .tab {
+            padding: 1rem 2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            flex: 1;
+            text-align: center;
+            background-color: var(--white);
+            color: var(--text-color);
+        }
+        
+        .tab.active {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        .tab:hover:not(.active) {
+            background-color: var(--primary-light);
+        }
+        
+        .tab-content {
+            display: none;
+            padding: 2rem;
+            background-color: var(--white);
+            border-radius: 0 0 8px 8px;
+            box-shadow: var(--shadow);
+            animation: fadeIn 0.5s ease;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.7rem 1.5rem;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            font-size: 1rem;
+        }
+        
+        .btn:hover {
+            background-color: var(--primary-dark);
+        }
+        
+        .btn-secondary {
+            background-color: var(--secondary-color);
+        }
+        
+        .btn-secondary:hover {
+            background-color: #2980b9;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+        
+        input, textarea, select {
+            width: 100%;
+            padding: 0.7rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+        
+        .question-item {
+            background-color: var(--light-bg);
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            border-left: 4px solid var(--primary-color);
+        }
+        
+        .option-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+        
+        .option-item input[type="text"] {
+            flex: 1;
+            margin-right: 1rem;
+        }
+        
+        .option-item input[type="checkbox"],
+        .option-item input[type="radio"] {
+            width: auto;
+            margin-right: 0.5rem;
+        }
+        
+        .quiz-card {
+            background-color: var(--white);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: var(--shadow);
+            transition: transform 0.3s ease;
+        }
+        
+        .quiz-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .quiz-title {
+            font-size: 1.3rem;
+            margin-bottom: 0.5rem;
+            color: var(--primary-dark);
+        }
+        
+        .quiz-description {
+            color: #666;
+            margin-bottom: 1rem;
+        }
+        
+        .quiz-meta {
+            display: flex;
+            justify-content: space-between;
+            color: #888;
+            font-size: 0.9rem;
+        }
+        
+        .progress-bar {
+            height: 8px;
+            background-color: #eee;
+            border-radius: 4px;
+            margin: 1rem 0;
+            overflow: hidden;
+        }
+        
+        .progress {
+            height: 100%;
+            background-color: var(--primary-color);
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+        
+        .statistics {
+            display: flex;
+            justify-content: space-around;
+            margin: 2rem 0;
+            text-align: center;
+        }
+        
+        .stat-item {
+            flex: 1;
+            padding: 1rem;
+        }
+        
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            color: #666;
+        }
+        
+        footer {
+            background-color: var(--text-color);
+            color: white;
+            text-align: center;
+            padding: 2rem 0;
+            margin-top: 3rem;
+        }
+        
+        .hidden {
+            display: none;
+        }
+    </style>
 </head>
 <body>
-  <div class="jackpot" id="jackpot">
-    <h2>💎 JACKPOT! 💎</h2>
-  </div>
-
-  <div class="container">
-    <header><h1>💀 EBANUTYI CASINO 💀</h1></header>
-
-    <div id="auth" class="auth">
-      <h2>🔐 Введи ник</h2>
-      <input type="text" id="username" placeholder="Только латиница" />
-      <br />
-      <button onclick="login()">Войти</button>
-    </div>
-
-    <div id="dashboard" class="dashboard hidden">
-      <h2>Привет, <span id="user-nick">...</span>!</h2>
-      <p>💰 Баланс: <span id="balance">1000</span></p>
-      <button onclick="location.reload()">🔄 Сменить аккаунт</button>
-
-      <div class="slot-machine" id="slot-machine">
-        <!-- Барабаны будут созданы через JS -->
-      </div>
-
-      <button id="spin-btn" onclick="spin()">🔥 КРУТИТЬ (10 монет)</button>
-    </div>
-  </div>
-
-  <script>
-    const SYMBOLS = ["😀", "😎", "🤑", "🤩", "🥳", "😈", "💀", "👑", "💎", "✨"];
-    const RARE = ["👑", "💎", "✨"];
-    const MULTIPLIERS = { "👑": 5, "💎": 10, "✨": 20 };
-
-    let balance = 1000;
-    let currentUser = null;
-
-    // Создаём барабаны
-    function initSlot() {
-      const machine = document.getElementById('slot-machine');
-      machine.innerHTML = '';
-      for (let i = 0; i < 5; i++) {
-        const container = document.createElement('div');
-        container.className = 'reel-container';
-        const reel = document.createElement('div');
-        reel.className = 'reel';
-        reel.id = `reel-${i}`;
-        // Заполняем много символов для плавного скролла
-        for (let j = 0; j < 50; j++) {
-          const sym = document.createElement('div');
-          sym.className = 'symbol';
-          sym.textContent = SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)];
-          reel.appendChild(sym);
-        }
-        container.appendChild(reel);
-        machine.appendChild(container);
-      }
-    }
-
-    function login() {
-      const nick = document.getElementById('username').value.trim();
-      if (!nick || !/^[a-zA-Z0-9_]{3,15}$/.test(nick)) {
-        alert("Ник: 3-15 латинских символов!");
-        return;
-      }
-      currentUser = nick;
-      document.getElementById('user-nick').textContent = nick;
-      document.getElementById('auth').classList.add('hidden');
-      document.getElementById('dashboard').classList.remove('hidden');
-      initSlot();
-    }
-
-    function getRandomResult() {
-      return Array(5).fill().map(() => SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)]);
-    }
-
-    async function spin() {
-      if (balance < 10) {
-        alert("Нужно 10 монет!");
-        return;
-      }
-      balance -= 10;
-      document.getElementById('balance').textContent = balance;
-
-      const spinBtn = document.getElementById('spin-btn');
-      spinBtn.disabled = true;
-
-      const result = getRandomResult();
-      const reels = Array.from(document.querySelectorAll('.reel'));
-
-      // Анимация кручения: каждый барабан крутится разное время
-      const promises = reels.map(async (reel, i) => {
-        // Случайное количество "лишних" оборотов (для реалистичности)
-        const extraSpins = 3 + Math.random() * 2;
-        const totalSymbols = 50;
-        const targetIndex = Math.floor(Math.random() * 10); // позиция в первых 10
-        const finalOffset = -(targetIndex + extraSpins * 10) * 120;
-
-        reel.style.transition = `transform ${2 + i * 0.3}s cubic-bezier(0.2, 0.8, 0.4, 1)`;
-        reel.style.transform = `translateY(${finalOffset}px)`;
-
-        // Ждём окончания анимации
-        await new Promise(r => setTimeout(r, (2 + i * 0.3) * 1000));
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">QuizMaster</div>
+                <nav>
+                    <ul>
+                        <li><a href="#" class="tab-link" data-tab="create">Создать тест</a></li>
+                        <li><a href="#" class="tab-link" data-tab="browse">Найти тесты</a></li>
+                        <li><a href="#" class="tab-link" data-tab="results">Мои результаты</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </header>
+    
+    <div class="container">
+        <div class="tabs">
+            <div class="tab active" data-tab="create">Создание теста</div>
+            <div class="tab" data-tab="browse">Каталог тестов</div>
+            <div class="tab" data-tab="results">Результаты</div>
+        </div>
         
-        // Обновляем DOM, чтобы результат был именно нужным
-        const symbols = reel.querySelectorAll('.symbol');
-        // Перезаписываем символы так, чтобы targetIndex был нужным
-        for (let j = 0; j < symbols.length; j++) {
-          symbols[j].textContent = SYMBOLS[(j - targetIndex + 100) % SYMBOLS.length];
+        <div class="tab-content active" id="create-tab">
+            <h2>Создание нового теста</h2>
+            <div class="form-group">
+                <label for="quiz-title">Название теста</label>
+                <input type="text" id="quiz-title" placeholder="Введите название теста">
+            </div>
+            
+            <div class="form-group">
+                <label for="quiz-description">Описание теста</label>
+                <textarea id="quiz-description" rows="3" placeholder="Опишите ваш тест"></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label>Настройка оценки:</label>
+                <div style="display: flex; gap: 1rem;">
+                    <div style="flex: 1;">
+                        <label for="pass-percent">Минимальный процент для прохождения</label>
+                        <input type="number" id="pass-percent" min="0" max="100" value="70">
+                    </div>
+                    <div style="flex: 1;">
+                        <label for="excellent-percent">Процент для отличной оценки</label>
+                        <input type="number" id="excellent-percent" min="0" max="100" value="90">
+                    </div>
+                </div>
+            </div>
+            
+            <h3>Вопросы теста</h3>
+            <div id="questions-container">
+                <!-- Вопросы будут добавляться здесь -->
+            </div>
+            
+            <button class="btn" id="add-question-btn">Добавить вопрос</button>
+            <button class="btn btn-secondary" id="publish-btn" style="float: right;">Опубликовать тест</button>
+        </div>
+        
+        <div class="tab-content" id="browse-tab">
+            <h2>Каталог тестов</h2>
+            <div class="form-group">
+                <input type="text" placeholder="Поиск тестов...">
+            </div>
+            
+            <div id="quiz-list">
+                <div class="quiz-card">
+                    <div class="quiz-title">Тест по истории России</div>
+                    <div class="quiz-description">Проверьте свои знания по истории России от древних времен до наших дней</div>
+                    <div class="quiz-meta">
+                        <span>15 вопросов</span>
+                        <span>Автор: Иван Петров</span>
+                    </div>
+                    <button class="btn" data-quiz="1">Пройти тест</button>
+                </div>
+                
+                <div class="quiz-card">
+                    <div class="quiz-title">География мира</div>
+                    <div class="quiz-description">Сможете ли вы определить страны по их контурам и столицы по описанию?</div>
+                    <div class="quiz-meta">
+                        <span>20 вопросов</span>
+                        <span>Автор: Анна Сидорова</span>
+                    </div>
+                    <button class="btn" data-quiz="2">Пройти тест</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="tab-content" id="results-tab">
+            <h2>Мои результаты</h2>
+            <div id="user-results">
+                <div class="quiz-card">
+                    <div class="quiz-title">Тест по истории России</div>
+                    <div class="progress-bar">
+                        <div class="progress" style="width: 80%"></div>
+                    </div>
+                    <div class="quiz-meta">
+                        <span>Результат: 80%</span>
+                        <span>Лучше, чем у 65% пользователей</span>
+                    </div>
+                </div>
+                
+                <div class="quiz-card">
+                    <div class="quiz-title">География мира</div>
+                    <div class="progress-bar">
+                        <div class="progress" style="width: 65%"></div>
+                    </div>
+                    <div class="quiz-meta">
+                        <span>Результат: 65%</span>
+                        <span>Лучше, чем у 42% пользователей</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Модальное окно прохождения теста -->
+        <div id="quiz-modal" class="hidden">
+            <div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: flex; justify-content: center; align-items: center; z-index: 1000;">
+                <div style="background: white; padding: 2rem; border-radius: 8px; width: 90%; max-width: 800px; max-height: 90vh; overflow-y: auto;">
+                    <div id="quiz-content">
+                        <!-- Содержимое теста будет загружено сюда -->
+                    </div>
+                    <div style="text-align: center; margin-top: 2rem;">
+                        <button class="btn" id="prev-question">Назад</button>
+                        <button class="btn" id="next-question">Далее</button>
+                        <button class="btn btn-secondary" id="submit-quiz" style="display: none;">Завершить тест</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Модальное окно результатов -->
+        <div id="results-modal" class="hidden">
+            <div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: flex; justify-content: center; align-items: center; z-index: 1000;">
+                <div style="background: white; padding: 2rem; border-radius: 8px; width: 90%; max-width: 600px;">
+                    <h2 style="text-align: center; margin-bottom: 1.5rem;">Результаты теста</h2>
+                    <div class="statistics">
+                        <div class="stat-item">
+                            <div class="stat-value" id="user-score">0%</div>
+                            <div class="stat-label">Ваш результат</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="user-rank">0%</div>
+                            <div class="stat-label">Лучше, чем у других</div>
+                        </div>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress" id="result-progress" style="width: 0%"></div>
+                    </div>
+                    <div style="text-align: center; margin-top: 2rem;">
+                        <button class="btn" id="close-results">Закрыть</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <footer>
+        <div class="container">
+            <p>QuizMaster &copy; 2023 - Создание и публикация онлайн тестов</p>
+        </div>
+    </footer>
+
+    <script>
+        // Переключение вкладок
+        document.querySelectorAll('.tab, .tab-link').forEach(tab => {
+            tab.addEventListener('click', function() {
+                const tabId = this.getAttribute('data-tab');
+                
+                // Убираем активный класс у всех вкладок и контента
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                
+                // Добавляем активный класс текущей вкладке и контенту
+                this.classList.add('active');
+                document.getElementById(`${tabId}-tab`).classList.add('active');
+            });
+        });
+        
+        // Добавление вопросов
+        let questionCount = 0;
+        
+        document.getElementById('add-question-btn').addEventListener('click', function() {
+            questionCount++;
+            const questionHTML = `
+                <div class="question-item" id="question-${questionCount}">
+                    <div class="form-group">
+                        <label>Вопрос ${questionCount}</label>
+                        <input type="text" class="question-text" placeholder="Введите вопрос">
+                    </div>
+                    <div class="form-group">
+                        <label>Тип вопроса:</label>
+                        <select class="question-type">
+                            <option value="single">Один вариант ответа</option>
+                            <option value="multiple">Несколько вариантов ответа</option>
+                        </select>
+                    </div>
+                    <div class="options-container">
+                        <div class="option-item">
+                            <input type="text" placeholder="Вариант ответа 1">
+                            <input type="checkbox" class="correct-option" style="display: none;">
+                            <input type="radio" class="correct-option" name="correct-${questionCount}">
+                            <button class="btn remove-option" style="padding: 0.3rem 0.7rem;">×</button>
+                        </div>
+                        <div class="option-item">
+                            <input type="text" placeholder="Вариант ответа 2">
+                            <input type="checkbox" class="correct-option" style="display: none;">
+                            <input type="radio" class="correct-option" name="correct-${questionCount}">
+                            <button class="btn remove-option" style="padding: 0.3rem 0.7rem;">×</button>
+                        </div>
+                    </div>
+                    <button class="btn add-option" style="margin-top: 0.5rem;">Добавить вариант</button>
+                    <button class="btn remove-question" style="margin-top: 1rem; background-color: #e74c3c;">Удалить вопрос</button>
+                </div>
+            `;
+            
+            document.getElementById('questions-container').insertAdjacentHTML('beforeend', questionHTML);
+            
+            // Обновляем обработчики событий для нового вопроса
+            updateQuestionEventListeners(questionCount);
+        });
+        
+        function updateQuestionEventListeners(questionId) {
+            const questionElement = document.getElementById(`question-${questionId}`);
+            
+            // Изменение типа вопроса
+            questionElement.querySelector('.question-type').addEventListener('change', function() {
+                const isMultiple = this.value === 'multiple';
+                const options = questionElement.querySelectorAll('.correct-option');
+                
+                options.forEach(option => {
+                    if (isMultiple) {
+                        option.type = 'checkbox';
+                        option.style.display = 'inline-block';
+                    } else {
+                        option.type = 'radio';
+                        option.style.display = 'inline-block';
+                    }
+                });
+            });
+            
+            // Добавление варианта ответа
+            questionElement.querySelector('.add-option').addEventListener('click', function() {
+                const optionsContainer = questionElement.querySelector('.options-container');
+                const optionCount = optionsContainer.children.length + 1;
+                const isMultiple = questionElement.querySelector('.question-type').value === 'multiple';
+                
+                const optionHTML = `
+                    <div class="option-item">
+                        <input type="text" placeholder="Вариант ответа ${optionCount}">
+                        <input type="${isMultiple ? 'checkbox' : 'radio'}" class="correct-option" ${isMultiple ? '' : `name="correct-${questionId}"`}>
+                        <button class="btn remove-option" style="padding: 0.3rem 0.7rem;">×</button>
+                    </div>
+                `;
+                
+                optionsContainer.insertAdjacentHTML('beforeend', optionHTML);
+                
+                // Добавляем обработчик для новой кнопки удаления
+                optionsContainer.lastElementChild.querySelector('.remove-option').addEventListener('click', function() {
+                    this.parentElement.remove();
+                });
+            });
+            
+            // Удаление варианта ответа
+            questionElement.querySelectorAll('.remove-option').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    this.parentElement.remove();
+                });
+            });
+            
+            // Удаление вопроса
+            questionElement.querySelector('.remove-question').addEventListener('click', function() {
+                questionElement.remove();
+            });
         }
-        // Фиксируем позицию
-        reel.style.transition = 'none';
-        reel.style.transform = `translateY(${-targetIndex * 120}px)`;
-      });
-
-      await Promise.all(promises);
-
-      // Проверка выигрыша
-      const counts = {};
-      result.forEach(sym => counts[sym] = (counts[sym] || 0) + 1);
-      let win = 0;
-      let isJackpot = false;
-      for (const [sym, count] of Object.entries(counts)) {
-        if (count >= 3) {
-          const mult = MULTIPLIERS[sym] || 2;
-          win += count * mult * 10;
-          if (RARE.includes(sym) && count === 5) isJackpot = true;
+        
+        // Публикация теста
+        document.getElementById('publish-btn').addEventListener('click', function() {
+            const title = document.getElementById('quiz-title').value;
+            const description = document.getElementById('quiz-description').value;
+            
+            if (!title || !description || questionCount === 0) {
+                alert('Заполните все обязательные поля и добавьте хотя бы один вопрос!');
+                return;
+            }
+            
+            alert('Тест успешно опубликован!');
+            // В реальном приложении здесь был бы код для сохранения теста в базе данных
+        });
+        
+        // Прохождение теста
+        document.querySelectorAll('#quiz-list .btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const quizId = this.getAttribute('data-quiz');
+                startQuiz(quizId);
+            });
+        });
+        
+        function startQuiz(quizId) {
+            // В реальном приложении здесь был бы запрос к серверу для получения данных теста
+            // Для демонстрации используем фиктивные данные
+            
+            const quizData = {
+                title: "Тест по истории России",
+                questions: [
+                    {
+                        text: "В каком году произошло Крещение Руси?",
+                        type: "single",
+                        options: [
+                            { text: "988 год", correct: true },
+                            { text: "989 год", correct: false },
+                            { text: "990 год", correct: false },
+                            { text: "991 год", correct: false }
+                        ]
+                    },
+                    {
+                        text: "Какие из этих событий произошли в XVII веке?",
+                        type: "multiple",
+                        options: [
+                            { text: "Смутное время", correct: true },
+                            { text: "Восстание Степана Разина", correct: true },
+                            { text: "Отмена крепостного права", correct: false },
+                            { text: "Восстание декабристов", correct: false }
+                        ]
+                    }
+                ]
+            };
+            
+            // Отображаем модальное окно с тестом
+            const quizContent = document.getElementById('quiz-content');
+            quizContent.innerHTML = `
+                <h2>${quizData.title}</h2>
+                <div id="quiz-questions">
+                    ${quizData.questions.map((question, index) => `
+                        <div class="question-item ${index === 0 ? 'active' : ''}" data-index="${index}">
+                            <h3>Вопрос ${index + 1}</h3>
+                            <p>${question.text}</p>
+                            <div class="options">
+                                ${question.options.map((option, optIndex) => `
+                                    <div class="option-item">
+                                        <input type="${question.type === 'single' ? 'radio' : 'checkbox'}" 
+                                               name="question-${index}" 
+                                               value="${optIndex}" 
+                                               id="q${index}-opt${optIndex}">
+                                        <label for="q${index}-opt${optIndex}">${option.text}</label>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+            
+            document.getElementById('quiz-modal').classList.remove('hidden');
+            
+            // Настройка навигации по вопросам
+            let currentQuestion = 0;
+            const questions = document.querySelectorAll('#quiz-questions .question-item');
+            const totalQuestions = questions.length;
+            
+            document.getElementById('prev-question').addEventListener('click', function() {
+                if (currentQuestion > 0) {
+                    questions[currentQuestion].classList.remove('active');
+                    currentQuestion--;
+                    questions[currentQuestion].classList.add('active');
+                    
+                    document.getElementById('next-question').style.display = 'inline-block';
+                    document.getElementById('submit-quiz').style.display = 'none';
+                    
+                    if (currentQuestion === 0) {
+                        document.getElementById('prev-question').style.display = 'none';
+                    }
+                }
+            });
+            
+            document.getElementById('next-question').addEventListener('click', function() {
+                if (currentQuestion < totalQuestions - 1) {
+                    questions[currentQuestion].classList.remove('active');
+                    currentQuestion++;
+                    questions[currentQuestion].classList.add('active');
+                    
+                    document.getElementById('prev-question').style.display = 'inline-block';
+                    
+                    if (currentQuestion === totalQuestions - 1) {
+                        document.getElementById('next-question').style.display = 'none';
+                        document.getElementById('submit-quiz').style.display = 'inline-block';
+                    }
+                }
+            });
+            
+            // Сброс стилей при первом запуске
+            document.getElementById('prev-question').style.display = 'none';
+            if (totalQuestions === 1) {
+                document.getElementById('next-question').style.display = 'none';
+                document.getElementById('submit-quiz').style.display = 'inline-block';
+            }
+            
+            // Завершение теста
+            document.getElementById('submit-quiz').addEventListener('click', function() {
+                // В реальном приложении здесь был бы код для проверки ответов
+                const score = Math.floor(Math.random() * 40) + 60; // Случайный результат от 60 до 100%
+                const rank = Math.floor(Math.random() * 40) + 50; // Случайный рейтинг от 50 до 90%
+                
+                document.getElementById('user-score').textContent = `${score}%`;
+                document.getElementById('user-rank').textContent = `${rank}%`;
+                
+                const progressBar = document.getElementById('result-progress');
+                progressBar.style.width = `${score}%`;
+                
+                document.getElementById('quiz-modal').classList.add('hidden');
+                document.getElementById('results-modal').classList.remove('hidden');
+            });
         }
-      }
-
-      if (win > 0) {
-        balance += win;
-        document.body.classList.add('win-shake');
-        setTimeout(() => document.body.classList.remove('win-shake'), 500);
-
-        if (isJackpot) {
-          const jackpot = document.getElementById('jackpot');
-          jackpot.classList.add('show');
-          setTimeout(() => jackpot.classList.remove('show'), 3000);
-        }
-
-        alert(`🎉 ВЫИГРЫШ: ${win} монет!`);
-      } else {
-        alert("💀 Проебал. Крути дальше!");
-      }
-
-      document.getElementById('balance').textContent = balance;
-      spinBtn.disabled = false;
-    }
-
-    // Инициализация
-    window.onload = () => {
-      // Для демо — сразу показываем слот, если ник в localStorage
-      const lastUser = localStorage.getItem('casino_user');
-      if (lastUser) {
-        currentUser = lastUser;
-        document.getElementById('user-nick').textContent = lastUser;
-        document.getElementById('auth').classList.add('hidden');
-        document.getElementById('dashboard').classList.remove('hidden');
-        initSlot();
-      }
-    };
-  </script>
+        
+        // Закрытие модальных окон
+        document.getElementById('close-results').addEventListener('click', function() {
+            document.getElementById('results-modal').classList.add('hidden');
+        });
+    </script>
 </body>
 </html>
