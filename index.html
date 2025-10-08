@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Trade Bot - Полная версия</title>
+    <title>Trade Bot - Полная функциональность</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
@@ -187,6 +187,12 @@
             padding: 8px 12px;
             font-size: 0.8rem;
             margin: 5px;
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
         }
 
         .profile-info {
@@ -446,6 +452,7 @@
 
         .action-buttons .btn {
             flex: 1;
+            margin: 0;
         }
 
         .pagination {
@@ -493,6 +500,53 @@
             position: relative;
             overflow: hidden;
         }
+
+        .message-bubble {
+            max-width: 80%;
+            padding: 10px 15px;
+            border-radius: 15px;
+            margin: 5px 0;
+            word-wrap: break-word;
+        }
+
+        .message-sent {
+            background-color: var(--primary);
+            color: white;
+            margin-left: auto;
+            border-bottom-right-radius: 5px;
+        }
+
+        .message-received {
+            background-color: var(--gray);
+            color: var(--dark);
+            margin-right: auto;
+            border-bottom-left-radius: 5px;
+        }
+
+        .message-time {
+            font-size: 0.7rem;
+            opacity: 0.7;
+            margin-top: 5px;
+        }
+
+        .chat-container {
+            max-height: 300px;
+            overflow-y: auto;
+            padding: 10px;
+            border: 1px solid var(--gray);
+            border-radius: 10px;
+            margin-bottom: 15px;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .nav-buttons .btn {
+            flex: 1;
+        }
     </style>
 </head>
 <body>
@@ -509,14 +563,14 @@
             <div class="tab active" data-tab="profile"><i class="fas fa-user"></i> Профиль</div>
             <div class="tab" data-tab="trades"><i class="fas fa-exchange-alt"></i> Обмены</div>
             <div class="tab" data-tab="sales"><i class="fas fa-shopping-cart"></i> Продажи</div>
-            <div class="tab" data-tab="stock"><i class="fas fa-boxes"></i> Сток</div>
             <div class="tab" data-tab="search"><i class="fas fa-search"></i> Поиск</div>
+            <div class="tab" data-tab="messages"><i class="fas fa-envelope"></i> Сообщения</div>
             <div class="tab" data-tab="settings"><i class="fas fa-cog"></i> Настройки</div>
             <div class="tab" data-tab="admin"><i class="fas fa-shield-alt"></i> Админ</div>
         </div>
 
         <div class="content">
-            <!-- Все секции будут заполняться динамически -->
+            <!-- Секции будут заполняться динамически -->
         </div>
     </div>
 
@@ -528,10 +582,11 @@
     </div>
 
     <script>
-        // ПОЛНАЯ БАЗА ДАННЫХ КАК В ПАЙТОН БОТЕ
+        // ПОЛНАЯ БАЗА ДАННЫХ С ВСЕМИ ФУНКЦИЯМИ
         const DB = {
             users: {
                 '1': {
+                    id: '1',
                     internal_username: 'Justazero',
                     roblox_username: 'Justazero_RBLX',
                     telegram_username: 'Justazero',
@@ -543,12 +598,62 @@
                     admin_role: 'full',
                     can_change_username: false,
                     messages_sent: [],
-                    messages_received: []
+                    messages_received: [],
+                    complaints: []
+                },
+                '2': {
+                    id: '2',
+                    internal_username: 'TestUser',
+                    roblox_username: 'TestUser_RBLX',
+                    telegram_username: 'testuser',
+                    lang: 'ru',
+                    trades: [
+                        {
+                            give: { category: 'items', description: 'Редкая шапка 2018 года' },
+                            want: { category: 'items', description: 'Любые ограниченные предметы' }
+                        }
+                    ],
+                    sales: [
+                        {
+                            category: 'account',
+                            description: 'Аккаунт с 10к Robux',
+                            price: '5000 RUB'
+                        }
+                    ],
+                    banned: false,
+                    is_admin: false,
+                    admin_role: null,
+                    can_change_username: true,
+                    messages_sent: [],
+                    messages_received: [],
+                    complaints: []
                 }
             },
-            pending_trades: {},
-            pending_sales: {},
-            complaints: [],
+            pending_trades: {
+                '2': [
+                    {
+                        give: { category: 'boost', description: 'Прокачка до 100 уровня' },
+                        want: { category: 'items', description: 'Редкие предметы' }
+                    }
+                ]
+            },
+            pending_sales: {
+                '2': [
+                    {
+                        category: 'help',
+                        description: 'Помощь с прохождением сложного уровня',
+                        price: '1000 RUB'
+                    }
+                ]
+            },
+            complaints: [
+                {
+                    user_id: '2',
+                    username: 'TestUser',
+                    message: 'Пользователь Justazero не отвечает на сообщения',
+                    timestamp: Date.now() - 3600000
+                }
+            ],
             categories: {
                 'items': '🎮 Предметы',
                 'boost': '🚀 Буст аккаунта', 
@@ -560,30 +665,54 @@
                 'confirm': '✅ Подтверждающий админ',
                 'ban': '🛡️ Банящий админ', 
                 'full': '👑 Полный админ'
-            }
+            },
+            messages: [
+                {
+                    id: 1,
+                    from: '2',
+                    to: '1',
+                    text: 'Привет! Интересует ваш трейд',
+                    timestamp: Date.now() - 1800000,
+                    read: false
+                },
+                {
+                    id: 2,
+                    from: '1',
+                    to: '2',
+                    text: 'Здравствуйте! Что вас интересует?',
+                    timestamp: Date.now() - 1200000,
+                    read: true
+                }
+            ]
         };
 
-        // ТЕКУЩИЙ ПОЛЬЗОВАТЕЛЬ
+        // ТЕКУЩИЙ ПОЛЬЗОВАТЕЛЬ И СОСТОЯНИЕ
         let currentUser = DB.users['1'];
-        let userStates = {};
-        let userTradingData = {};
-        let userSearchData = {};
+        let currentState = {
+            activeModal: null,
+            searchResults: [],
+            currentSearchIndex: 0,
+            currentMessageUser: null,
+            adminModerationIndex: {
+                trades: 0,
+                sales: 0,
+                complaints: 0
+            }
+        };
 
         // ИНИЦИАЛИЗАЦИЯ
         document.addEventListener('DOMContentLoaded', function() {
             initializeApp();
-            showNotification('Бот успешно запущен!', 'success');
+            showNotification('Trade Bot успешно запущен!', 'success');
         });
 
         function initializeApp() {
             initializeTabs();
-            renderAllSections();
-            initializeModals();
-            initializeEventListeners();
+            renderSection('profile');
+            initializeRippleEffects();
         }
 
         function initializeTabs() {
-            const content = document.querySelector('.content');
             const tabs = document.querySelectorAll('.tab');
             
             tabs.forEach(tab => {
@@ -595,16 +724,6 @@
                     
                     renderSection(tabId);
                 });
-            });
-            
-            // Показываем профиль по умолчанию
-            renderSection('profile');
-        }
-
-        function renderAllSections() {
-            const sections = ['profile', 'trades', 'sales', 'stock', 'search', 'settings', 'admin'];
-            sections.forEach(section => {
-                renderSection(section);
             });
         }
 
@@ -621,11 +740,11 @@
                 case 'sales':
                     renderSalesSection();
                     break;
-                case 'stock':
-                    renderStockSection();
-                    break;
                 case 'search':
                     renderSearchSection();
+                    break;
+                case 'messages':
+                    renderMessagesSection();
                     break;
                 case 'settings':
                     renderSettingsSection();
@@ -637,25 +756,14 @@
         }
 
         function renderProfileSection() {
-            const content = document.querySelector('.content');
             const isBanned = currentUser.banned;
-            const isAdmin = currentUser.is_admin;
             
             if (isBanned) {
-                content.innerHTML = `
-                    <div class="card">
-                        <div class="card-title" style="color: var(--danger);">
-                            <i class="fas fa-ban"></i> Аккаунт заблокирован
-                        </div>
-                        <p>Ваш аккаунт был заблокирован администратором.</p>
-                        <button class="btn btn-secondary" id="contact-admin-btn">
-                            <i class="fas fa-headset"></i> Связь с админом
-                        </button>
-                    </div>
-                `;
+                renderBannedProfile();
                 return;
             }
             
+            const content = document.querySelector('.content');
             content.innerHTML = `
                 <div class="card">
                     <div class="card-title">
@@ -679,7 +787,7 @@
                             <span>
                                 <span class="status-indicator status-online"></span>
                                 Активен 
-                                ${isAdmin ? '<span class="badge admin-badge">Админ</span>' : ''}
+                                ${currentUser.is_admin ? '<span class="badge admin-badge">Админ</span>' : ''}
                             </span>
                         </div>
                     </div>
@@ -705,6 +813,10 @@
                             <span>На модерации:</span>
                             <span>${(DB.pending_trades['1']?.length || 0) + (DB.pending_sales['1']?.length || 0)}</span>
                         </div>
+                        <div class="info-item">
+                            <span>Сообщения:</span>
+                            <span>${getUnreadMessagesCount()} непрочитанных</span>
+                        </div>
                     </div>
                 </div>
 
@@ -712,10 +824,12 @@
                     <div class="card-title">
                         <i class="fas fa-exchange-alt"></i> Быстрые действия
                     </div>
-                    <button class="btn" id="quick-trade-btn">
+                    <button class="btn ${currentUser.trades.length >= 1 ? 'btn-secondary' : ''}" id="quick-trade-btn"
+                            ${currentUser.trades.length >= 1 ? 'disabled' : ''}>
                         <i class="fas fa-plus"></i> Создать трейд
                     </button>
-                    <button class="btn btn-secondary" id="quick-sale-btn">
+                    <button class="btn btn-secondary ${currentUser.sales.length >= 5 ? 'btn-secondary' : ''}" id="quick-sale-btn"
+                            ${currentUser.sales.length >= 5 ? 'disabled' : ''}>
                         <i class="fas fa-tag"></i> Добавить продажу
                     </button>
                     <button class="btn" id="search-user-btn">
@@ -724,12 +838,10 @@
                 </div>
             `;
 
-            // Навешиваем обработчики
-            document.getElementById('edit-profile-btn')?.addEventListener('click', showEditProfileModal);
-            document.getElementById('quick-trade-btn')?.addEventListener('click', () => switchToTab('trades'));
-            document.getElementById('quick-sale-btn')?.addEventListener('click', () => switchToTab('sales'));
-            document.getElementById('search-user-btn')?.addEventListener('click', () => switchToTab('search'));
-            document.getElementById('contact-admin-btn')?.addEventListener('click', showContactAdminModal);
+            document.getElementById('edit-profile-btn').addEventListener('click', showEditProfileModal);
+            document.getElementById('quick-trade-btn').addEventListener('click', () => switchToTab('trades'));
+            document.getElementById('quick-sale-btn').addEventListener('click', () => switchToTab('sales'));
+            document.getElementById('search-user-btn').addEventListener('click', () => switchToTab('search'));
         }
 
         function renderTradesSection() {
@@ -799,9 +911,9 @@
                 ` : ''}
             `;
 
-            document.getElementById('create-trade-btn')?.addEventListener('click', showCreateTradeModal);
-            document.getElementById('search-trades-btn')?.addEventListener('click', showSearchTradesModal);
-            document.getElementById('my-trades-btn')?.addEventListener('click', showMyTradesModal);
+            document.getElementById('create-trade-btn').addEventListener('click', showCreateTradeModal);
+            document.getElementById('search-trades-btn').addEventListener('click', showSearchTradesModal);
+            document.getElementById('my-trades-btn').addEventListener('click', showMyTrades);
         }
 
         function renderSalesSection() {
@@ -872,25 +984,9 @@
                 ` : ''}
             `;
 
-            document.getElementById('create-sale-btn')?.addEventListener('click', showCreateSaleModal);
-            document.getElementById('search-sales-btn')?.addEventListener('click', showSearchSalesModal);
-            document.getElementById('my-sales-btn')?.addEventListener('click', showMySalesModal);
-        }
-
-        function renderStockSection() {
-            const content = document.querySelector('.content');
-            content.innerHTML = `
-                <div class="card">
-                    <div class="card-title">
-                        <i class="fas fa-boxes"></i> Мой сток
-                    </div>
-                    <div class="empty-state">
-                        <i class="fas fa-box-open"></i>
-                        <p>Раздел в разработке</p>
-                        <p style="font-size: 0.8rem; margin-top: 10px;">Скоро здесь появится управление вашим инвентарем</p>
-                    </div>
-                </div>
-            `;
+            document.getElementById('create-sale-btn').addEventListener('click', showCreateSaleModal);
+            document.getElementById('search-sales-btn').addEventListener('click', showSearchSalesModal);
+            document.getElementById('my-sales-btn').addEventListener('click', showMySales);
         }
 
         function renderSearchSection() {
@@ -911,16 +1007,62 @@
 
                 <div class="card">
                     <div class="card-title">
-                        <i class="fas fa-history"></i> Недавние поиски
+                        <i class="fas fa-exchange-alt"></i> Поиск трейдов
                     </div>
-                    <div class="empty-state">
-                        <i class="fas fa-clock"></i>
-                        <p>Здесь появятся ваши недавние поиски</p>
+                    <button class="btn btn-secondary" id="search-trades-category-btn">
+                        <i class="fas fa-filter"></i> Поиск по категории
+                    </button>
+                </div>
+
+                <div class="card">
+                    <div class="card-title">
+                        <i class="fas fa-shopping-cart"></i> Поиск продаж
                     </div>
+                    <button class="btn btn-secondary" id="search-sales-category-btn">
+                        <i class="fas fa-filter"></i> Поиск по категории
+                    </button>
                 </div>
             `;
 
             document.getElementById('search-user-button').addEventListener('click', searchUser);
+            document.getElementById('search-trades-category-btn').addEventListener('click', showSearchTradesByCategory);
+            document.getElementById('search-sales-category-btn').addEventListener('click', showSearchSalesByCategory);
+        }
+
+        function renderMessagesSection() {
+            const content = document.querySelector('.content');
+            const conversations = getConversations();
+            
+            content.innerHTML = `
+                <div class="card">
+                    <div class="card-title">
+                        <i class="fas fa-envelope"></i> Мои сообщения
+                    </div>
+                    ${conversations.length === 0 ? `
+                        <div class="empty-state">
+                            <i class="fas fa-inbox"></i>
+                            <p>У вас пока нет сообщений</p>
+                        </div>
+                    ` : `
+                        ${conversations.map(conv => `
+                            <div class="trade-item" onclick="openChat('${conv.userId}')" style="cursor: pointer;">
+                                <div class="trade-icon">
+                                    <i class="fas fa-user"></i>
+                                </div>
+                                <div class="trade-details">
+                                    <div class="trade-title">${conv.username} ${conv.unread > 0 ? `<span class="badge badge-success">${conv.unread}</span>` : ''}</div>
+                                    <div class="trade-description">${conv.lastMessage}</div>
+                                </div>
+                            </div>
+                        `).join('')}
+                    `}
+                    <button class="btn btn-secondary" id="new-message-btn">
+                        <i class="fas fa-plus"></i> Новое сообщение
+                    </button>
+                </div>
+            `;
+
+            document.getElementById('new-message-btn').addEventListener('click', showNewMessageModal);
         }
 
         function renderSettingsSection() {
@@ -948,6 +1090,9 @@
                     <button class="btn" id="tutorial-btn">
                         <i class="fas fa-book"></i> Туториал
                     </button>
+                    <button class="btn btn-warning" id="complaint-btn">
+                        <i class="fas fa-flag"></i> Пожаловаться
+                    </button>
                 </div>
 
                 ${currentUser.is_admin ? `
@@ -965,21 +1110,14 @@
             document.getElementById('lang-ru-btn').addEventListener('click', () => changeLanguage('ru'));
             document.getElementById('lang-en-btn').addEventListener('click', () => changeLanguage('en'));
             document.getElementById('contact-admin-btn').addEventListener('click', showContactAdminModal);
-            document.getElementById('tutorial-btn').addEventListener('click', showTutorialModal);
+            document.getElementById('tutorial-btn').addEventListener('click', showTutorial);
+            document.getElementById('complaint-btn').addEventListener('click', showComplaintModal);
             document.getElementById('go-to-admin-btn')?.addEventListener('click', () => switchToTab('admin'));
         }
 
         function renderAdminSection() {
             if (!currentUser.is_admin) {
-                const content = document.querySelector('.content');
-                content.innerHTML = `
-                    <div class="card">
-                        <div class="card-title" style="color: var(--danger);">
-                            <i class="fas fa-ban"></i> Доступ запрещен
-                        </div>
-                        <p>У вас нет прав для доступа к админ-панели.</p>
-                    </div>
-                `;
+                renderNoAccess();
                 return;
             }
 
@@ -1032,6 +1170,9 @@
                     <button class="btn btn-secondary" id="allow-username-change-btn">
                         <i class="fas fa-unlock"></i> Разрешить смену ника
                     </button>
+                    <button class="btn" id="view-messages-btn">
+                        <i class="fas fa-envelope"></i> Просмотр переписок
+                    </button>
                 </div>
 
                 ${currentUser.admin_role === 'full' ? `
@@ -1058,27 +1199,24 @@
                     <button class="btn btn-secondary" id="view-stats-btn">
                         <i class="fas fa-chart-pie"></i> Просмотр статистики
                     </button>
-                    <button class="btn btn-secondary" id="view-messages-btn">
-                        <i class="fas fa-envelope"></i> Просмотр переписок
-                    </button>
                 </div>
             `;
 
             // Навешиваем обработчики для админ-панели
-            document.getElementById('moderate-trades-btn')?.addEventListener('click', showModerateTradesModal);
-            document.getElementById('moderate-sales-btn')?.addEventListener('click', showModerateSalesModal);
-            document.getElementById('moderate-complaints-btn')?.addEventListener('click', showModerateComplaintsModal);
-            document.getElementById('ban-user-btn')?.addEventListener('click', showBanUserModal);
-            document.getElementById('unban-user-btn')?.addEventListener('click', showUnbanUserModal);
-            document.getElementById('allow-username-change-btn')?.addEventListener('click', showAllowUsernameChangeModal);
+            document.getElementById('moderate-trades-btn').addEventListener('click', () => showModeration('trades'));
+            document.getElementById('moderate-sales-btn').addEventListener('click', () => showModeration('sales'));
+            document.getElementById('moderate-complaints-btn').addEventListener('click', () => showModeration('complaints'));
+            document.getElementById('ban-user-btn').addEventListener('click', showBanUserModal);
+            document.getElementById('unban-user-btn').addEventListener('click', showUnbanUserModal);
+            document.getElementById('allow-username-change-btn').addEventListener('click', showAllowUsernameChangeModal);
+            document.getElementById('view-messages-btn').addEventListener('click', showAdminViewMessagesModal);
             document.getElementById('promote-admin-btn')?.addEventListener('click', showPromoteAdminModal);
             document.getElementById('demote-admin-btn')?.addEventListener('click', showDemoteAdminModal);
             document.getElementById('broadcast-btn')?.addEventListener('click', showBroadcastModal);
-            document.getElementById('view-stats-btn')?.addEventListener('click', showStatsModal);
-            document.getElementById('view-messages-btn')?.addEventListener('click', showViewMessagesModal);
+            document.getElementById('view-stats-btn').addEventListener('click', showStatsModal);
         }
 
-        // МОДАЛЬНЫЕ ОКНА
+        // ОСНОВНЫЕ ФУНКЦИИ БОТА
         function showEditProfileModal() {
             const modal = createModal(`
                 <div class="modal-header">
@@ -1106,7 +1244,7 @@
             `);
 
             document.getElementById('save-profile-btn').addEventListener('click', saveProfile);
-            document.getElementById('cancel-edit-btn').addEventListener('click', () => modal.remove());
+            document.getElementById('cancel-edit-btn').addEventListener('click', () => closeModal());
         }
 
         function showCreateTradeModal() {
@@ -1150,16 +1288,14 @@
                 </div>
             `);
 
-            // Инициализация выбора категорий
             initializeCategorySelection('give-category-options', 'give');
             initializeCategorySelection('want-category-options', 'want');
             
-            // Обновление сводки
             document.getElementById('give-description').addEventListener('input', updateTradeSummary);
             document.getElementById('want-description').addEventListener('input', updateTradeSummary);
 
             document.getElementById('publish-trade-btn').addEventListener('click', publishTrade);
-            document.getElementById('cancel-trade-btn').addEventListener('click', () => modal.remove());
+            document.getElementById('cancel-trade-btn').addEventListener('click', () => closeModal());
         }
 
         function showCreateSaleModal() {
@@ -1192,89 +1328,7 @@
 
             initializeCategorySelection('sale-category-options', 'sale');
             document.getElementById('publish-sale-btn').addEventListener('click', publishSale);
-            document.getElementById('cancel-sale-btn').addEventListener('click', () => modal.remove());
-        }
-
-        // ОСНОВНЫЕ ФУНКЦИИ
-        function saveProfile() {
-            const internalUsername = document.getElementById('edit-internal-username').value;
-            const robloxUsername = document.getElementById('edit-roblox-username').value;
-            const telegramUsername = document.getElementById('edit-telegram-username').value;
-
-            if (internalUsername !== currentUser.internal_username && !currentUser.can_change_username) {
-                showNotification('Смена ника заблокирована админом!', 'error');
-                return;
-            }
-
-            currentUser.internal_username = internalUsername;
-            currentUser.roblox_username = robloxUsername;
-            currentUser.telegram_username = telegramUsername;
-
-            showNotification('Профиль успешно обновлен!', 'success');
-            document.querySelector('.modal').remove();
-            renderSection('profile');
-        }
-
-        function publishTrade() {
-            const giveCategory = userTradingData.giveCategory;
-            const wantCategory = userTradingData.wantCategory;
-            const giveDescription = document.getElementById('give-description').value;
-            const wantDescription = document.getElementById('want-description').value;
-
-            if (!giveCategory || !wantCategory || !giveDescription || !wantDescription) {
-                showNotification('Заполните все поля!', 'error');
-                return;
-            }
-
-            const tradeData = {
-                give: { category: giveCategory, description: giveDescription },
-                want: { category: wantCategory, description: wantDescription }
-            };
-
-            // Добавляем в ожидание модерации
-            if (!DB.pending_trades['1']) DB.pending_trades['1'] = [];
-            DB.pending_trades['1'].push(tradeData);
-
-            showNotification('Трейд отправлен на модерацию!', 'success');
-            document.querySelector('.modal').remove();
-            renderSection('trades');
-        }
-
-        function publishSale() {
-            const category = userTradingData.saleCategory;
-            const description = document.getElementById('sale-description').value;
-            const price = document.getElementById('sale-price').value;
-
-            if (!category || !description || !price) {
-                showNotification('Заполните все поля!', 'error');
-                return;
-            }
-
-            const saleData = {
-                category: category,
-                description: description,
-                price: price
-            };
-
-            // Добавляем в ожидание модерации
-            if (!DB.pending_sales['1']) DB.pending_sales['1'] = [];
-            DB.pending_sales['1'].push(saleData);
-
-            showNotification('Продажа отправлена на модерацию!', 'success');
-            document.querySelector('.modal').remove();
-            renderSection('sales');
-        }
-
-        function deleteTrade(index) {
-            currentUser.trades.splice(index, 1);
-            showNotification('Трейд удален!', 'success');
-            renderSection('trades');
-        }
-
-        function deleteSale(index) {
-            currentUser.sales.splice(index, 1);
-            showNotification('Продажа удалена!', 'success');
-            renderSection('sales');
+            document.getElementById('cancel-sale-btn').addEventListener('click', () => closeModal());
         }
 
         function searchUser() {
@@ -1287,8 +1341,8 @@
             }
 
             const foundUsers = Object.values(DB.users).filter(user => 
-                user.internal_username.toLowerCase().includes(username.toLowerCase()) ||
-                user.telegram_username.toLowerCase().includes(username.toLowerCase())
+                user.internal_username.toLowerCase().includes(username.toLowerCase()) &&
+                user.id !== currentUser.id
             );
 
             if (foundUsers.length === 0) {
@@ -1306,15 +1360,423 @@
                         <div class="trade-description">Telegram: ${user.telegram_username || 'Не указан'}</div>
                         <div class="trade-description">Roblox: ${user.roblox_username || 'Не указан'}</div>
                     </div>
-                    <button class="btn btn-small btn-secondary" onclick="messageUser('${user.internal_username}')">
-                        <i class="fas fa-envelope"></i>
-                    </button>
+                    <div class="nav-buttons">
+                        <button class="btn btn-small btn-secondary" onclick="viewUserTrades('${user.id}')">
+                            <i class="fas fa-exchange-alt"></i>
+                        </button>
+                        <button class="btn btn-small btn-secondary" onclick="viewUserSales('${user.id}')">
+                            <i class="fas fa-shopping-cart"></i>
+                        </button>
+                        <button class="btn btn-small" onclick="messageUser('${user.id}')">
+                            <i class="fas fa-envelope"></i>
+                        </button>
+                    </div>
                 </div>
             `).join('');
         }
 
-        function messageUser(username) {
-            showNotification(`Функция сообщений для ${username} в разработке`, 'info');
+        function showSearchTradesByCategory() {
+            const modal = createModal(`
+                <div class="modal-header">
+                    <div class="modal-title">Поиск трейдов по категории</div>
+                    <button class="close-modal">&times;</button>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Выберите категорию</label>
+                    <div class="category-options" id="search-trade-category-options">
+                        ${Object.entries(DB.categories).map(([key, label]) => 
+                            `<div class="category-option" data-category="${key}">${label}</div>`
+                        ).join('')}
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Описание для поиска</label>
+                    <textarea class="form-textarea" id="search-trade-description" placeholder="Опишите что ищете..."></textarea>
+                </div>
+                <div class="action-buttons">
+                    <button class="btn" id="search-trade-btn">Искать</button>
+                    <button class="btn btn-secondary" id="cancel-search-btn">Отмена</button>
+                </div>
+            `);
+
+            let selectedCategory = null;
+            document.querySelectorAll('#search-trade-category-options .category-option').forEach(option => {
+                option.addEventListener('click', function() {
+                    document.querySelectorAll('#search-trade-category-options .category-option').forEach(opt => {
+                        opt.classList.remove('selected');
+                    });
+                    this.classList.add('selected');
+                    selectedCategory = this.getAttribute('data-category');
+                });
+            });
+
+            document.getElementById('search-trade-btn').addEventListener('click', () => {
+                const description = document.getElementById('search-trade-description').value;
+                if (!selectedCategory || !description) {
+                    showNotification('Заполните все поля!', 'error');
+                    return;
+                }
+                performTradeSearch(selectedCategory, description);
+                closeModal();
+            });
+
+            document.getElementById('cancel-search-btn').addEventListener('click', () => closeModal());
+        }
+
+        function performTradeSearch(category, searchText) {
+            const allTrades = [];
+            
+            // Собираем все трейды из всех пользователей
+            Object.values(DB.users).forEach(user => {
+                if (user.id !== currentUser.id && !user.banned) {
+                    user.trades.forEach(trade => {
+                        if (trade.give.category === category) {
+                            allTrades.push({
+                                user: user,
+                                trade: trade,
+                                matchPercentage: calculateMatchPercentage(trade.give.description, searchText)
+                            });
+                        }
+                    });
+                }
+            });
+
+            // Фильтруем по совпадению > 50%
+            const results = allTrades.filter(item => item.matchPercentage >= 50)
+                                   .sort((a, b) => b.matchPercentage - a.matchPercentage);
+
+            currentState.searchResults = results;
+            currentState.currentSearchIndex = 0;
+
+            if (results.length === 0) {
+                showNotification('По вашему запросу ничего не найдено', 'warning');
+                return;
+            }
+
+            showSearchResult('trade');
+        }
+
+        function showSearchResult(type) {
+            if (currentState.searchResults.length === 0) return;
+
+            const result = currentState.searchResults[currentState.currentSearchIndex];
+            const modal = createModal(`
+                <div class="modal-header">
+                    <div class="modal-title">Результат поиска</div>
+                    <button class="close-modal">&times;</button>
+                </div>
+                <div class="trade-summary">
+                    <div class="trade-title">${type === 'trade' ? 'Трейд' : 'Продажа'} от ${result.user.internal_username}</div>
+                    <div><strong>Совпадение:</strong> ${result.matchPercentage.toFixed(1)}%</div>
+                    ${type === 'trade' ? `
+                        <div><strong>Даёт:</strong> ${DB.categories[result.trade.give.category]} - ${result.trade.give.description}</div>
+                        <div><strong>Хочет:</strong> ${DB.categories[result.trade.want.category]} - ${result.trade.want.description}</div>
+                    ` : `
+                        <div><strong>Товар:</strong> ${DB.categories[result.sale.category]} - ${result.sale.description}</div>
+                        <div><strong>Цена:</strong> ${result.sale.price}</div>
+                    `}
+                </div>
+                <div class="action-buttons">
+                    <button class="btn" onclick="messageUser('${result.user.id}')">
+                        <i class="fas fa-envelope"></i> Написать
+                    </button>
+                    <button class="btn btn-secondary" onclick="closeModal(); showNextSearchResult('${type}')">
+                        <i class="fas fa-arrow-right"></i> Дальше
+                    </button>
+                </div>
+                <div class="pagination">
+                    <button class="btn btn-small" onclick="showPrevSearchResult('${type}')" ${currentState.currentSearchIndex === 0 ? 'disabled' : ''}>
+                        <i class="fas fa-arrow-left"></i> Назад
+                    </button>
+                    <span>${currentState.currentSearchIndex + 1} / ${currentState.searchResults.length}</span>
+                    <button class="btn btn-small" onclick="showNextSearchResult('${type}')" ${currentState.currentSearchIndex === currentState.searchResults.length - 1 ? 'disabled' : ''}>
+                        Дальше <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+            `);
+        }
+
+        function showNextSearchResult(type) {
+            if (currentState.currentSearchIndex < currentState.searchResults.length - 1) {
+                currentState.currentSearchIndex++;
+                showSearchResult(type);
+            }
+        }
+
+        function showPrevSearchResult(type) {
+            if (currentState.currentSearchIndex > 0) {
+                currentState.currentSearchIndex--;
+                showSearchResult(type);
+            }
+        }
+
+        // ФУНКЦИИ МОДЕРАЦИИ
+        function showModeration(type) {
+            let items = [];
+            let title = '';
+
+            switch(type) {
+                case 'trades':
+                    items = Object.entries(DB.pending_trades).flatMap(([userId, trades]) => 
+                        trades.map(trade => ({ userId, trade, type: 'trade' }))
+                    );
+                    title = 'Модерация трейдов';
+                    break;
+                case 'sales':
+                    items = Object.entries(DB.pending_sales).flatMap(([userId, sales]) => 
+                        sales.map(sale => ({ userId, sale, type: 'sale' }))
+                    );
+                    title = 'Модерация продаж';
+                    break;
+                case 'complaints':
+                    items = DB.complaints.map(complaint => ({ ...complaint, type: 'complaint' }));
+                    title = 'Модерация жалоб';
+                    break;
+            }
+
+            if (items.length === 0) {
+                showNotification(`Нет ${type} для модерации`, 'info');
+                return;
+            }
+
+            currentState.adminModerationIndex[type] = 0;
+            showModerationItem(type, items, 0);
+        }
+
+        function showModerationItem(type, items, index) {
+            if (index >= items.length) {
+                showNotification('Модерация завершена!', 'success');
+                return;
+            }
+
+            const item = items[index];
+            let content = '';
+
+            if (type === 'complaints') {
+                content = `
+                    <div class="modal-header">
+                        <div class="modal-title">Жалоба от ${item.username}</div>
+                        <button class="close-modal">&times;</button>
+                    </div>
+                    <div class="trade-summary">
+                        <div><strong>Сообщение:</strong> ${item.message}</div>
+                        <div><strong>Время:</strong> ${new Date(item.timestamp).toLocaleString()}</div>
+                    </div>
+                    <div class="action-buttons">
+                        <button class="btn btn-success" onclick="resolveComplaint(${index})">
+                            <i class="fas fa-check"></i> Решено
+                        </button>
+                        <button class="btn btn-secondary" onclick="replyToComplaint('${item.user_id}')">
+                            <i class="fas fa-reply"></i> Ответить
+                        </button>
+                        <button class="btn btn-danger" onclick="closeModerationItem('${type}', ${index})">
+                            <i class="fas fa-times"></i> Пропустить
+                        </button>
+                    </div>
+                `;
+            } else {
+                const user = DB.users[item.userId];
+                const isTrade = item.type === 'trade';
+                content = `
+                    <div class="modal-header">
+                        <div class="modal-title">${isTrade ? 'Трейд' : 'Продажа'} от ${user.internal_username}</div>
+                        <button class="close-modal">&times;</button>
+                    </div>
+                    <div class="trade-summary">
+                        ${isTrade ? `
+                            <div><strong>Даёт:</strong> ${DB.categories[item.trade.give.category]} - ${item.trade.give.description}</div>
+                            <div><strong>Хочет:</strong> ${DB.categories[item.trade.want.category]} - ${item.trade.want.description}</div>
+                        ` : `
+                            <div><strong>Товар:</strong> ${DB.categories[item.sale.category]} - ${item.sale.description}</div>
+                            <div><strong>Цена:</strong> ${item.sale.price}</div>
+                        `}
+                    </div>
+                    <div class="action-buttons">
+                        <button class="btn btn-success" onclick="approveItem('${type}', '${item.userId}', ${index})">
+                            <i class="fas fa-check"></i> Одобрить
+                        </button>
+                        <button class="btn btn-danger" onclick="rejectItem('${type}', '${item.userId}', ${index})">
+                            <i class="fas fa-times"></i> Отклонить
+                        </button>
+                    </div>
+                `;
+            }
+
+            const modal = createModal(content);
+        }
+
+        function approveItem(type, userId, index) {
+            if (type === 'trades') {
+                const trade = DB.pending_trades[userId][index];
+                DB.pending_trades[userId].splice(index, 1);
+                if (!DB.users[userId].trades) DB.users[userId].trades = [];
+                DB.users[userId].trades.push(trade);
+                showNotification('Трейд одобрен!', 'success');
+            } else if (type === 'sales') {
+                const sale = DB.pending_sales[userId][index];
+                DB.pending_sales[userId].splice(index, 1);
+                if (!DB.users[userId].sales) DB.users[userId].sales = [];
+                DB.users[userId].sales.push(sale);
+                showNotification('Продажа одобрена!', 'success');
+            }
+            closeModal();
+            renderSection('admin');
+        }
+
+        function rejectItem(type, userId, index) {
+            if (type === 'trades') {
+                DB.pending_trades[userId].splice(index, 1);
+                showNotification('Трейд отклонен!', 'warning');
+            } else if (type === 'sales') {
+                DB.pending_sales[userId].splice(index, 1);
+                showNotification('Продажа отклонена!', 'warning');
+            }
+            closeModal();
+            renderSection('admin');
+        }
+
+        // ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ
+        function saveProfile() {
+            const internalUsername = document.getElementById('edit-internal-username').value;
+            const robloxUsername = document.getElementById('edit-roblox-username').value;
+            const telegramUsername = document.getElementById('edit-telegram-username').value;
+
+            if (internalUsername !== currentUser.internal_username && !currentUser.can_change_username) {
+                showNotification('Смена ника заблокирована админом!', 'error');
+                return;
+            }
+
+            currentUser.internal_username = internalUsername;
+            currentUser.roblox_username = robloxUsername;
+            currentUser.telegram_username = telegramUsername;
+
+            showNotification('Профиль успешно обновлен!', 'success');
+            closeModal();
+            renderSection('profile');
+        }
+
+        function publishTrade() {
+            const giveCategory = currentState.giveCategory;
+            const wantCategory = currentState.wantCategory;
+            const giveDescription = document.getElementById('give-description').value;
+            const wantDescription = document.getElementById('want-description').value;
+
+            if (!giveCategory || !wantCategory || !giveDescription || !wantDescription) {
+                showNotification('Заполните все поля!', 'error');
+                return;
+            }
+
+            const tradeData = {
+                give: { category: giveCategory, description: giveDescription },
+                want: { category: wantCategory, description: wantDescription }
+            };
+
+            if (!DB.pending_trades[currentUser.id]) DB.pending_trades[currentUser.id] = [];
+            DB.pending_trades[currentUser.id].push(tradeData);
+
+            showNotification('Трейд отправлен на модерацию!', 'success');
+            closeModal();
+            renderSection('trades');
+        }
+
+        function publishSale() {
+            const category = currentState.saleCategory;
+            const description = document.getElementById('sale-description').value;
+            const price = document.getElementById('sale-price').value;
+
+            if (!category || !description || !price) {
+                showNotification('Заполните все поля!', 'error');
+                return;
+            }
+
+            const saleData = {
+                category: category,
+                description: description,
+                price: price
+            };
+
+            if (!DB.pending_sales[currentUser.id]) DB.pending_sales[currentUser.id] = [];
+            DB.pending_sales[currentUser.id].push(saleData);
+
+            showNotification('Продажа отправлена на модерацию!', 'success');
+            closeModal();
+            renderSection('sales');
+        }
+
+        function deleteTrade(index) {
+            currentUser.trades.splice(index, 1);
+            showNotification('Трейд удален!', 'success');
+            renderSection('trades');
+        }
+
+        function deleteSale(index) {
+            currentUser.sales.splice(index, 1);
+            showNotification('Продажа удалена!', 'success');
+            renderSection('sales');
+        }
+
+        function messageUser(userId) {
+            currentState.currentMessageUser = userId;
+            openChat(userId);
+        }
+
+        function openChat(userId) {
+            const user = DB.users[userId];
+            const messages = DB.messages.filter(msg => 
+                (msg.from === currentUser.id && msg.to === userId) || 
+                (msg.from === userId && msg.to === currentUser.id)
+            ).sort((a, b) => a.timestamp - b.timestamp);
+
+            const modal = createModal(`
+                <div class="modal-header">
+                    <div class="modal-title">Чат с ${user.internal_username}</div>
+                    <button class="close-modal">&times;</button>
+                </div>
+                <div class="chat-container" id="chat-messages">
+                    ${messages.map(msg => `
+                        <div class="message-bubble ${msg.from === currentUser.id ? 'message-sent' : 'message-received'}">
+                            <div>${msg.text}</div>
+                            <div class="message-time">${new Date(msg.timestamp).toLocaleTimeString()}</div>
+                        </div>
+                    `).join('')}
+                </div>
+                <div class="search-bar">
+                    <input type="text" class="search-input" id="message-input" placeholder="Введите сообщение...">
+                    <button class="search-btn" id="send-message-btn">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+            `);
+
+            const chatContainer = document.getElementById('chat-messages');
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+
+            document.getElementById('send-message-btn').addEventListener('click', sendMessage);
+            document.getElementById('message-input').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') sendMessage();
+            });
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('message-input');
+            const text = input.value.trim();
+            
+            if (!text) return;
+
+            const newMessage = {
+                id: DB.messages.length + 1,
+                from: currentUser.id,
+                to: currentState.currentMessageUser,
+                text: text,
+                timestamp: Date.now(),
+                read: false
+            };
+
+            DB.messages.push(newMessage);
+            input.value = '';
+
+            // Обновляем чат
+            openChat(currentState.currentMessageUser);
         }
 
         function changeLanguage(lang) {
@@ -1323,20 +1785,37 @@
             renderSection('settings');
         }
 
-        // ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ
+        function switchToTab(tabId) {
+            document.querySelectorAll('.tab').forEach(tab => {
+                if (tab.getAttribute('data-tab') === tabId) {
+                    tab.click();
+                }
+            });
+        }
+
         function createModal(content) {
+            closeModal(); // Закрываем предыдущее модальное окно
+
             const modal = document.createElement('div');
             modal.className = 'modal';
             modal.style.display = 'flex';
             modal.innerHTML = `<div class="modal-content">${content}</div>`;
             
-            modal.querySelector('.close-modal').addEventListener('click', () => modal.remove());
+            modal.querySelector('.close-modal').addEventListener('click', () => closeModal());
             modal.addEventListener('click', (e) => {
-                if (e.target === modal) modal.remove();
+                if (e.target === modal) closeModal();
             });
             
             document.body.appendChild(modal);
+            currentState.activeModal = modal;
             return modal;
+        }
+
+        function closeModal() {
+            if (currentState.activeModal) {
+                currentState.activeModal.remove();
+                currentState.activeModal = null;
+            }
         }
 
         function initializeCategorySelection(containerId, type) {
@@ -1345,15 +1824,15 @@
                 option.addEventListener('click', function() {
                     options.forEach(opt => opt.classList.remove('selected'));
                     this.classList.add('selected');
-                    userTradingData[`${type}Category`] = this.getAttribute('data-category');
+                    currentState[`${type}Category`] = this.getAttribute('data-category');
                     if (type === 'give' || type === 'want') updateTradeSummary();
                 });
             });
         }
 
         function updateTradeSummary() {
-            const giveCategory = userTradingData.giveCategory;
-            const wantCategory = userTradingData.wantCategory;
+            const giveCategory = currentState.giveCategory;
+            const wantCategory = currentState.wantCategory;
             const giveDescription = document.getElementById('give-description')?.value || '';
             const wantDescription = document.getElementById('want-description')?.value || '';
             
@@ -1365,14 +1844,6 @@
                     `${DB.categories[wantCategory]} - ${wantDescription}`;
                 summary.style.display = 'block';
             }
-        }
-
-        function switchToTab(tabId) {
-            document.querySelectorAll('.tab').forEach(tab => {
-                if (tab.getAttribute('data-tab') === tabId) {
-                    tab.click();
-                }
-            });
         }
 
         function showNotification(message, type = 'info') {
@@ -1405,58 +1876,526 @@
             }, 3000);
         }
 
-        // Заглушки для остальных функций
-        function initializeModals() {}
-        function initializeEventListeners() {}
-        function showContactAdminModal() { showNotification('Функция связи с админом в разработке', 'info'); }
-        function showTutorialModal() { showNotification('Туториал в разработке', 'info'); }
-        function showSearchTradesModal() { showNotification('Поиск трейдов в разработке', 'info'); }
-        function showMyTradesModal() { showNotification('Просмотр трейдов в разработке', 'info'); }
-        function showSearchSalesModal() { showNotification('Поиск продаж в разработке', 'info'); }
-        function showMySalesModal() { showNotification('Просмотр продаж в разработке', 'info'); }
+        function getUnreadMessagesCount() {
+            return DB.messages.filter(msg => msg.to === currentUser.id && !msg.read).length;
+        }
 
-        // Заглушки для админ-функций
-        function showModerateTradesModal() { showNotification('Модерация трейдов в разработке', 'info'); }
-        function showModerateSalesModal() { showNotification('Модерация продаж в разработке', 'info'); }
-        function showModerateComplaintsModal() { showNotification('Модерация жалоб в разработке', 'info'); }
-        function showBanUserModal() { showNotification('Бан пользователей в разработке', 'info'); }
-        function showUnbanUserModal() { showNotification('Разбан пользователей в разработке', 'info'); }
-        function showAllowUsernameChangeModal() { showNotification('Разрешение смены ника в разработке', 'info'); }
-        function showPromoteAdminModal() { showNotification('Назначение админов в разработке', 'info'); }
-        function showDemoteAdminModal() { showNotification('Снятие админов в разработке', 'info'); }
-        function showBroadcastModal() { showNotification('Рассылка в разработке', 'info'); }
-        function showStatsModal() { showNotification('Статистика в разработке', 'info'); }
-        function showViewMessagesModal() { showNotification('Просмотр переписок в разработке', 'info'); }
+        function getConversations() {
+            const conversationMap = new Map();
+            
+            DB.messages.forEach(msg => {
+                const otherUserId = msg.from === currentUser.id ? msg.to : msg.from;
+                if (!conversationMap.has(otherUserId)) {
+                    const user = DB.users[otherUserId];
+                    conversationMap.set(otherUserId, {
+                        userId: otherUserId,
+                        username: user.internal_username,
+                        lastMessage: msg.text,
+                        lastTime: msg.timestamp,
+                        unread: 0
+                    });
+                }
+                
+                const conv = conversationMap.get(otherUserId);
+                if (msg.timestamp > conv.lastTime) {
+                    conv.lastMessage = msg.text;
+                    conv.lastTime = msg.timestamp;
+                }
+                
+                if (msg.to === currentUser.id && !msg.read) {
+                    conv.unread++;
+                }
+            });
+            
+            return Array.from(conversationMap.values()).sort((a, b) => b.lastTime - a.lastTime);
+        }
 
-        // Добавляем эффект ripple для всех кнопок
-        document.addEventListener('click', function(e) {
-            if (e.target.classList.contains('btn') || e.target.closest('.btn')) {
-                const button = e.target.classList.contains('btn') ? e.target : e.target.closest('.btn');
-                const ripple = document.createElement('span');
-                const rect = button.getBoundingClientRect();
-                const size = Math.max(rect.width, rect.height);
-                const x = e.clientX - rect.left - size / 2;
-                const y = e.clientY - rect.top - size / 2;
+        function calculateMatchPercentage(text, search) {
+            const textWords = text.toLowerCase().split(/\s+/);
+            const searchWords = search.toLowerCase().split(/\s+/);
+            
+            let matched = 0;
+            searchWords.forEach(word => {
+                if (textWords.some(tWord => tWord.includes(word))) {
+                    matched++;
+                }
+            });
+            
+            return (matched / searchWords.length) * 100;
+        }
+
+        function initializeRippleEffects() {
+            document.addEventListener('click', function(e) {
+                if (e.target.classList.contains('btn') || e.target.closest('.btn')) {
+                    const button = e.target.classList.contains('btn') ? e.target : e.target.closest('.btn');
+                    const ripple = document.createElement('span');
+                    const rect = button.getBoundingClientRect();
+                    const size = Math.max(rect.width, rect.height);
+                    const x = e.clientX - rect.left - size / 2;
+                    const y = e.clientY - rect.top - size / 2;
+                    
+                    ripple.style.cssText = `
+                        position: absolute;
+                        border-radius: 50%;
+                        background-color: rgba(255, 255, 255, 0.7);
+                        transform: scale(0);
+                        animation: ripple-animation 0.6s linear;
+                        width: ${size}px;
+                        height: ${size}px;
+                        left: ${x}px;
+                        top: ${y}px;
+                    `;
+                    
+                    button.style.position = 'relative';
+                    button.style.overflow = 'hidden';
+                    button.appendChild(ripple);
+                    
+                    setTimeout(() => ripple.remove(), 600);
+                }
+            });
+        }
+
+        // ЗАГЛУШКИ ДЛЯ ОСТАЛЬНЫХ ФУНКЦИЙ
+        function renderBannedProfile() {
+            const content = document.querySelector('.content');
+            content.innerHTML = `
+                <div class="card">
+                    <div class="card-title" style="color: var(--danger);">
+                        <i class="fas fa-ban"></i> Аккаунт заблокирован
+                    </div>
+                    <p>Ваш аккаунт был заблокирован администратором.</p>
+                    <button class="btn btn-secondary" id="contact-admin-btn">
+                        <i class="fas fa-headset"></i> Связь с админом
+                    </button>
+                </div>
+            `;
+        }
+
+        function renderNoAccess() {
+            const content = document.querySelector('.content');
+            content.innerHTML = `
+                <div class="card">
+                    <div class="card-title" style="color: var(--danger);">
+                        <i class="fas fa-ban"></i> Доступ запрещен
+                    </div>
+                    <p>У вас нет прав для доступа к админ-панели.</p>
+                </div>
+            `;
+        }
+
+        function showMyTrades() {
+            showNotification('Просмотр своих трейдов', 'info');
+        }
+
+        function showMySales() {
+            showNotification('Просмотр своих продаж', 'info');
+        }
+
+        function viewUserTrades(userId) {
+            const user = DB.users[userId];
+            const modal = createModal(`
+                <div class="modal-header">
+                    <div class="modal-title">Трейды пользователя ${user.internal_username}</div>
+                    <button class="close-modal">&times;</button>
+                </div>
+                ${user.trades.length === 0 ? `
+                    <div class="empty-state">
+                        <p>У пользователя нет активных трейдов</p>
+                    </div>
+                ` : `
+                    ${user.trades.map(trade => `
+                        <div class="trade-item">
+                            <div class="trade-icon">
+                                <i class="fas fa-exchange-alt"></i>
+                            </div>
+                            <div class="trade-details">
+                                <div class="trade-title">${DB.categories[trade.give.category]} → ${DB.categories[trade.want.category]}</div>
+                                <div class="trade-description">${trade.give.description}</div>
+                            </div>
+                        </div>
+                    `).join('')}
+                `}
+                <div class="action-buttons">
+                    <button class="btn" onclick="messageUser('${userId}')">
+                        <i class="fas fa-envelope"></i> Написать
+                    </button>
+                    <button class="btn btn-secondary" onclick="closeModal()">
+                        Закрыть
+                    </button>
+                </div>
+            `);
+        }
+
+        function viewUserSales(userId) {
+            const user = DB.users[userId];
+            const modal = createModal(`
+                <div class="modal-header">
+                    <div class="modal-title">Продажи пользователя ${user.internal_username}</div>
+                    <button class="close-modal">&times;</button>
+                </div>
+                ${user.sales.length === 0 ? `
+                    <div class="empty-state">
+                        <p>У пользователя нет активных продаж</p>
+                    </div>
+                ` : `
+                    ${user.sales.map(sale => `
+                        <div class="trade-item">
+                            <div class="trade-icon">
+                                <i class="fas fa-shopping-cart"></i>
+                            </div>
+                            <div class="trade-details">
+                                <div class="trade-title">${DB.categories[sale.category]}</div>
+                                <div class="trade-description">${sale.description}</div>
+                                <div style="color: var(--success); font-weight: bold;">${sale.price}</div>
+                            </div>
+                        </div>
+                    `).join('')}
+                `}
+                <div class="action-buttons">
+                    <button class="btn" onclick="messageUser('${userId}')">
+                        <i class="fas fa-envelope"></i> Написать
+                    </button>
+                    <button class="btn btn-secondary" onclick="closeModal()">
+                        Закрыть
+                    </button>
+                </div>
+            `);
+        }
+
+        function showNewMessageModal() {
+            const modal = createModal(`
+                <div class="modal-header">
+                    <div class="modal-title">Новое сообщение</div>
+                    <button class="close-modal">&times;</button>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Получатель</label>
+                    <input type="text" class="form-input" id="new-message-user" placeholder="Введите внутренний ник">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Сообщение</label>
+                    <textarea class="form-textarea" id="new-message-text" placeholder="Введите сообщение..."></textarea>
+                </div>
+                <div class="action-buttons">
+                    <button class="btn" id="send-new-message-btn">Отправить</button>
+                    <button class="btn btn-secondary" onclick="closeModal()">Отмена</button>
+                </div>
+            `);
+
+            document.getElementById('send-new-message-btn').addEventListener('click', () => {
+                const username = document.getElementById('new-message-user').value;
+                const text = document.getElementById('new-message-text').value;
                 
-                ripple.style.cssText = `
-                    position: absolute;
-                    border-radius: 50%;
-                    background-color: rgba(255, 255, 255, 0.7);
-                    transform: scale(0);
-                    animation: ripple-animation 0.6s linear;
-                    width: ${size}px;
-                    height: ${size}px;
-                    left: ${x}px;
-                    top: ${y}px;
-                `;
-                
-                button.style.position = 'relative';
-                button.style.overflow = 'hidden';
-                button.appendChild(ripple);
-                
-                setTimeout(() => ripple.remove(), 600);
+                const user = Object.values(DB.users).find(u => u.internal_username === username);
+                if (!user) {
+                    showNotification('Пользователь не найден!', 'error');
+                    return;
+                }
+
+                messageUser(user.id);
+                closeModal();
+            });
+        }
+
+        // ЗАГЛУШКИ ДЛЯ АДМИН-ФУНКЦИЙ
+        function showContactAdminModal() {
+            const modal = createModal(`
+                <div class="modal-header">
+                    <div class="modal-title">Связь с админом</div>
+                    <button class="close-modal">&times;</button>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Ваше сообщение</label>
+                    <textarea class="form-textarea" id="admin-message" placeholder="Опишите проблему..."></textarea>
+                </div>
+                <div class="action-buttons">
+                    <button class="btn" onclick="sendAdminMessage()">Отправить</button>
+                    <button class="btn btn-secondary" onclick="closeModal()">Отмена</button>
+                </div>
+            `);
+        }
+
+        function sendAdminMessage() {
+            const message = document.getElementById('admin-message').value;
+            if (!message) {
+                showNotification('Введите сообщение!', 'error');
+                return;
             }
-        });
+
+            DB.complaints.push({
+                user_id: currentUser.id,
+                username: currentUser.internal_username,
+                message: message,
+                timestamp: Date.now()
+            });
+
+            showNotification('Жалоба отправлена админам!', 'success');
+            closeModal();
+        }
+
+        function showTutorial() {
+            const modal = createModal(`
+                <div class="modal-header">
+                    <div class="modal-title">Туториал по использованию бота</div>
+                    <button class="close-modal">&times;</button>
+                </div>
+                <div style="max-height: 300px; overflow-y: auto;">
+                    <h4>Создание трейдов:</h4>
+                    <p>• Максимум 1 активный трейд</p>
+                    <p>• Трейды проходят модерацию</p>
+                    <p>• Выбирайте категории тщательно</p>
+                    
+                    <h4>Продажи:</h4>
+                    <p>• Максимум 5 активных продаж</p>
+                    <p>• Указывайте реальные цены</p>
+                    <p>• Подробно описывайте товар</p>
+                    
+                    <h4>Общение:</h4>
+                    <p>• Уважайте других пользователей</p>
+                    <p>• Не спамьте сообщениями</p>
+                    <p>• При проблемах - пишите админам</p>
+                </div>
+                <div class="action-buttons">
+                    <button class="btn btn-secondary" onclick="closeModal()">Закрыть</button>
+                </div>
+            `);
+        }
+
+        function showComplaintModal() {
+            showContactAdminModal();
+        }
+
+        function showBanUserModal() {
+            const modal = createModal(`
+                <div class="modal-header">
+                    <div class="modal-title">Бан пользователя</div>
+                    <button class="close-modal">&times;</button>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Никнейм пользователя</label>
+                    <input type="text" class="form-input" id="ban-username" placeholder="Введите внутренний ник">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Причина</label>
+                    <select class="form-select" id="ban-reason">
+                        <option value="spam">📋 Спам</option>
+                        <option value="nick">📋 Недопустимый ник</option>
+                        <option value="other">📋 Другое</option>
+                    </select>
+                </div>
+                <div class="action-buttons">
+                    <button class="btn btn-danger" onclick="banUser()">Забанить</button>
+                    <button class="btn btn-secondary" onclick="closeModal()">Отмена</button>
+                </div>
+            `);
+        }
+
+        function banUser() {
+            const username = document.getElementById('ban-username').value;
+            const reason = document.getElementById('ban-reason').value;
+            
+            const user = Object.values(DB.users).find(u => u.internal_username === username);
+            if (!user) {
+                showNotification('Пользователь не найден!', 'error');
+                return;
+            }
+
+            user.banned = true;
+            showNotification(`Пользователь ${username} забанен!`, 'success');
+            closeModal();
+        }
+
+        function showUnbanUserModal() {
+            const modal = createModal(`
+                <div class="modal-header">
+                    <div class="modal-title">Разбан пользователя</div>
+                    <button class="close-modal">&times;</button>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Никнейм пользователя</label>
+                    <input type="text" class="form-input" id="unban-username" placeholder="Введите внутренний ник">
+                </div>
+                <div class="action-buttons">
+                    <button class="btn btn-success" onclick="unbanUser()">Разбанить</button>
+                    <button class="btn btn-secondary" onclick="closeModal()">Отмена</button>
+                </div>
+            `);
+        }
+
+        function unbanUser() {
+            const username = document.getElementById('unban-username').value;
+            
+            const user = Object.values(DB.users).find(u => u.internal_username === username);
+            if (!user) {
+                showNotification('Пользователь не найден!', 'error');
+                return;
+            }
+
+            user.banned = false;
+            showNotification(`Пользователь ${username} разбанен!`, 'success');
+            closeModal();
+        }
+
+        function showAllowUsernameChangeModal() {
+            const modal = createModal(`
+                <div class="modal-header">
+                    <div class="modal-title">Разрешить смену ника</div>
+                    <button class="close-modal">&times;</button>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Никнейм пользователя</label>
+                    <input type="text" class="form-input" id="allow-username" placeholder="Введите внутренний ник">
+                </div>
+                <div class="action-buttons">
+                    <button class="btn btn-success" onclick="allowUsernameChange()">Разрешить</button>
+                    <button class="btn btn-secondary" onclick="closeModal()">Отмена</button>
+                </div>
+            `);
+        }
+
+        function allowUsernameChange() {
+            const username = document.getElementById('allow-username').value;
+            
+            const user = Object.values(DB.users).find(u => u.internal_username === username);
+            if (!user) {
+                showNotification('Пользователь не найден!', 'error');
+                return;
+            }
+
+            user.can_change_username = true;
+            showNotification(`Пользователь ${username} может менять ник!`, 'success');
+            closeModal();
+        }
+
+        function showAdminViewMessagesModal() {
+            const modal = createModal(`
+                <div class="modal-header">
+                    <div class="modal-title">Просмотр переписок</div>
+                    <button class="close-modal">&times;</button>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Никнейм пользователя</label>
+                    <input type="text" class="form-input" id="view-messages-username" placeholder="Введите внутренний ник">
+                </div>
+                <div class="action-buttons">
+                    <button class="btn" onclick="adminViewMessages()">Просмотреть</button>
+                    <button class="btn btn-secondary" onclick="closeModal()">Отмена</button>
+                </div>
+            `);
+        }
+
+        function adminViewMessages() {
+            const username = document.getElementById('view-messages-username').value;
+            
+            const user = Object.values(DB.users).find(u => u.internal_username === username);
+            if (!user) {
+                showNotification('Пользователь не найден!', 'error');
+                return;
+            }
+
+            // Показываем все сообщения пользователя
+            const userMessages = DB.messages.filter(msg => msg.from === user.id || msg.to === user.id)
+                                          .sort((a, b) => a.timestamp - b.timestamp);
+
+            const modal = createModal(`
+                <div class="modal-header">
+                    <div class="modal-title">Переписки ${username}</div>
+                    <button class="close-modal">&times;</button>
+                </div>
+                <div style="max-height: 400px; overflow-y: auto;">
+                    ${userMessages.length === 0 ? `
+                        <div class="empty-state">
+                            <p>Нет сообщений</p>
+                        </div>
+                    ` : userMessages.map(msg => {
+                        const fromUser = DB.users[msg.from];
+                        const toUser = DB.users[msg.to];
+                        return `
+                            <div class="message-bubble ${msg.from === user.id ? 'message-received' : 'message-sent'}" style="margin: 10px 0;">
+                                <div><strong>${fromUser.internal_username} → ${toUser.internal_username}:</strong></div>
+                                <div>${msg.text}</div>
+                                <div class="message-time">${new Date(msg.timestamp).toLocaleString()}</div>
+                            </div>
+                        `;
+                    }).join('')}
+                </div>
+                <div class="action-buttons">
+                    <button class="btn btn-secondary" onclick="closeModal()">Закрыть</button>
+                </div>
+            `);
+        }
+
+        function showPromoteAdminModal() {
+            showNotification('Функция назначения админов', 'info');
+        }
+
+        function showDemoteAdminModal() {
+            showNotification('Функция снятия админов', 'info');
+        }
+
+        function showBroadcastModal() {
+            showNotification('Функция рассылки', 'info');
+        }
+
+        function showStatsModal() {
+            const totalUsers = Object.values(DB.users).length;
+            const activeUsers = Object.values(DB.users).filter(u => !u.banned).length;
+            const totalTrades = Object.values(DB.users).reduce((sum, user) => sum + user.trades.length, 0);
+            const totalSales = Object.values(DB.users).reduce((sum, user) => sum + user.sales.length, 0);
+            const pendingTrades = Object.values(DB.pending_trades).flat().length;
+            const pendingSales = Object.values(DB.pending_sales).flat().length;
+
+            const modal = createModal(`
+                <div class="modal-header">
+                    <div class="modal-title">Статистика бота</div>
+                    <button class="close-modal">&times;</button>
+                </div>
+                <div class="trade-summary">
+                    <div><strong>Всего пользователей:</strong> ${totalUsers}</div>
+                    <div><strong>Активных пользователей:</strong> ${activeUsers}</div>
+                    <div><strong>Заблокированных:</strong> ${totalUsers - activeUsers}</div>
+                    <div><strong>Активных трейдов:</strong> ${totalTrades}</div>
+                    <div><strong>Активных продаж:</strong> ${totalSales}</div>
+                    <div><strong>На модерации:</strong> ${pendingTrades + pendingSales}</div>
+                    <div><strong>Всего сообщений:</strong> ${DB.messages.length}</div>
+                    <div><strong>Жалоб:</strong> ${DB.complaints.length}</div>
+                </div>
+                <div class="action-buttons">
+                    <button class="btn btn-secondary" onclick="closeModal()">Закрыть</button>
+                </div>
+            `);
+        }
+
+        function resolveComplaint(index) {
+            DB.complaints.splice(index, 1);
+            showNotification('Жалоба отмечена как решенная!', 'success');
+            closeModal();
+            renderSection('admin');
+        }
+
+        function replyToComplaint(userId) {
+            currentState.currentMessageUser = userId;
+            openChat(userId);
+        }
+
+        function closeModerationItem(type, index) {
+            if (type === 'complaints') {
+                DB.complaints.splice(index, 1);
+            }
+            closeModal();
+            renderSection('admin');
+        }
+
+        // ДЕЛАЕМ ФУНКЦИИ ГЛОБАЛЬНЫМИ ДЛЯ HTML
+        window.deleteTrade = deleteTrade;
+        window.deleteSale = deleteSale;
+        window.messageUser = messageUser;
+        window.openChat = openChat;
+        window.viewUserTrades = viewUserTrades;
+        window.viewUserSales = viewUserSales;
+        window.showNextSearchResult = showNextSearchResult;
+        window.showPrevSearchResult = showPrevSearchResult;
+        window.closeModal = closeModal;
     </script>
 </body>
     </html>
