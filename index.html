@@ -195,10 +195,6 @@
             box-shadow: 0 4px 10px rgba(106, 137, 204, 0.3);
         }
 
-        .btn-secondary:hover {
-            box-shadow: 0 6px 15px rgba(106, 137, 204, 0.4);
-        }
-
         .btn-success {
             background: linear-gradient(to right, var(--success), #67d17e);
             box-shadow: 0 4px 10px rgba(120, 224, 143, 0.3);
@@ -453,6 +449,135 @@
             background-color: var(--light);
             color: var(--dark);
         }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1001;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: white;
+            border-radius: 15px;
+            padding: 20px;
+            width: 90%;
+            max-width: 400px;
+            max-height: 80vh;
+            overflow-y: auto;
+            animation: modalFadeIn 0.3s ease;
+        }
+
+        @keyframes modalFadeIn {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .modal-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--primary-dark);
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--dark);
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .form-input, .form-select, .form-textarea {
+            width: 100%;
+            padding: 10px 15px;
+            border: 1px solid var(--gray);
+            border-radius: 10px;
+            outline: none;
+            transition: var(--transition);
+        }
+
+        .form-input:focus, .form-select:focus, .form-textarea:focus {
+            border-color: var(--primary);
+        }
+
+        .form-textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .category-options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .category-option {
+            padding: 15px;
+            border: 2px solid var(--gray);
+            border-radius: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .category-option.selected {
+            border-color: var(--primary);
+            background-color: rgba(255, 154, 118, 0.1);
+        }
+
+        .category-option:hover {
+            border-color: var(--primary);
+        }
+
+        .trade-summary {
+            background-color: var(--light);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+        }
+
+        .trade-summary-item {
+            margin-bottom: 10px;
+        }
+
+        .trade-summary-label {
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .action-buttons .btn {
+            flex: 1;
+        }
     </style>
 </head>
 <body>
@@ -493,15 +618,15 @@
                     <div class="profile-info">
                         <div class="info-item">
                             <span class="info-label">Внутренний ник:</span>
-                            <span class="info-value">Justazero</span>
+                            <span class="info-value" id="internal-username">Justazero</span>
                         </div>
                         <div class="info-item">
                             <span class="info-label">Roblox аккаунт:</span>
-                            <span class="info-value">Justazero_RBLX</span>
+                            <span class="info-value" id="roblox-username">Justazero_RBLX</span>
                         </div>
                         <div class="info-item">
                             <span class="info-label">Telegram:</span>
-                            <span class="info-value">@Justazero</span>
+                            <span class="info-value" id="telegram-username">@Justazero</span>
                         </div>
                         <div class="info-item">
                             <span class="info-label">Статус:</span>
@@ -511,7 +636,7 @@
                             </span>
                         </div>
                     </div>
-                    <button class="btn btn-secondary">
+                    <button class="btn btn-secondary" id="edit-profile-btn">
                         <i class="fas fa-edit"></i> Редактировать профиль
                     </button>
                 </div>
@@ -523,19 +648,19 @@
                     <div class="profile-info">
                         <div class="info-item">
                             <span class="info-label">Активные трейды:</span>
-                            <span class="info-value">3</span>
+                            <span class="info-value" id="active-trades-count">3</span>
                         </div>
                         <div class="info-item">
                             <span class="info-label">Активные продажи:</span>
-                            <span class="info-value">2</span>
+                            <span class="info-value" id="active-sales-count">2</span>
                         </div>
                         <div class="info-item">
                             <span class="info-label">Успешные сделки:</span>
-                            <span class="info-value">12</span>
+                            <span class="info-value" id="successful-deals">12</span>
                         </div>
                         <div class="info-item">
                             <span class="info-label">Рейтинг:</span>
-                            <span class="info-value">4.8/5.0</span>
+                            <span class="info-value" id="user-rating">4.8/5.0</span>
                         </div>
                     </div>
                 </div>
@@ -547,27 +672,10 @@
                     <div class="card-title">
                         <i class="fas fa-exchange-alt"></i> Мои трейды
                     </div>
-                    <div class="trade-item">
-                        <div class="trade-icon">
-                            <i class="fas fa-gamepad"></i>
-                        </div>
-                        <div class="trade-details">
-                            <div class="trade-title">Предметы Roblox</div>
-                            <div class="trade-description">Обменяю Dominus за несколько редких шапок</div>
-                        </div>
-                        <span class="badge badge-success">Активен</span>
+                    <div id="my-trades-list">
+                        <!-- Трейды будут загружены динамически -->
                     </div>
-                    <div class="trade-item">
-                        <div class="trade-icon">
-                            <i class="fas fa-user-shield"></i>
-                        </div>
-                        <div class="trade-details">
-                            <div class="trade-title">Буст аккаунта</div>
-                            <div class="trade-description">Прокачаю ваш аккаунт за ограниченные предметы</div>
-                        </div>
-                        <span class="badge badge-warning">На модерации</span>
-                    </div>
-                    <button class="btn">
+                    <button class="btn" id="create-trade-btn">
                         <i class="fas fa-plus"></i> Создать новый трейд
                     </button>
                 </div>
@@ -577,12 +685,12 @@
                         <i class="fas fa-search"></i> Найти трейды
                     </div>
                     <div class="search-bar">
-                        <input type="text" class="search-input" placeholder="Что ищете?">
-                        <button class="search-btn">
+                        <input type="text" class="search-input" id="search-trades-input" placeholder="Что ищете?">
+                        <button class="search-btn" id="search-trades-btn">
                             <i class="fas fa-search"></i>
                         </button>
                     </div>
-                    <button class="btn btn-secondary">
+                    <button class="btn btn-secondary" id="advanced-search-btn">
                         <i class="fas fa-filter"></i> Расширенный поиск
                     </button>
                 </div>
@@ -594,27 +702,10 @@
                     <div class="card-title">
                         <i class="fas fa-shopping-cart"></i> Мои продажи
                     </div>
-                    <div class="trade-item">
-                        <div class="trade-icon">
-                            <i class="fas fa-key"></i>
-                        </div>
-                        <div class="trade-details">
-                            <div class="trade-title">Аккаунт Roblox</div>
-                            <div class="trade-description">Продаю аккаунт с ограниченными предметами</div>
-                        </div>
-                        <span class="badge badge-success">2 500 RUB</span>
+                    <div id="my-sales-list">
+                        <!-- Продажи будут загружены динамически -->
                     </div>
-                    <div class="trade-item">
-                        <div class="trade-icon">
-                            <i class="fas fa-tools"></i>
-                        </div>
-                        <div class="trade-details">
-                            <div class="trade-title">Игровая помощь</div>
-                            <div class="trade-description">Помощь с прохождением сложных уровней</div>
-                        </div>
-                        <span class="badge badge-success">500 RUB/час</span>
-                    </div>
-                    <button class="btn">
+                    <button class="btn" id="create-sale-btn">
                         <i class="fas fa-plus"></i> Добавить продажу
                     </button>
                 </div>
@@ -624,12 +715,12 @@
                         <i class="fas fa-search"></i> Найти продажи
                     </div>
                     <div class="search-bar">
-                        <input type="text" class="search-input" placeholder="Что ищете?">
-                        <button class="search-btn">
+                        <input type="text" class="search-input" id="search-sales-input" placeholder="Что ищете?">
+                        <button class="search-btn" id="search-sales-btn">
                             <i class="fas fa-search"></i>
                         </button>
                     </div>
-                    <button class="btn btn-secondary">
+                    <button class="btn btn-secondary" id="sales-by-category-btn">
                         <i class="fas fa-filter"></i> По категориям
                     </button>
                 </div>
@@ -642,14 +733,13 @@
                         <i class="fas fa-users"></i> Поиск пользователей
                     </div>
                     <div class="search-bar">
-                        <input type="text" class="search-input" placeholder="Введите никнейм">
-                        <button class="search-btn">
+                        <input type="text" class="search-input" id="search-users-input" placeholder="Введите никнейм">
+                        <button class="search-btn" id="search-users-btn">
                             <i class="fas fa-search"></i>
                         </button>
                     </div>
-                    <div class="empty-state">
-                        <i class="fas fa-search"></i>
-                        <p>Введите никнейм для поиска пользователей</p>
+                    <div id="users-search-results">
+                        <!-- Результаты поиска будут загружены динамически -->
                     </div>
                 </div>
 
@@ -657,23 +747,8 @@
                     <div class="card-title">
                         <i class="fas fa-history"></i> Недавние поиски
                     </div>
-                    <div class="trade-item">
-                        <div class="trade-icon">
-                            <i class="fas fa-user"></i>
-                        </div>
-                        <div class="trade-details">
-                            <div class="trade-title">RobloxTrader</div>
-                            <div class="trade-description">Активный трейдер, 25 сделок</div>
-                        </div>
-                    </div>
-                    <div class="trade-item">
-                        <div class="trade-icon">
-                            <i class="fas fa-user"></i>
-                        </div>
-                        <div class="trade-details">
-                            <div class="trade-title">ItemCollector</div>
-                            <div class="trade-description">Коллекционер редких предметов</div>
-                        </div>
+                    <div id="recent-searches">
+                        <!-- Недавние поиски будут загружены динамически -->
                     </div>
                 </div>
             </div>
@@ -684,10 +759,10 @@
                     <div class="card-title">
                         <i class="fas fa-language"></i> Язык
                     </div>
-                    <button class="btn">
+                    <button class="btn" id="lang-ru-btn">
                         <i class="fas fa-globe"></i> Русский
                     </button>
-                    <button class="btn btn-secondary">
+                    <button class="btn btn-secondary" id="lang-en-btn">
                         <i class="fas fa-globe"></i> English
                     </button>
                 </div>
@@ -699,19 +774,19 @@
                     <div class="info-item">
                         <span class="info-label">Сообщения</span>
                         <span class="info-value">
-                            <input type="checkbox" checked>
+                            <input type="checkbox" id="notif-messages" checked>
                         </span>
                     </div>
                     <div class="info-item">
                         <span class="info-label">Новые трейды</span>
                         <span class="info-value">
-                            <input type="checkbox" checked>
+                            <input type="checkbox" id="notif-trades" checked>
                         </span>
                     </div>
                     <div class="info-item">
                         <span class="info-label">Обновления системы</span>
                         <span class="info-value">
-                            <input type="checkbox">
+                            <input type="checkbox" id="notif-updates">
                         </span>
                     </div>
                 </div>
@@ -720,10 +795,10 @@
                     <div class="card-title">
                         <i class="fas fa-shield-alt"></i> Безопасность
                     </div>
-                    <button class="btn">
+                    <button class="btn" id="change-password-btn">
                         <i class="fas fa-key"></i> Сменить пароль
                     </button>
-                    <button class="btn btn-secondary">
+                    <button class="btn btn-secondary" id="login-history-btn">
                         <i class="fas fa-history"></i> История входов
                     </button>
                 </div>
@@ -732,13 +807,13 @@
                     <div class="card-title">
                         <i class="fas fa-cogs"></i> Админ-панель
                     </div>
-                    <button class="btn btn-warning">
+                    <button class="btn btn-warning" id="moderation-btn">
                         <i class="fas fa-user-shield"></i> Модерация
                     </button>
-                    <button class="btn btn-secondary">
+                    <button class="btn btn-secondary" id="stats-btn">
                         <i class="fas fa-chart-bar"></i> Статистика
                     </button>
-                    <button class="btn btn-danger">
+                    <button class="btn btn-danger" id="user-management-btn">
                         <i class="fas fa-ban"></i> Управление пользователями
                     </button>
                 </div>
@@ -746,6 +821,82 @@
         </div>
     </div>
 
+    <!-- Модальные окна -->
+    <div class="modal" id="edit-profile-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">Редактирование профиля</div>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Внутренний никнейм</label>
+                <input type="text" class="form-input" id="edit-internal-username" value="Justazero">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Roblox аккаунт</label>
+                <input type="text" class="form-input" id="edit-roblox-username" value="Justazero_RBLX">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Telegram юзернейм</label>
+                <input type="text" class="form-input" id="edit-telegram-username" value="@Justazero">
+            </div>
+            <div class="action-buttons">
+                <button class="btn" id="save-profile-btn">Сохранить</button>
+                <button class="btn btn-secondary" id="cancel-edit-profile-btn">Отмена</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="create-trade-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">Создание трейда</div>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Что вы даёте?</label>
+                <div class="category-options" id="give-category-options">
+                    <div class="category-option" data-category="items">🎮 Предметы</div>
+                    <div class="category-option" data-category="boost">🚀 Буст аккаунта</div>
+                    <div class="category-option" data-category="account">🔑 Аккаунт</div>
+                    <div class="category-option" data-category="help">🛠️ Игровая помощь</div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Описание того, что даёте</label>
+                <textarea class="form-textarea" id="give-description" placeholder="Опишите предмет..."></textarea>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Что вы хотите?</label>
+                <div class="category-options" id="want-category-options">
+                    <div class="category-option" data-category="items">🎮 Предметы</div>
+                    <div class="category-option" data-category="boost">🚀 Буст аккаунта</div>
+                    <div class="category-option" data-category="account">🔑 Аккаунт</div>
+                    <div class="category-option" data-category="help">🛠️ Игровая помощь</div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Описание того, что хотите</label>
+                <textarea class="form-textarea" id="want-description" placeholder="Опишите желаемый предмет..."></textarea>
+            </div>
+            <div class="trade-summary" id="trade-summary" style="display: none;">
+                <div class="trade-summary-item">
+                    <span class="trade-summary-label">Вы даёте:</span>
+                    <span id="summary-give"></span>
+                </div>
+                <div class="trade-summary-item">
+                    <span class="trade-summary-label">Вы хотите:</span>
+                    <span id="summary-want"></span>
+                </div>
+            </div>
+            <div class="action-buttons">
+                <button class="btn" id="publish-trade-btn">Опубликовать</button>
+                <button class="btn btn-secondary" id="cancel-trade-btn">Отмена</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Уведомление -->
     <div class="notification" id="notification">
         <div class="notification-icon">
             <i class="fas fa-check"></i>
@@ -756,8 +907,122 @@
     </div>
 
     <script>
+        // Мок-данные для демонстрации
+        const mockData = {
+            user: {
+                internalUsername: "Justazero",
+                robloxUsername: "Justazero_RBLX",
+                telegramUsername: "@Justazero",
+                isAdmin: true,
+                activeTrades: 3,
+                activeSales: 2,
+                successfulDeals: 12,
+                rating: 4.8
+            },
+            trades: [
+                {
+                    id: 1,
+                    give: { category: "items", description: "Обменяю Dominus за несколько редких шапок" },
+                    want: { category: "items", description: "Редкие шапки из коллекции 2018 года" },
+                    status: "active"
+                },
+                {
+                    id: 2,
+                    give: { category: "boost", description: "Прокачаю ваш аккаунт за ограниченные предметы" },
+                    want: { category: "items", description: "Любые ограниченные предметы" },
+                    status: "moderation"
+                }
+            ],
+            sales: [
+                {
+                    id: 1,
+                    category: "account",
+                    description: "Продаю аккаунт с ограниченными предметами",
+                    price: "2 500 RUB",
+                    status: "active"
+                },
+                {
+                    id: 2,
+                    category: "help",
+                    description: "Помощь с прохождением сложных уровней",
+                    price: "500 RUB/час",
+                    status: "active"
+                }
+            ],
+            categories: {
+                items: "🎮 Предметы",
+                boost: "🚀 Буст аккаунта", 
+                account: "🔑 Аккаунт",
+                help: "🛠️ Игровая помощь",
+                other: "📌 Другое"
+            }
+        };
+
+        // Состояние приложения
+        const state = {
+            currentUser: mockData.user,
+            trades: mockData.trades,
+            sales: mockData.sales,
+            currentTrade: {
+                give: { category: null, description: "" },
+                want: { category: null, description: "" }
+            },
+            searchResults: {
+                users: [],
+                trades: [],
+                sales: []
+            },
+            language: 'ru',
+            notifications: {
+                messages: true,
+                trades: true,
+                updates: false
+            }
+        };
+
+        // DOM элементы
+        const elements = {
+            // Профиль
+            internalUsername: document.getElementById('internal-username'),
+            robloxUsername: document.getElementById('roblox-username'),
+            telegramUsername: document.getElementById('telegram-username'),
+            activeTradesCount: document.getElementById('active-trades-count'),
+            activeSalesCount: document.getElementById('active-sales-count'),
+            successfulDeals: document.getElementById('successful-deals'),
+            userRating: document.getElementById('user-rating'),
+            editProfileBtn: document.getElementById('edit-profile-btn'),
+            
+            // Модальные окна
+            editProfileModal: document.getElementById('edit-profile-modal'),
+            createTradeModal: document.getElementById('create-trade-modal'),
+            
+            // Кнопки
+            createTradeBtn: document.getElementById('create-trade-btn'),
+            createSaleBtn: document.getElementById('create-sale-btn'),
+            saveProfileBtn: document.getElementById('save-profile-btn'),
+            publishTradeBtn: document.getElementById('publish-trade-btn'),
+            
+            // Списки
+            myTradesList: document.getElementById('my-trades-list'),
+            mySalesList: document.getElementById('my-sales-list'),
+            
+            // Уведомление
+            notification: document.getElementById('notification')
+        };
+
+        // Инициализация приложения
         document.addEventListener('DOMContentLoaded', function() {
-            // Инициализация вкладок
+            initializeTabs();
+            initializeProfile();
+            initializeTrades();
+            initializeSales();
+            initializeModals();
+            initializeNotifications();
+            showNotification('Добро пожаловать в Trade Bot!', 'success');
+        });
+
+        // Инициализация вкладок
+        function initializeTabs() {
             const tabs = document.querySelectorAll('.tab');
             const sections = document.querySelectorAll('.section');
             
@@ -774,65 +1039,366 @@
                     document.getElementById(`${tabId}-section`).classList.add('active');
                 });
             });
+        }
+
+        // Инициализация профиля
+        function initializeProfile() {
+            // Заполняем данные профиля
+            elements.internalUsername.textContent = state.currentUser.internalUsername;
+            elements.robloxUsername.textContent = state.currentUser.robloxUsername;
+            elements.telegramUsername.textContent = state.currentUser.telegramUsername;
+            elements.activeTradesCount.textContent = state.currentUser.activeTrades;
+            elements.activeSalesCount.textContent = state.currentUser.activeSales;
+            elements.successfulDeals.textContent = state.currentUser.successfulDeals;
+            elements.userRating.textContent = state.currentUser.rating + '/5.0';
             
-            // Показываем уведомление при загрузке
+            // Обработчик кнопки редактирования профиля
+            elements.editProfileBtn.addEventListener('click', function() {
+                document.getElementById('edit-internal-username').value = state.currentUser.internalUsername;
+                document.getElementById('edit-roblox-username').value = state.currentUser.robloxUsername;
+                document.getElementById('edit-telegram-username').value = state.currentUser.telegramUsername;
+                openModal('edit-profile-modal');
+            });
+            
+            // Обработчик сохранения профиля
+            document.getElementById('save-profile-btn').addEventListener('click', function() {
+                const newInternal = document.getElementById('edit-internal-username').value;
+                const newRoblox = document.getElementById('edit-roblox-username').value;
+                const newTelegram = document.getElementById('edit-telegram-username').value;
+                
+                // Обновляем состояние
+                state.currentUser.internalUsername = newInternal;
+                state.currentUser.robloxUsername = newRoblox;
+                state.currentUser.telegramUsername = newTelegram;
+                
+                // Обновляем UI
+                elements.internalUsername.textContent = newInternal;
+                elements.robloxUsername.textContent = newRoblox;
+                elements.telegramUsername.textContent = newTelegram;
+                
+                closeModal('edit-profile-modal');
+                showNotification('Профиль успешно обновлен!', 'success');
+            });
+        }
+
+        // Инициализация трейдов
+        function initializeTrades() {
+            // Обработчик кнопки создания трейда
+            elements.createTradeBtn.addEventListener('click', function() {
+                // Сброс формы
+                state.currentTrade = {
+                    give: { category: null, description: "" },
+                    want: { category: null, description: "" }
+                };
+                document.getElementById('give-description').value = '';
+                document.getElementById('want-description').value = '';
+                document.getElementById('trade-summary').style.display = 'none';
+                
+                // Сброс выбранных категорий
+                document.querySelectorAll('.category-option').forEach(option => {
+                    option.classList.remove('selected');
+                });
+                
+                openModal('create-trade-modal');
+            });
+            
+            // Обработчики выбора категорий для "даю"
+            document.querySelectorAll('#give-category-options .category-option').forEach(option => {
+                option.addEventListener('click', function() {
+                    document.querySelectorAll('#give-category-options .category-option').forEach(opt => {
+                        opt.classList.remove('selected');
+                    });
+                    this.classList.add('selected');
+                    state.currentTrade.give.category = this.getAttribute('data-category');
+                    updateTradeSummary();
+                });
+            });
+            
+            // Обработчики выбора категорий для "хочу"
+            document.querySelectorAll('#want-category-options .category-option').forEach(option => {
+                option.addEventListener('click', function() {
+                    document.querySelectorAll('#want-category-options .category-option').forEach(opt => {
+                        opt.classList.remove('selected');
+                    });
+                    this.classList.add('selected');
+                    state.currentTrade.want.category = this.getAttribute('data-category');
+                    updateTradeSummary();
+                });
+            });
+            
+            // Обработчики ввода описания
+            document.getElementById('give-description').addEventListener('input', function() {
+                state.currentTrade.give.description = this.value;
+                updateTradeSummary();
+            });
+            
+            document.getElementById('want-description').addEventListener('input', function() {
+                state.currentTrade.want.description = this.value;
+                updateTradeSummary();
+            });
+            
+            // Обработчик публикации трейда
+            document.getElementById('publish-trade-btn').addEventListener('click', function() {
+                if (!state.currentTrade.give.category || !state.currentTrade.want.category || 
+                    !state.currentTrade.give.description || !state.currentTrade.want.description) {
+                    showNotification('Заполните все поля!', 'error');
+                    return;
+                }
+                
+                // Добавляем новый трейд
+                const newTrade = {
+                    id: state.trades.length + 1,
+                    give: { ...state.currentTrade.give },
+                    want: { ...state.currentTrade.want },
+                    status: 'moderation'
+                };
+                
+                state.trades.push(newTrade);
+                state.currentUser.activeTrades++;
+                
+                // Обновляем UI
+                renderTrades();
+                elements.activeTradesCount.textContent = state.currentUser.activeTrades;
+                
+                closeModal('create-trade-modal');
+                showNotification('Трейд отправлен на модерацию!', 'success');
+            });
+            
+            // Первоначальная отрисовка трейдов
+            renderTrades();
+        }
+
+        // Инициализация продаж
+        function initializeSales() {
+            // Обработчик кнопки создания продажи
+            document.getElementById('create-sale-btn').addEventListener('click', function() {
+                showNotification('Функция создания продажи в разработке', 'info');
+            });
+            
+            // Первоначальная отрисовка продаж
+            renderSales();
+        }
+
+        // Инициализация модальных окон
+        function initializeModals() {
+            // Закрытие модальных окон
+            document.querySelectorAll('.close-modal').forEach(closeBtn => {
+                closeBtn.addEventListener('click', function() {
+                    const modal = this.closest('.modal');
+                    closeModal(modal.id);
+                });
+            });
+            
+            // Закрытие по клику вне модального окна
+            document.querySelectorAll('.modal').forEach(modal => {
+                modal.addEventListener('click', function(e) {
+                    if (e.target === this) {
+                        closeModal(this.id);
+                    }
+                });
+            });
+            
+            // Кнопки отмены
+            document.getElementById('cancel-edit-profile-btn').addEventListener('click', function() {
+                closeModal('edit-profile-modal');
+            });
+            
+            document.getElementById('cancel-trade-btn').addEventListener('click', function() {
+                closeModal('create-trade-modal');
+            });
+        }
+
+        // Инициализация уведомлений
+        function initializeNotifications() {
+            // Настройки уведомлений
+            document.getElementById('notif-messages').addEventListener('change', function() {
+                state.notifications.messages = this.checked;
+            });
+            
+            document.getElementById('notif-trades').addEventListener('change', function() {
+                state.notifications.trades = this.checked;
+            });
+            
+            document.getElementById('notif-updates').addEventListener('change', function() {
+                state.notifications.updates = this.checked;
+            });
+        }
+
+        // Функции для работы с модальными окнами
+        function openModal(modalId) {
+            document.getElementById(modalId).style.display = 'flex';
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+        // Функция показа уведомлений
+        function showNotification(message, type = 'info') {
+            const notification = elements.notification;
+            const icon = notification.querySelector('.notification-icon i');
+            const messageEl = notification.querySelector('.notification-message');
+            
+            // Устанавливаем иконку в зависимости от типа
+            icon.className = 'fas ' + (
+                type === 'success' ? 'fa-check' :
+                type === 'error' ? 'fa-exclamation-triangle' :
+                type === 'warning' ? 'fa-exclamation-circle' :
+                'fa-info-circle'
+            );
+            
+            // Устанавливаем цвет в зависимости от типа
+            notification.querySelector('.notification-icon').style.backgroundColor = 
+                type === 'success' ? 'var(--success)' :
+                type === 'error' ? 'var(--danger)' :
+                type === 'warning' ? 'var(--warning)' :
+                'var(--secondary)';
+            
+            messageEl.textContent = message;
+            
+            // Показываем уведомление
+            notification.classList.remove('hide');
+            notification.style.display = 'flex';
+            
+            // Автоматически скрываем через 3 секунды
             setTimeout(() => {
-                const notification = document.getElementById('notification');
                 notification.classList.add('hide');
                 setTimeout(() => {
                     notification.style.display = 'none';
                 }, 300);
             }, 3000);
+        }
+
+        // Обновление сводки трейда
+        function updateTradeSummary() {
+            const summary = document.getElementById('trade-summary');
+            const giveCategory = state.currentTrade.give.category;
+            const wantCategory = state.currentTrade.want.category;
             
-            // Анимация кнопок
-            const buttons = document.querySelectorAll('.btn');
-            buttons.forEach(button => {
-                button.addEventListener('click', function(e) {
-                    // Создаем эффект пульсации
-                    const ripple = document.createElement('span');
-                    const rect = this.getBoundingClientRect();
-                    const size = Math.max(rect.width, rect.height);
-                    const x = e.clientX - rect.left - size / 2;
-                    const y = e.clientY - rect.top - size / 2;
-                    
-                    ripple.style.width = ripple.style.height = size + 'px';
-                    ripple.style.left = x + 'px';
-                    ripple.style.top = y + 'px';
-                    ripple.classList.add('ripple');
-                    
-                    this.appendChild(ripple);
-                    
-                    setTimeout(() => {
-                        ripple.remove();
-                    }, 600);
-                });
+            if (giveCategory && wantCategory) {
+                document.getElementById('summary-give').textContent = 
+                    `${mockData.categories[giveCategory]} - ${state.currentTrade.give.description}`;
+                document.getElementById('summary-want').textContent = 
+                    `${mockData.categories[wantCategory]} - ${state.currentTrade.want.description}`;
+                summary.style.display = 'block';
+            } else {
+                summary.style.display = 'none';
+            }
+        }
+
+        // Отрисовка списка трейдов
+        function renderTrades() {
+            const tradesList = elements.myTradesList;
+            tradesList.innerHTML = '';
+            
+            if (state.trades.length === 0) {
+                tradesList.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-exchange-alt"></i>
+                        <p>У вас пока нет трейдов</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            state.trades.forEach(trade => {
+                const tradeElement = document.createElement('div');
+                tradeElement.className = 'trade-item';
+                tradeElement.innerHTML = `
+                    <div class="trade-icon">
+                        <i class="fas fa-exchange-alt"></i>
+                    </div>
+                    <div class="trade-details">
+                        <div class="trade-title">${mockData.categories[trade.give.category]} → ${mockData.categories[trade.want.category]}</div>
+                        <div class="trade-description">${trade.give.description}</div>
+                    </div>
+                    <span class="badge ${trade.status === 'active' ? 'badge-success' : 'badge-warning'}">
+                        ${trade.status === 'active' ? 'Активен' : 'На модерации'}
+                    </span>
+                `;
+                tradesList.appendChild(tradeElement);
             });
+        }
+
+        // Отрисовка списка продаж
+        function renderSales() {
+            const salesList = elements.mySalesList;
+            salesList.innerHTML = '';
             
-            // Добавляем стили для эффекта пульсации
-            const style = document.createElement('style');
-            style.textContent = `
-                .ripple {
-                    position: absolute;
-                    border-radius: 50%;
-                    background-color: rgba(255, 255, 255, 0.7);
-                    transform: scale(0);
-                    animation: ripple-animation 0.6s linear;
-                }
+            if (state.sales.length === 0) {
+                salesList.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-shopping-cart"></i>
+                        <p>У вас пока нет продаж</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            state.sales.forEach(sale => {
+                const saleElement = document.createElement('div');
+                saleElement.className = 'trade-item';
+                saleElement.innerHTML = `
+                    <div class="trade-icon">
+                        <i class="fas fa-shopping-cart"></i>
+                    </div>
+                    <div class="trade-details">
+                        <div class="trade-title">${mockData.categories[sale.category]}</div>
+                        <div class="trade-description">${sale.description}</div>
+                    </div>
+                    <span class="badge badge-success">${sale.price}</span>
+                `;
+                salesList.appendChild(saleElement);
+            });
+        }
+
+        // Эффект пульсации для кнопок
+        document.addEventListener('click', function(e) {
+            if (e.target.classList.contains('btn')) {
+                const button = e.target;
+                const ripple = document.createElement('span');
+                const rect = button.getBoundingClientRect();
+                const size = Math.max(rect.width, rect.height);
+                const x = e.clientX - rect.left - size / 2;
+                const y = e.clientY - rect.top - size / 2;
                 
-                @keyframes ripple-animation {
-                    to {
-                        transform: scale(4);
-                        opacity: 0;
-                    }
-                }
+                ripple.style.width = ripple.style.height = size + 'px';
+                ripple.style.left = x + 'px';
+                ripple.style.top = y + 'px';
+                ripple.classList.add('ripple');
                 
-                .btn {
-                    position: relative;
-                    overflow: hidden;
-                }
-            `;
-            document.head.appendChild(style);
+                button.appendChild(ripple);
+                
+                setTimeout(() => {
+                    ripple.remove();
+                }, 600);
+            }
         });
+
+        // Добавляем стили для эффекта пульсации
+        const style = document.createElement('style');
+        style.textContent = `
+            .ripple {
+                position: absolute;
+                border-radius: 50%;
+                background-color: rgba(255, 255, 255, 0.7);
+                transform: scale(0);
+                animation: ripple-animation 0.6s linear;
+            }
+            
+            @keyframes ripple-animation {
+                to {
+                    transform: scale(4);
+                    opacity: 0;
+                }
+            }
+            
+            .btn {
+                position: relative;
+                overflow: hidden;
+            }
+        `;
+        document.head.appendChild(style);
     </script>
 </body>
-                                                         </html>
+    </html>
