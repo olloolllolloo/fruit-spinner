@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Trade Bot - Веб-версия</title>
+    <title>Trade Bot - Полная версия</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
@@ -33,9 +33,6 @@
             color: var(--dark);
             min-height: 100vh;
             padding: 20px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
         }
 
         .container {
@@ -46,6 +43,7 @@
             box-shadow: var(--shadow);
             overflow: hidden;
             animation: fadeIn 0.5s ease;
+            margin: 0 auto;
         }
 
         @keyframes fadeIn {
@@ -59,16 +57,6 @@
             padding: 20px;
             text-align: center;
             position: relative;
-        }
-
-        .header h1 {
-            font-size: 1.5rem;
-            margin-bottom: 5px;
-        }
-
-        .header p {
-            font-size: 0.9rem;
-            opacity: 0.9;
         }
 
         .avatar {
@@ -89,17 +77,20 @@
             display: flex;
             background-color: var(--light);
             border-bottom: 1px solid var(--gray);
+            flex-wrap: wrap;
         }
 
         .tab {
             flex: 1;
+            min-width: 80px;
             text-align: center;
-            padding: 15px 0;
+            padding: 15px 5px;
             cursor: pointer;
             transition: var(--transition);
             font-weight: 600;
             color: var(--dark);
             position: relative;
+            font-size: 0.8rem;
         }
 
         .tab.active {
@@ -116,10 +107,6 @@
             background-color: var(--primary);
         }
 
-        .tab:hover {
-            background-color: rgba(255, 154, 118, 0.1);
-        }
-
         .content {
             padding: 20px;
             min-height: 400px;
@@ -130,11 +117,6 @@
         .section {
             display: none;
             animation: slideIn 0.3s ease;
-        }
-
-        @keyframes slideIn {
-            from { opacity: 0; transform: translateX(10px); }
-            to { opacity: 1; transform: translateX(0); }
         }
 
         .section.active {
@@ -149,11 +131,6 @@
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
             border: 1px solid var(--gray);
             transition: var(--transition);
-        }
-
-        .card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
         }
 
         .card-title {
@@ -192,22 +169,24 @@
 
         .btn-secondary {
             background: linear-gradient(to right, var(--secondary), #5a79bc);
-            box-shadow: 0 4px 10px rgba(106, 137, 204, 0.3);
         }
 
         .btn-success {
             background: linear-gradient(to right, var(--success), #67d17e);
-            box-shadow: 0 4px 10px rgba(120, 224, 143, 0.3);
         }
 
         .btn-warning {
             background: linear-gradient(to right, var(--warning), #e5a732);
-            box-shadow: 0 4px 10px rgba(246, 185, 59, 0.3);
         }
 
         .btn-danger {
             background: linear-gradient(to right, var(--danger), #d44832);
-            box-shadow: 0 4px 10px rgba(229, 80, 57, 0.3);
+        }
+
+        .btn-small {
+            padding: 8px 12px;
+            font-size: 0.8rem;
+            margin: 5px;
         }
 
         .profile-info {
@@ -223,15 +202,6 @@
 
         .info-item:last-child {
             border-bottom: none;
-        }
-
-        .info-label {
-            font-weight: 600;
-            color: var(--dark);
-        }
-
-        .info-value {
-            color: var(--primary-dark);
         }
 
         .trade-item {
@@ -284,20 +254,11 @@
             align-items: center;
             z-index: 1000;
             animation: slideUp 0.3s ease;
-        }
-
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateX(-50%) translateY(20px); }
-            to { opacity: 1; transform: translateX(-50%) translateY(0); }
+            max-width: 90%;
         }
 
         .notification.hide {
             animation: slideDown 0.3s ease forwards;
-        }
-
-        @keyframes slideDown {
-            from { opacity: 1; transform: translateX(-50%) translateY(0); }
-            to { opacity: 0; transform: translateX(-50%) translateY(20px); }
         }
 
         .notification-icon {
@@ -312,10 +273,6 @@
             color: white;
         }
 
-        .notification-message {
-            flex: 1;
-        }
-
         .search-bar {
             display: flex;
             margin-bottom: 15px;
@@ -327,11 +284,6 @@
             border: 1px solid var(--gray);
             border-radius: 10px 0 0 10px;
             outline: none;
-            transition: var(--transition);
-        }
-
-        .search-input:focus {
-            border-color: var(--primary);
         }
 
         .search-btn {
@@ -341,37 +293,12 @@
             border: none;
             border-radius: 0 10px 10px 0;
             cursor: pointer;
-            transition: var(--transition);
-        }
-
-        .search-btn:hover {
-            background: linear-gradient(to right, var(--primary-dark), #d67a5a);
         }
 
         .empty-state {
             text-align: center;
             padding: 30px 0;
             color: #888;
-        }
-
-        .empty-state i {
-            font-size: 3rem;
-            margin-bottom: 15px;
-            color: var(--gray);
-        }
-
-        .loader {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid rgba(255, 154, 118, 0.3);
-            border-radius: 50%;
-            border-top-color: var(--primary);
-            animation: spin 1s ease-in-out infinite;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
         }
 
         .badge {
@@ -415,41 +342,6 @@
             background-color: var(--success);
         }
 
-        .status-offline {
-            background-color: var(--danger);
-        }
-
-        .pagination {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 15px;
-        }
-
-        .pagination-btn {
-            padding: 8px 15px;
-            background-color: var(--light);
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: var(--transition);
-            color: var(--dark);
-        }
-
-        .pagination-btn:hover {
-            background-color: var(--primary);
-            color: white;
-        }
-
-        .pagination-btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
-        .pagination-btn:disabled:hover {
-            background-color: var(--light);
-            color: var(--dark);
-        }
-
         .modal {
             display: none;
             position: fixed;
@@ -461,22 +353,18 @@
             z-index: 1001;
             justify-content: center;
             align-items: center;
+            padding: 20px;
         }
 
         .modal-content {
             background-color: white;
             border-radius: 15px;
             padding: 20px;
-            width: 90%;
+            width: 100%;
             max-width: 400px;
             max-height: 80vh;
             overflow-y: auto;
             animation: modalFadeIn 0.3s ease;
-        }
-
-        @keyframes modalFadeIn {
-            from { opacity: 0; transform: scale(0.9); }
-            to { opacity: 1; transform: scale(1); }
         }
 
         .modal-header {
@@ -508,7 +396,6 @@
             display: block;
             margin-bottom: 5px;
             font-weight: 600;
-            color: var(--dark);
         }
 
         .form-input, .form-select, .form-textarea {
@@ -517,11 +404,6 @@
             border: 1px solid var(--gray);
             border-radius: 10px;
             outline: none;
-            transition: var(--transition);
-        }
-
-        .form-input:focus, .form-select:focus, .form-textarea:focus {
-            border-color: var(--primary);
         }
 
         .form-textarea {
@@ -550,24 +432,11 @@
             background-color: rgba(255, 154, 118, 0.1);
         }
 
-        .category-option:hover {
-            border-color: var(--primary);
-        }
-
         .trade-summary {
             background-color: var(--light);
             padding: 15px;
             border-radius: 10px;
             margin-bottom: 15px;
-        }
-
-        .trade-summary-item {
-            margin-bottom: 10px;
-        }
-
-        .trade-summary-label {
-            font-weight: 600;
-            color: var(--dark);
         }
 
         .action-buttons {
@@ -577,6 +446,52 @@
 
         .action-buttons .btn {
             flex: 1;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 15px;
+        }
+
+        .admin-panel {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 10px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+        }
+
+        .limit-info {
+            font-size: 0.8rem;
+            color: var(--danger);
+            margin-top: 5px;
+        }
+
+        .username-locked {
+            color: var(--danger);
+            font-size: 0.8rem;
+            margin-top: 5px;
+        }
+
+        .ripple {
+            position: absolute;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.7);
+            transform: scale(0);
+            animation: ripple-animation 0.6s linear;
+        }
+
+        @keyframes ripple-animation {
+            to {
+                transform: scale(4);
+                opacity: 0;
+            }
+        }
+
+        .btn {
+            position: relative;
+            overflow: hidden;
         }
     </style>
 </head>
@@ -591,53 +506,185 @@
         </div>
 
         <div class="tabs">
-            <div class="tab active" data-tab="profile">
-                <i class="fas fa-user"></i> Профиль
-            </div>
-            <div class="tab" data-tab="trades">
-                <i class="fas fa-exchange-alt"></i> Обмены
-            </div>
-            <div class="tab" data-tab="sales">
-                <i class="fas fa-shopping-cart"></i> Продажи
-            </div>
-            <div class="tab" data-tab="search">
-                <i class="fas fa-search"></i> Поиск
-            </div>
-            <div class="tab" data-tab="settings">
-                <i class="fas fa-cog"></i> Настройки
-            </div>
+            <div class="tab active" data-tab="profile"><i class="fas fa-user"></i> Профиль</div>
+            <div class="tab" data-tab="trades"><i class="fas fa-exchange-alt"></i> Обмены</div>
+            <div class="tab" data-tab="sales"><i class="fas fa-shopping-cart"></i> Продажи</div>
+            <div class="tab" data-tab="stock"><i class="fas fa-boxes"></i> Сток</div>
+            <div class="tab" data-tab="search"><i class="fas fa-search"></i> Поиск</div>
+            <div class="tab" data-tab="settings"><i class="fas fa-cog"></i> Настройки</div>
+            <div class="tab" data-tab="admin"><i class="fas fa-shield-alt"></i> Админ</div>
         </div>
 
         <div class="content">
-            <!-- Профиль -->
-            <div class="section active" id="profile-section">
+            <!-- Все секции будут заполняться динамически -->
+        </div>
+    </div>
+
+    <div class="notification" id="notification">
+        <div class="notification-icon">
+            <i class="fas fa-check"></i>
+        </div>
+        <div class="notification-message">Добро пожаловать в Trade Bot!</div>
+    </div>
+
+    <script>
+        // ПОЛНАЯ БАЗА ДАННЫХ КАК В ПАЙТОН БОТЕ
+        const DB = {
+            users: {
+                '1': {
+                    internal_username: 'Justazero',
+                    roblox_username: 'Justazero_RBLX',
+                    telegram_username: 'Justazero',
+                    lang: 'ru',
+                    trades: [],
+                    sales: [],
+                    banned: false,
+                    is_admin: true,
+                    admin_role: 'full',
+                    can_change_username: false,
+                    messages_sent: [],
+                    messages_received: []
+                }
+            },
+            pending_trades: {},
+            pending_sales: {},
+            complaints: [],
+            categories: {
+                'items': '🎮 Предметы',
+                'boost': '🚀 Буст аккаунта', 
+                'account': '🔑 Аккаунт',
+                'help': '🛠️ Игровая помощь',
+                'other': '📌 Другое'
+            },
+            admin_roles: {
+                'confirm': '✅ Подтверждающий админ',
+                'ban': '🛡️ Банящий админ', 
+                'full': '👑 Полный админ'
+            }
+        };
+
+        // ТЕКУЩИЙ ПОЛЬЗОВАТЕЛЬ
+        let currentUser = DB.users['1'];
+        let userStates = {};
+        let userTradingData = {};
+        let userSearchData = {};
+
+        // ИНИЦИАЛИЗАЦИЯ
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeApp();
+            showNotification('Бот успешно запущен!', 'success');
+        });
+
+        function initializeApp() {
+            initializeTabs();
+            renderAllSections();
+            initializeModals();
+            initializeEventListeners();
+        }
+
+        function initializeTabs() {
+            const content = document.querySelector('.content');
+            const tabs = document.querySelectorAll('.tab');
+            
+            tabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    const tabId = this.getAttribute('data-tab');
+                    
+                    tabs.forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    renderSection(tabId);
+                });
+            });
+            
+            // Показываем профиль по умолчанию
+            renderSection('profile');
+        }
+
+        function renderAllSections() {
+            const sections = ['profile', 'trades', 'sales', 'stock', 'search', 'settings', 'admin'];
+            sections.forEach(section => {
+                renderSection(section);
+            });
+        }
+
+        function renderSection(sectionId) {
+            const content = document.querySelector('.content');
+            
+            switch(sectionId) {
+                case 'profile':
+                    renderProfileSection();
+                    break;
+                case 'trades':
+                    renderTradesSection();
+                    break;
+                case 'sales':
+                    renderSalesSection();
+                    break;
+                case 'stock':
+                    renderStockSection();
+                    break;
+                case 'search':
+                    renderSearchSection();
+                    break;
+                case 'settings':
+                    renderSettingsSection();
+                    break;
+                case 'admin':
+                    renderAdminSection();
+                    break;
+            }
+        }
+
+        function renderProfileSection() {
+            const content = document.querySelector('.content');
+            const isBanned = currentUser.banned;
+            const isAdmin = currentUser.is_admin;
+            
+            if (isBanned) {
+                content.innerHTML = `
+                    <div class="card">
+                        <div class="card-title" style="color: var(--danger);">
+                            <i class="fas fa-ban"></i> Аккаунт заблокирован
+                        </div>
+                        <p>Ваш аккаунт был заблокирован администратором.</p>
+                        <button class="btn btn-secondary" id="contact-admin-btn">
+                            <i class="fas fa-headset"></i> Связь с админом
+                        </button>
+                    </div>
+                `;
+                return;
+            }
+            
+            content.innerHTML = `
                 <div class="card">
                     <div class="card-title">
                         <i class="fas fa-id-card"></i> Информация профиля
                     </div>
                     <div class="profile-info">
                         <div class="info-item">
-                            <span class="info-label">Внутренний ник:</span>
-                            <span class="info-value" id="internal-username">Justazero</span>
+                            <span>Внутренний ник:</span>
+                            <span>${currentUser.internal_username} ${currentUser.can_change_username ? '🔄' : '🔒'}</span>
                         </div>
                         <div class="info-item">
-                            <span class="info-label">Roblox аккаунт:</span>
-                            <span class="info-value" id="roblox-username">Justazero_RBLX</span>
+                            <span>Roblox аккаунт:</span>
+                            <span>${currentUser.roblox_username || '❌ Не указан'}</span>
                         </div>
                         <div class="info-item">
-                            <span class="info-label">Telegram:</span>
-                            <span class="info-value" id="telegram-username">@Justazero</span>
+                            <span>Telegram:</span>
+                            <span>${currentUser.telegram_username || '❌ Не указан'}</span>
                         </div>
                         <div class="info-item">
-                            <span class="info-label">Статус:</span>
-                            <span class="info-value">
+                            <span>Статус:</span>
+                            <span>
                                 <span class="status-indicator status-online"></span>
-                                Онлайн <span class="badge admin-badge">Админ</span>
+                                Активен 
+                                ${isAdmin ? '<span class="badge admin-badge">Админ</span>' : ''}
                             </span>
                         </div>
                     </div>
                     <button class="btn btn-secondary" id="edit-profile-btn">
-                        <i class="fas fa-edit"></i> Редактировать профиль
+                        <i class="fas fa-edit"></i> Настроить профиль
                     </button>
                 </div>
 
@@ -647,599 +694,692 @@
                     </div>
                     <div class="profile-info">
                         <div class="info-item">
-                            <span class="info-label">Активные трейды:</span>
-                            <span class="info-value" id="active-trades-count">3</span>
+                            <span>Активные трейды:</span>
+                            <span>${currentUser.trades.length}/1</span>
                         </div>
                         <div class="info-item">
-                            <span class="info-label">Активные продажи:</span>
-                            <span class="info-value" id="active-sales-count">2</span>
+                            <span>Активные продажи:</span>
+                            <span>${currentUser.sales.length}/5</span>
                         </div>
                         <div class="info-item">
-                            <span class="info-label">Успешные сделки:</span>
-                            <span class="info-value" id="successful-deals">12</span>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-label">Рейтинг:</span>
-                            <span class="info-value" id="user-rating">4.8/5.0</span>
+                            <span>На модерации:</span>
+                            <span>${(DB.pending_trades['1']?.length || 0) + (DB.pending_sales['1']?.length || 0)}</span>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- Обмены -->
-            <div class="section" id="trades-section">
                 <div class="card">
                     <div class="card-title">
-                        <i class="fas fa-exchange-alt"></i> Мои трейды
+                        <i class="fas fa-exchange-alt"></i> Быстрые действия
                     </div>
-                    <div id="my-trades-list">
-                        <!-- Трейды будут загружены динамически -->
-                    </div>
-                    <button class="btn" id="create-trade-btn">
-                        <i class="fas fa-plus"></i> Создать новый трейд
+                    <button class="btn" id="quick-trade-btn">
+                        <i class="fas fa-plus"></i> Создать трейд
+                    </button>
+                    <button class="btn btn-secondary" id="quick-sale-btn">
+                        <i class="fas fa-tag"></i> Добавить продажу
+                    </button>
+                    <button class="btn" id="search-user-btn">
+                        <i class="fas fa-search"></i> Найти пользователя
                     </button>
                 </div>
+            `;
 
+            // Навешиваем обработчики
+            document.getElementById('edit-profile-btn')?.addEventListener('click', showEditProfileModal);
+            document.getElementById('quick-trade-btn')?.addEventListener('click', () => switchToTab('trades'));
+            document.getElementById('quick-sale-btn')?.addEventListener('click', () => switchToTab('sales'));
+            document.getElementById('search-user-btn')?.addEventListener('click', () => switchToTab('search'));
+            document.getElementById('contact-admin-btn')?.addEventListener('click', showContactAdminModal);
+        }
+
+        function renderTradesSection() {
+            const content = document.querySelector('.content');
+            const userTrades = currentUser.trades;
+            const pendingTrades = DB.pending_trades['1'] || [];
+            
+            content.innerHTML = `
                 <div class="card">
                     <div class="card-title">
+                        <i class="fas fa-exchange-alt"></i> Управление трейдами
+                    </div>
+                    ${currentUser.trades.length >= 1 ? '<div class="limit-info">⚠️ Лимит трейдов достигнут (1/1)</div>' : ''}
+                    
+                    <button class="btn ${currentUser.trades.length >= 1 ? 'btn-secondary' : ''}" id="create-trade-btn" 
+                            ${currentUser.trades.length >= 1 ? 'disabled' : ''}>
+                        <i class="fas fa-plus"></i> Создать трейд
+                    </button>
+                    <button class="btn btn-secondary" id="search-trades-btn">
                         <i class="fas fa-search"></i> Найти трейды
-                    </div>
-                    <div class="search-bar">
-                        <input type="text" class="search-input" id="search-trades-input" placeholder="Что ищете?">
-                        <button class="search-btn" id="search-trades-btn">
-                            <i class="fas fa-search"></i>
-                        </button>
-                    </div>
-                    <button class="btn btn-secondary" id="advanced-search-btn">
-                        <i class="fas fa-filter"></i> Расширенный поиск
+                    </button>
+                    <button class="btn" id="my-trades-btn">
+                        <i class="fas fa-list"></i> Мои трейды (${userTrades.length + pendingTrades.length})
                     </button>
                 </div>
-            </div>
 
-            <!-- Продажи -->
-            <div class="section" id="sales-section">
+                ${pendingTrades.length > 0 ? `
                 <div class="card">
                     <div class="card-title">
-                        <i class="fas fa-shopping-cart"></i> Мои продажи
+                        <i class="fas fa-clock"></i> Ожидают модерации
                     </div>
-                    <div id="my-sales-list">
-                        <!-- Продажи будут загружены динамически -->
+                    ${pendingTrades.map((trade, index) => `
+                        <div class="trade-item">
+                            <div class="trade-icon">
+                                <i class="fas fa-hourglass-half"></i>
+                            </div>
+                            <div class="trade-details">
+                                <div class="trade-title">${DB.categories[trade.give.category]} → ${DB.categories[trade.want.category]}</div>
+                                <div class="trade-description">${trade.give.description}</div>
+                            </div>
+                            <span class="badge badge-warning">На проверке</span>
+                        </div>
+                    `).join('')}
+                </div>
+                ` : ''}
+
+                ${userTrades.length > 0 ? `
+                <div class="card">
+                    <div class="card-title">
+                        <i class="fas fa-check-circle"></i> Активные трейды
                     </div>
-                    <button class="btn" id="create-sale-btn">
+                    ${userTrades.map((trade, index) => `
+                        <div class="trade-item">
+                            <div class="trade-icon">
+                                <i class="fas fa-exchange-alt"></i>
+                            </div>
+                            <div class="trade-details">
+                                <div class="trade-title">${DB.categories[trade.give.category]} → ${DB.categories[trade.want.category]}</div>
+                                <div class="trade-description">${trade.give.description}</div>
+                            </div>
+                            <button class="btn btn-small btn-danger" onclick="deleteTrade(${index})">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    `).join('')}
+                </div>
+                ` : ''}
+            `;
+
+            document.getElementById('create-trade-btn')?.addEventListener('click', showCreateTradeModal);
+            document.getElementById('search-trades-btn')?.addEventListener('click', showSearchTradesModal);
+            document.getElementById('my-trades-btn')?.addEventListener('click', showMyTradesModal);
+        }
+
+        function renderSalesSection() {
+            const content = document.querySelector('.content');
+            const userSales = currentUser.sales;
+            const pendingSales = DB.pending_sales['1'] || [];
+            
+            content.innerHTML = `
+                <div class="card">
+                    <div class="card-title">
+                        <i class="fas fa-shopping-cart"></i> Управление продажами
+                    </div>
+                    ${currentUser.sales.length >= 5 ? '<div class="limit-info">⚠️ Лимит продаж достигнут (5/5)</div>' : ''}
+                    
+                    <button class="btn ${currentUser.sales.length >= 5 ? 'btn-secondary' : ''}" id="create-sale-btn"
+                            ${currentUser.sales.length >= 5 ? 'disabled' : ''}>
                         <i class="fas fa-plus"></i> Добавить продажу
                     </button>
-                </div>
-
-                <div class="card">
-                    <div class="card-title">
+                    <button class="btn btn-secondary" id="search-sales-btn">
                         <i class="fas fa-search"></i> Найти продажи
-                    </div>
-                    <div class="search-bar">
-                        <input type="text" class="search-input" id="search-sales-input" placeholder="Что ищете?">
-                        <button class="search-btn" id="search-sales-btn">
-                            <i class="fas fa-search"></i>
-                        </button>
-                    </div>
-                    <button class="btn btn-secondary" id="sales-by-category-btn">
-                        <i class="fas fa-filter"></i> По категориям
+                    </button>
+                    <button class="btn" id="my-sales-btn">
+                        <i class="fas fa-list"></i> Мои продажи (${userSales.length + pendingSales.length})
                     </button>
                 </div>
-            </div>
 
-            <!-- Поиск -->
-            <div class="section" id="search-section">
+                ${pendingSales.length > 0 ? `
+                <div class="card">
+                    <div class="card-title">
+                        <i class="fas fa-clock"></i> Ожидают модерации
+                    </div>
+                    ${pendingSales.map((sale, index) => `
+                        <div class="trade-item">
+                            <div class="trade-icon">
+                                <i class="fas fa-hourglass-half"></i>
+                            </div>
+                            <div class="trade-details">
+                                <div class="trade-title">${DB.categories[sale.category]}</div>
+                                <div class="trade-description">${sale.description} - ${sale.price}</div>
+                            </div>
+                            <span class="badge badge-warning">На проверке</span>
+                        </div>
+                    `).join('')}
+                </div>
+                ` : ''}
+
+                ${userSales.length > 0 ? `
+                <div class="card">
+                    <div class="card-title">
+                        <i class="fas fa-check-circle"></i> Активные продажи
+                    </div>
+                    ${userSales.map((sale, index) => `
+                        <div class="trade-item">
+                            <div class="trade-icon">
+                                <i class="fas fa-shopping-cart"></i>
+                            </div>
+                            <div class="trade-details">
+                                <div class="trade-title">${DB.categories[sale.category]}</div>
+                                <div class="trade-description">${sale.description}</div>
+                                <div class="trade-price" style="color: var(--success); font-weight: bold;">${sale.price}</div>
+                            </div>
+                            <button class="btn btn-small btn-danger" onclick="deleteSale(${index})">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    `).join('')}
+                </div>
+                ` : ''}
+            `;
+
+            document.getElementById('create-sale-btn')?.addEventListener('click', showCreateSaleModal);
+            document.getElementById('search-sales-btn')?.addEventListener('click', showSearchSalesModal);
+            document.getElementById('my-sales-btn')?.addEventListener('click', showMySalesModal);
+        }
+
+        function renderStockSection() {
+            const content = document.querySelector('.content');
+            content.innerHTML = `
+                <div class="card">
+                    <div class="card-title">
+                        <i class="fas fa-boxes"></i> Мой сток
+                    </div>
+                    <div class="empty-state">
+                        <i class="fas fa-box-open"></i>
+                        <p>Раздел в разработке</p>
+                        <p style="font-size: 0.8rem; margin-top: 10px;">Скоро здесь появится управление вашим инвентарем</p>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderSearchSection() {
+            const content = document.querySelector('.content');
+            content.innerHTML = `
                 <div class="card">
                     <div class="card-title">
                         <i class="fas fa-users"></i> Поиск пользователей
                     </div>
                     <div class="search-bar">
-                        <input type="text" class="search-input" id="search-users-input" placeholder="Введите никнейм">
-                        <button class="search-btn" id="search-users-btn">
+                        <input type="text" class="search-input" id="search-user-input" placeholder="Введите внутренний ник">
+                        <button class="search-btn" id="search-user-button">
                             <i class="fas fa-search"></i>
                         </button>
                     </div>
-                    <div id="users-search-results">
-                        <!-- Результаты поиска будут загружены динамически -->
-                    </div>
+                    <div id="user-search-results"></div>
                 </div>
 
                 <div class="card">
                     <div class="card-title">
                         <i class="fas fa-history"></i> Недавние поиски
                     </div>
-                    <div id="recent-searches">
-                        <!-- Недавние поиски будут загружены динамически -->
+                    <div class="empty-state">
+                        <i class="fas fa-clock"></i>
+                        <p>Здесь появятся ваши недавние поиски</p>
                     </div>
                 </div>
-            </div>
+            `;
 
-            <!-- Настройки -->
-            <div class="section" id="settings-section">
+            document.getElementById('search-user-button').addEventListener('click', searchUser);
+        }
+
+        function renderSettingsSection() {
+            const content = document.querySelector('.content');
+            content.innerHTML = `
                 <div class="card">
                     <div class="card-title">
                         <i class="fas fa-language"></i> Язык
                     </div>
-                    <button class="btn" id="lang-ru-btn">
+                    <button class="btn ${currentUser.lang === 'ru' ? 'btn-success' : ''}" id="lang-ru-btn">
                         <i class="fas fa-globe"></i> Русский
                     </button>
-                    <button class="btn btn-secondary" id="lang-en-btn">
+                    <button class="btn ${currentUser.lang === 'en' ? 'btn-success' : ''}" id="lang-en-btn">
                         <i class="fas fa-globe"></i> English
                     </button>
                 </div>
 
                 <div class="card">
                     <div class="card-title">
-                        <i class="fas fa-bell"></i> Уведомления
+                        <i class="fas fa-headset"></i> Поддержка
                     </div>
-                    <div class="info-item">
-                        <span class="info-label">Сообщения</span>
-                        <span class="info-value">
-                            <input type="checkbox" id="notif-messages" checked>
-                        </span>
+                    <button class="btn btn-secondary" id="contact-admin-btn">
+                        <i class="fas fa-envelope"></i> Связь с админом
+                    </button>
+                    <button class="btn" id="tutorial-btn">
+                        <i class="fas fa-book"></i> Туториал
+                    </button>
+                </div>
+
+                ${currentUser.is_admin ? `
+                <div class="card">
+                    <div class="card-title">
+                        <i class="fas fa-shield-alt"></i> Админ-панель
                     </div>
-                    <div class="info-item">
-                        <span class="info-label">Новые трейды</span>
-                        <span class="info-value">
-                            <input type="checkbox" id="notif-trades" checked>
-                        </span>
+                    <button class="btn btn-warning" id="go-to-admin-btn">
+                        <i class="fas fa-cogs"></i> Перейти в админ-панель
+                    </button>
+                </div>
+                ` : ''}
+            `;
+
+            document.getElementById('lang-ru-btn').addEventListener('click', () => changeLanguage('ru'));
+            document.getElementById('lang-en-btn').addEventListener('click', () => changeLanguage('en'));
+            document.getElementById('contact-admin-btn').addEventListener('click', showContactAdminModal);
+            document.getElementById('tutorial-btn').addEventListener('click', showTutorialModal);
+            document.getElementById('go-to-admin-btn')?.addEventListener('click', () => switchToTab('admin'));
+        }
+
+        function renderAdminSection() {
+            if (!currentUser.is_admin) {
+                const content = document.querySelector('.content');
+                content.innerHTML = `
+                    <div class="card">
+                        <div class="card-title" style="color: var(--danger);">
+                            <i class="fas fa-ban"></i> Доступ запрещен
+                        </div>
+                        <p>У вас нет прав для доступа к админ-панели.</p>
                     </div>
-                    <div class="info-item">
-                        <span class="info-label">Обновления системы</span>
-                        <span class="info-value">
-                            <input type="checkbox" id="notif-updates">
-                        </span>
+                `;
+                return;
+            }
+
+            const pendingTradesCount = Object.values(DB.pending_trades).flat().length;
+            const pendingSalesCount = Object.values(DB.pending_sales).flat().length;
+            const complaintsCount = DB.complaints.length;
+            const onlineUsers = Object.values(DB.users).filter(u => !u.banned).length;
+
+            const content = document.querySelector('.content');
+            content.innerHTML = `
+                <div class="admin-panel">
+                    <div class="card-title" style="color: white;">
+                        <i class="fas fa-shield-alt"></i> Админ-панель
+                    </div>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                        <span>🟢 Онлайн: ${onlineUsers}</span>
+                        <span>⏳ На модерации: ${pendingTradesCount + pendingSalesCount}</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between;">
+                        <span>📢 Жалобы: ${complaintsCount}</span>
+                        <span>👑 Роль: ${DB.admin_roles[currentUser.admin_role]}</span>
                     </div>
                 </div>
 
                 <div class="card">
                     <div class="card-title">
-                        <i class="fas fa-shield-alt"></i> Безопасность
+                        <i class="fas fa-tasks"></i> Модерация
                     </div>
-                    <button class="btn" id="change-password-btn">
-                        <i class="fas fa-key"></i> Сменить пароль
+                    <button class="btn btn-warning" id="moderate-trades-btn">
+                        <i class="fas fa-exchange-alt"></i> Трейды (${pendingTradesCount})
                     </button>
-                    <button class="btn btn-secondary" id="login-history-btn">
-                        <i class="fas fa-history"></i> История входов
+                    <button class="btn btn-warning" id="moderate-sales-btn">
+                        <i class="fas fa-shopping-cart"></i> Продажи (${pendingSalesCount})
+                    </button>
+                    <button class="btn btn-warning" id="moderate-complaints-btn">
+                        <i class="fas fa-flag"></i> Жалобы (${complaintsCount})
                     </button>
                 </div>
 
                 <div class="card">
                     <div class="card-title">
-                        <i class="fas fa-cogs"></i> Админ-панель
+                        <i class="fas fa-users-cog"></i> Управление пользователями
                     </div>
-                    <button class="btn btn-warning" id="moderation-btn">
-                        <i class="fas fa-user-shield"></i> Модерация
+                    <button class="btn btn-danger" id="ban-user-btn">
+                        <i class="fas fa-ban"></i> Забанить пользователя
                     </button>
-                    <button class="btn btn-secondary" id="stats-btn">
+                    <button class="btn btn-success" id="unban-user-btn">
+                        <i class="fas fa-check"></i> Разбанить пользователя
+                    </button>
+                    <button class="btn btn-secondary" id="allow-username-change-btn">
+                        <i class="fas fa-unlock"></i> Разрешить смену ника
+                    </button>
+                </div>
+
+                ${currentUser.admin_role === 'full' ? `
+                <div class="card">
+                    <div class="card-title">
+                        <i class="fas fa-crown"></i> Администрирование
+                    </div>
+                    <button class="btn" id="promote-admin-btn">
+                        <i class="fas fa-user-plus"></i> Назначить админа
+                    </button>
+                    <button class="btn btn-danger" id="demote-admin-btn">
+                        <i class="fas fa-user-minus"></i> Снять админа
+                    </button>
+                    <button class="btn btn-secondary" id="broadcast-btn">
+                        <i class="fas fa-bullhorn"></i> Рассылка
+                    </button>
+                </div>
+                ` : ''}
+
+                <div class="card">
+                    <div class="card-title">
                         <i class="fas fa-chart-bar"></i> Статистика
+                    </div>
+                    <button class="btn btn-secondary" id="view-stats-btn">
+                        <i class="fas fa-chart-pie"></i> Просмотр статистики
                     </button>
-                    <button class="btn btn-danger" id="user-management-btn">
-                        <i class="fas fa-ban"></i> Управление пользователями
+                    <button class="btn btn-secondary" id="view-messages-btn">
+                        <i class="fas fa-envelope"></i> Просмотр переписок
                     </button>
                 </div>
-            </div>
-        </div>
-    </div>
+            `;
 
-    <!-- Модальные окна -->
-    <div class="modal" id="edit-profile-modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <div class="modal-title">Редактирование профиля</div>
-                <button class="close-modal">&times;</button>
-            </div>
-            <div class="form-group">
-                <label class="form-label">Внутренний никнейм</label>
-                <input type="text" class="form-input" id="edit-internal-username" value="Justazero">
-            </div>
-            <div class="form-group">
-                <label class="form-label">Roblox аккаунт</label>
-                <input type="text" class="form-input" id="edit-roblox-username" value="Justazero_RBLX">
-            </div>
-            <div class="form-group">
-                <label class="form-label">Telegram юзернейм</label>
-                <input type="text" class="form-input" id="edit-telegram-username" value="@Justazero">
-            </div>
-            <div class="action-buttons">
-                <button class="btn" id="save-profile-btn">Сохранить</button>
-                <button class="btn btn-secondary" id="cancel-edit-profile-btn">Отмена</button>
-            </div>
-        </div>
-    </div>
+            // Навешиваем обработчики для админ-панели
+            document.getElementById('moderate-trades-btn')?.addEventListener('click', showModerateTradesModal);
+            document.getElementById('moderate-sales-btn')?.addEventListener('click', showModerateSalesModal);
+            document.getElementById('moderate-complaints-btn')?.addEventListener('click', showModerateComplaintsModal);
+            document.getElementById('ban-user-btn')?.addEventListener('click', showBanUserModal);
+            document.getElementById('unban-user-btn')?.addEventListener('click', showUnbanUserModal);
+            document.getElementById('allow-username-change-btn')?.addEventListener('click', showAllowUsernameChangeModal);
+            document.getElementById('promote-admin-btn')?.addEventListener('click', showPromoteAdminModal);
+            document.getElementById('demote-admin-btn')?.addEventListener('click', showDemoteAdminModal);
+            document.getElementById('broadcast-btn')?.addEventListener('click', showBroadcastModal);
+            document.getElementById('view-stats-btn')?.addEventListener('click', showStatsModal);
+            document.getElementById('view-messages-btn')?.addEventListener('click', showViewMessagesModal);
+        }
 
-    <div class="modal" id="create-trade-modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <div class="modal-title">Создание трейда</div>
-                <button class="close-modal">&times;</button>
-            </div>
-            <div class="form-group">
-                <label class="form-label">Что вы даёте?</label>
-                <div class="category-options" id="give-category-options">
-                    <div class="category-option" data-category="items">🎮 Предметы</div>
-                    <div class="category-option" data-category="boost">🚀 Буст аккаунта</div>
-                    <div class="category-option" data-category="account">🔑 Аккаунт</div>
-                    <div class="category-option" data-category="help">🛠️ Игровая помощь</div>
+        // МОДАЛЬНЫЕ ОКНА
+        function showEditProfileModal() {
+            const modal = createModal(`
+                <div class="modal-header">
+                    <div class="modal-title">Редактирование профиля</div>
+                    <button class="close-modal">&times;</button>
                 </div>
-            </div>
-            <div class="form-group">
-                <label class="form-label">Описание того, что даёте</label>
-                <textarea class="form-textarea" id="give-description" placeholder="Опишите предмет..."></textarea>
-            </div>
-            <div class="form-group">
-                <label class="form-label">Что вы хотите?</label>
-                <div class="category-options" id="want-category-options">
-                    <div class="category-option" data-category="items">🎮 Предметы</div>
-                    <div class="category-option" data-category="boost">🚀 Буст аккаунта</div>
-                    <div class="category-option" data-category="account">🔑 Аккаунт</div>
-                    <div class="category-option" data-category="help">🛠️ Игровая помощь</div>
+                <div class="form-group">
+                    <label class="form-label">Внутренний никнейм</label>
+                    <input type="text" class="form-input" id="edit-internal-username" value="${currentUser.internal_username}" 
+                           ${!currentUser.can_change_username ? 'disabled' : ''}>
+                    ${!currentUser.can_change_username ? '<div class="username-locked">🔒 Смена ника заблокирована админом</div>' : ''}
                 </div>
-            </div>
-            <div class="form-group">
-                <label class="form-label">Описание того, что хотите</label>
-                <textarea class="form-textarea" id="want-description" placeholder="Опишите желаемый предмет..."></textarea>
-            </div>
-            <div class="trade-summary" id="trade-summary" style="display: none;">
-                <div class="trade-summary-item">
-                    <span class="trade-summary-label">Вы даёте:</span>
-                    <span id="summary-give"></span>
+                <div class="form-group">
+                    <label class="form-label">Roblox аккаунт</label>
+                    <input type="text" class="form-input" id="edit-roblox-username" value="${currentUser.roblox_username || ''}">
                 </div>
-                <div class="trade-summary-item">
-                    <span class="trade-summary-label">Вы хотите:</span>
-                    <span id="summary-want"></span>
+                <div class="form-group">
+                    <label class="form-label">Telegram юзернейм</label>
+                    <input type="text" class="form-input" id="edit-telegram-username" value="${currentUser.telegram_username || ''}">
                 </div>
-            </div>
-            <div class="action-buttons">
-                <button class="btn" id="publish-trade-btn">Опубликовать</button>
-                <button class="btn btn-secondary" id="cancel-trade-btn">Отмена</button>
-            </div>
-        </div>
-    </div>
+                <div class="action-buttons">
+                    <button class="btn" id="save-profile-btn">Сохранить</button>
+                    <button class="btn btn-secondary" id="cancel-edit-btn">Отмена</button>
+                </div>
+            `);
 
-    <!-- Уведомление -->
-    <div class="notification" id="notification">
-        <div class="notification-icon">
-            <i class="fas fa-check"></i>
-        </div>
-        <div class="notification-message">
-            Добро пожаловать в Trade Bot!
-        </div>
-    </div>
+            document.getElementById('save-profile-btn').addEventListener('click', saveProfile);
+            document.getElementById('cancel-edit-btn').addEventListener('click', () => modal.remove());
+        }
 
-    <script>
-        // Мок-данные для демонстрации
-        const mockData = {
-            user: {
-                internalUsername: "Justazero",
-                robloxUsername: "Justazero_RBLX",
-                telegramUsername: "@Justazero",
-                isAdmin: true,
-                activeTrades: 3,
-                activeSales: 2,
-                successfulDeals: 12,
-                rating: 4.8
-            },
-            trades: [
-                {
-                    id: 1,
-                    give: { category: "items", description: "Обменяю Dominus за несколько редких шапок" },
-                    want: { category: "items", description: "Редкие шапки из коллекции 2018 года" },
-                    status: "active"
-                },
-                {
-                    id: 2,
-                    give: { category: "boost", description: "Прокачаю ваш аккаунт за ограниченные предметы" },
-                    want: { category: "items", description: "Любые ограниченные предметы" },
-                    status: "moderation"
-                }
-            ],
-            sales: [
-                {
-                    id: 1,
-                    category: "account",
-                    description: "Продаю аккаунт с ограниченными предметами",
-                    price: "2 500 RUB",
-                    status: "active"
-                },
-                {
-                    id: 2,
-                    category: "help",
-                    description: "Помощь с прохождением сложных уровней",
-                    price: "500 RUB/час",
-                    status: "active"
-                }
-            ],
-            categories: {
-                items: "🎮 Предметы",
-                boost: "🚀 Буст аккаунта", 
-                account: "🔑 Аккаунт",
-                help: "🛠️ Игровая помощь",
-                other: "📌 Другое"
+        function showCreateTradeModal() {
+            const modal = createModal(`
+                <div class="modal-header">
+                    <div class="modal-title">Создание трейда</div>
+                    <button class="close-modal">&times;</button>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Что вы даёте?</label>
+                    <div class="category-options" id="give-category-options">
+                        ${Object.entries(DB.categories).map(([key, label]) => 
+                            `<div class="category-option" data-category="${key}">${label}</div>`
+                        ).join('')}
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Описание того, что даёте</label>
+                    <textarea class="form-textarea" id="give-description" placeholder="Подробно опишите предмет..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Что вы хотите?</label>
+                    <div class="category-options" id="want-category-options">
+                        ${Object.entries(DB.categories).map(([key, label]) => 
+                            `<div class="category-option" data-category="${key}">${label}</div>`
+                        ).join('')}
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Описание того, что хотите</label>
+                    <textarea class="form-textarea" id="want-description" placeholder="Подробно опишите желаемый предмет..."></textarea>
+                </div>
+                <div class="trade-summary" id="trade-summary" style="display: none;">
+                    <h4>Сводка трейда:</h4>
+                    <div><strong>Вы даёте:</strong> <span id="summary-give"></span></div>
+                    <div><strong>Вы хотите:</strong> <span id="summary-want"></span></div>
+                </div>
+                <div class="action-buttons">
+                    <button class="btn" id="publish-trade-btn">Опубликовать</button>
+                    <button class="btn btn-secondary" id="cancel-trade-btn">Отмена</button>
+                </div>
+            `);
+
+            // Инициализация выбора категорий
+            initializeCategorySelection('give-category-options', 'give');
+            initializeCategorySelection('want-category-options', 'want');
+            
+            // Обновление сводки
+            document.getElementById('give-description').addEventListener('input', updateTradeSummary);
+            document.getElementById('want-description').addEventListener('input', updateTradeSummary);
+
+            document.getElementById('publish-trade-btn').addEventListener('click', publishTrade);
+            document.getElementById('cancel-trade-btn').addEventListener('click', () => modal.remove());
+        }
+
+        function showCreateSaleModal() {
+            const modal = createModal(`
+                <div class="modal-header">
+                    <div class="modal-title">Создание продажи</div>
+                    <button class="close-modal">&times;</button>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Категория товара</label>
+                    <div class="category-options" id="sale-category-options">
+                        ${Object.entries(DB.categories).map(([key, label]) => 
+                            `<div class="category-option" data-category="${key}">${label}</div>`
+                        ).join('')}
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Описание товара</label>
+                    <textarea class="form-textarea" id="sale-description" placeholder="Подробно опишите товар..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Цена</label>
+                    <input type="text" class="form-input" id="sale-price" placeholder="Например: 1000 RUB">
+                </div>
+                <div class="action-buttons">
+                    <button class="btn" id="publish-sale-btn">Опубликовать</button>
+                    <button class="btn btn-secondary" id="cancel-sale-btn">Отмена</button>
+                </div>
+            `);
+
+            initializeCategorySelection('sale-category-options', 'sale');
+            document.getElementById('publish-sale-btn').addEventListener('click', publishSale);
+            document.getElementById('cancel-sale-btn').addEventListener('click', () => modal.remove());
+        }
+
+        // ОСНОВНЫЕ ФУНКЦИИ
+        function saveProfile() {
+            const internalUsername = document.getElementById('edit-internal-username').value;
+            const robloxUsername = document.getElementById('edit-roblox-username').value;
+            const telegramUsername = document.getElementById('edit-telegram-username').value;
+
+            if (internalUsername !== currentUser.internal_username && !currentUser.can_change_username) {
+                showNotification('Смена ника заблокирована админом!', 'error');
+                return;
             }
-        };
 
-        // Состояние приложения
-        const state = {
-            currentUser: mockData.user,
-            trades: mockData.trades,
-            sales: mockData.sales,
-            currentTrade: {
-                give: { category: null, description: "" },
-                want: { category: null, description: "" }
-            },
-            searchResults: {
-                users: [],
-                trades: [],
-                sales: []
-            },
-            language: 'ru',
-            notifications: {
-                messages: true,
-                trades: true,
-                updates: false
+            currentUser.internal_username = internalUsername;
+            currentUser.roblox_username = robloxUsername;
+            currentUser.telegram_username = telegramUsername;
+
+            showNotification('Профиль успешно обновлен!', 'success');
+            document.querySelector('.modal').remove();
+            renderSection('profile');
+        }
+
+        function publishTrade() {
+            const giveCategory = userTradingData.giveCategory;
+            const wantCategory = userTradingData.wantCategory;
+            const giveDescription = document.getElementById('give-description').value;
+            const wantDescription = document.getElementById('want-description').value;
+
+            if (!giveCategory || !wantCategory || !giveDescription || !wantDescription) {
+                showNotification('Заполните все поля!', 'error');
+                return;
             }
-        };
 
-        // DOM элементы
-        const elements = {
-            // Профиль
-            internalUsername: document.getElementById('internal-username'),
-            robloxUsername: document.getElementById('roblox-username'),
-            telegramUsername: document.getElementById('telegram-username'),
-            activeTradesCount: document.getElementById('active-trades-count'),
-            activeSalesCount: document.getElementById('active-sales-count'),
-            successfulDeals: document.getElementById('successful-deals'),
-            userRating: document.getElementById('user-rating'),
-            editProfileBtn: document.getElementById('edit-profile-btn'),
-            
-            // Модальные окна
-            editProfileModal: document.getElementById('edit-profile-modal'),
-            createTradeModal: document.getElementById('create-trade-modal'),
-            
-            // Кнопки
-            createTradeBtn: document.getElementById('create-trade-btn'),
-            createSaleBtn: document.getElementById('create-sale-btn'),
-            saveProfileBtn: document.getElementById('save-profile-btn'),
-            publishTradeBtn: document.getElementById('publish-trade-btn'),
-            
-            // Списки
-            myTradesList: document.getElementById('my-trades-list'),
-            mySalesList: document.getElementById('my-sales-list'),
-            
-            // Уведомление
-            notification: document.getElementById('notification')
-        };
+            const tradeData = {
+                give: { category: giveCategory, description: giveDescription },
+                want: { category: wantCategory, description: wantDescription }
+            };
 
-        // Инициализация приложения
-        document.addEventListener('DOMContentLoaded', function() {
-            initializeTabs();
-            initializeProfile();
-            initializeTrades();
-            initializeSales();
-            initializeModals();
-            initializeNotifications();
-            showNotification('Добро пожаловать в Trade Bot!', 'success');
-        });
+            // Добавляем в ожидание модерации
+            if (!DB.pending_trades['1']) DB.pending_trades['1'] = [];
+            DB.pending_trades['1'].push(tradeData);
 
-        // Инициализация вкладок
-        function initializeTabs() {
-            const tabs = document.querySelectorAll('.tab');
-            const sections = document.querySelectorAll('.section');
+            showNotification('Трейд отправлен на модерацию!', 'success');
+            document.querySelector('.modal').remove();
+            renderSection('trades');
+        }
+
+        function publishSale() {
+            const category = userTradingData.saleCategory;
+            const description = document.getElementById('sale-description').value;
+            const price = document.getElementById('sale-price').value;
+
+            if (!category || !description || !price) {
+                showNotification('Заполните все поля!', 'error');
+                return;
+            }
+
+            const saleData = {
+                category: category,
+                description: description,
+                price: price
+            };
+
+            // Добавляем в ожидание модерации
+            if (!DB.pending_sales['1']) DB.pending_sales['1'] = [];
+            DB.pending_sales['1'].push(saleData);
+
+            showNotification('Продажа отправлена на модерацию!', 'success');
+            document.querySelector('.modal').remove();
+            renderSection('sales');
+        }
+
+        function deleteTrade(index) {
+            currentUser.trades.splice(index, 1);
+            showNotification('Трейд удален!', 'success');
+            renderSection('trades');
+        }
+
+        function deleteSale(index) {
+            currentUser.sales.splice(index, 1);
+            showNotification('Продажа удалена!', 'success');
+            renderSection('sales');
+        }
+
+        function searchUser() {
+            const username = document.getElementById('search-user-input').value;
+            const resultsDiv = document.getElementById('user-search-results');
             
-            tabs.forEach(tab => {
-                tab.addEventListener('click', function() {
-                    const tabId = this.getAttribute('data-tab');
-                    
-                    // Убираем активный класс у всех вкладок и секций
-                    tabs.forEach(t => t.classList.remove('active'));
-                    sections.forEach(s => s.classList.remove('active'));
-                    
-                    // Добавляем активный класс текущей вкладке и секции
-                    this.classList.add('active');
-                    document.getElementById(`${tabId}-section`).classList.add('active');
+            if (!username) {
+                resultsDiv.innerHTML = '<div class="empty-state">Введите ник для поиска</div>';
+                return;
+            }
+
+            const foundUsers = Object.values(DB.users).filter(user => 
+                user.internal_username.toLowerCase().includes(username.toLowerCase()) ||
+                user.telegram_username.toLowerCase().includes(username.toLowerCase())
+            );
+
+            if (foundUsers.length === 0) {
+                resultsDiv.innerHTML = '<div class="empty-state">Пользователь не найден</div>';
+                return;
+            }
+
+            resultsDiv.innerHTML = foundUsers.map(user => `
+                <div class="trade-item">
+                    <div class="trade-icon">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="trade-details">
+                        <div class="trade-title">${user.internal_username} ${user.is_admin ? '👑' : ''}</div>
+                        <div class="trade-description">Telegram: ${user.telegram_username || 'Не указан'}</div>
+                        <div class="trade-description">Roblox: ${user.roblox_username || 'Не указан'}</div>
+                    </div>
+                    <button class="btn btn-small btn-secondary" onclick="messageUser('${user.internal_username}')">
+                        <i class="fas fa-envelope"></i>
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        function messageUser(username) {
+            showNotification(`Функция сообщений для ${username} в разработке`, 'info');
+        }
+
+        function changeLanguage(lang) {
+            currentUser.lang = lang;
+            showNotification(`Язык изменен на ${lang === 'ru' ? 'Русский' : 'English'}`, 'success');
+            renderSection('settings');
+        }
+
+        // ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ
+        function createModal(content) {
+            const modal = document.createElement('div');
+            modal.className = 'modal';
+            modal.style.display = 'flex';
+            modal.innerHTML = `<div class="modal-content">${content}</div>`;
+            
+            modal.querySelector('.close-modal').addEventListener('click', () => modal.remove());
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) modal.remove();
+            });
+            
+            document.body.appendChild(modal);
+            return modal;
+        }
+
+        function initializeCategorySelection(containerId, type) {
+            const options = document.querySelectorAll(`#${containerId} .category-option`);
+            options.forEach(option => {
+                option.addEventListener('click', function() {
+                    options.forEach(opt => opt.classList.remove('selected'));
+                    this.classList.add('selected');
+                    userTradingData[`${type}Category`] = this.getAttribute('data-category');
+                    if (type === 'give' || type === 'want') updateTradeSummary();
                 });
             });
         }
 
-        // Инициализация профиля
-        function initializeProfile() {
-            // Заполняем данные профиля
-            elements.internalUsername.textContent = state.currentUser.internalUsername;
-            elements.robloxUsername.textContent = state.currentUser.robloxUsername;
-            elements.telegramUsername.textContent = state.currentUser.telegramUsername;
-            elements.activeTradesCount.textContent = state.currentUser.activeTrades;
-            elements.activeSalesCount.textContent = state.currentUser.activeSales;
-            elements.successfulDeals.textContent = state.currentUser.successfulDeals;
-            elements.userRating.textContent = state.currentUser.rating + '/5.0';
+        function updateTradeSummary() {
+            const giveCategory = userTradingData.giveCategory;
+            const wantCategory = userTradingData.wantCategory;
+            const giveDescription = document.getElementById('give-description')?.value || '';
+            const wantDescription = document.getElementById('want-description')?.value || '';
             
-            // Обработчик кнопки редактирования профиля
-            elements.editProfileBtn.addEventListener('click', function() {
-                document.getElementById('edit-internal-username').value = state.currentUser.internalUsername;
-                document.getElementById('edit-roblox-username').value = state.currentUser.robloxUsername;
-                document.getElementById('edit-telegram-username').value = state.currentUser.telegramUsername;
-                openModal('edit-profile-modal');
-            });
-            
-            // Обработчик сохранения профиля
-            document.getElementById('save-profile-btn').addEventListener('click', function() {
-                const newInternal = document.getElementById('edit-internal-username').value;
-                const newRoblox = document.getElementById('edit-roblox-username').value;
-                const newTelegram = document.getElementById('edit-telegram-username').value;
-                
-                // Обновляем состояние
-                state.currentUser.internalUsername = newInternal;
-                state.currentUser.robloxUsername = newRoblox;
-                state.currentUser.telegramUsername = newTelegram;
-                
-                // Обновляем UI
-                elements.internalUsername.textContent = newInternal;
-                elements.robloxUsername.textContent = newRoblox;
-                elements.telegramUsername.textContent = newTelegram;
-                
-                closeModal('edit-profile-modal');
-                showNotification('Профиль успешно обновлен!', 'success');
-            });
+            const summary = document.getElementById('trade-summary');
+            if (giveCategory && wantCategory && giveDescription && wantDescription) {
+                document.getElementById('summary-give').textContent = 
+                    `${DB.categories[giveCategory]} - ${giveDescription}`;
+                document.getElementById('summary-want').textContent = 
+                    `${DB.categories[wantCategory]} - ${wantDescription}`;
+                summary.style.display = 'block';
+            }
         }
 
-        // Инициализация трейдов
-        function initializeTrades() {
-            // Обработчик кнопки создания трейда
-            elements.createTradeBtn.addEventListener('click', function() {
-                // Сброс формы
-                state.currentTrade = {
-                    give: { category: null, description: "" },
-                    want: { category: null, description: "" }
-                };
-                document.getElementById('give-description').value = '';
-                document.getElementById('want-description').value = '';
-                document.getElementById('trade-summary').style.display = 'none';
-                
-                // Сброс выбранных категорий
-                document.querySelectorAll('.category-option').forEach(option => {
-                    option.classList.remove('selected');
-                });
-                
-                openModal('create-trade-modal');
-            });
-            
-            // Обработчики выбора категорий для "даю"
-            document.querySelectorAll('#give-category-options .category-option').forEach(option => {
-                option.addEventListener('click', function() {
-                    document.querySelectorAll('#give-category-options .category-option').forEach(opt => {
-                        opt.classList.remove('selected');
-                    });
-                    this.classList.add('selected');
-                    state.currentTrade.give.category = this.getAttribute('data-category');
-                    updateTradeSummary();
-                });
-            });
-            
-            // Обработчики выбора категорий для "хочу"
-            document.querySelectorAll('#want-category-options .category-option').forEach(option => {
-                option.addEventListener('click', function() {
-                    document.querySelectorAll('#want-category-options .category-option').forEach(opt => {
-                        opt.classList.remove('selected');
-                    });
-                    this.classList.add('selected');
-                    state.currentTrade.want.category = this.getAttribute('data-category');
-                    updateTradeSummary();
-                });
-            });
-            
-            // Обработчики ввода описания
-            document.getElementById('give-description').addEventListener('input', function() {
-                state.currentTrade.give.description = this.value;
-                updateTradeSummary();
-            });
-            
-            document.getElementById('want-description').addEventListener('input', function() {
-                state.currentTrade.want.description = this.value;
-                updateTradeSummary();
-            });
-            
-            // Обработчик публикации трейда
-            document.getElementById('publish-trade-btn').addEventListener('click', function() {
-                if (!state.currentTrade.give.category || !state.currentTrade.want.category || 
-                    !state.currentTrade.give.description || !state.currentTrade.want.description) {
-                    showNotification('Заполните все поля!', 'error');
-                    return;
+        function switchToTab(tabId) {
+            document.querySelectorAll('.tab').forEach(tab => {
+                if (tab.getAttribute('data-tab') === tabId) {
+                    tab.click();
                 }
-                
-                // Добавляем новый трейд
-                const newTrade = {
-                    id: state.trades.length + 1,
-                    give: { ...state.currentTrade.give },
-                    want: { ...state.currentTrade.want },
-                    status: 'moderation'
-                };
-                
-                state.trades.push(newTrade);
-                state.currentUser.activeTrades++;
-                
-                // Обновляем UI
-                renderTrades();
-                elements.activeTradesCount.textContent = state.currentUser.activeTrades;
-                
-                closeModal('create-trade-modal');
-                showNotification('Трейд отправлен на модерацию!', 'success');
-            });
-            
-            // Первоначальная отрисовка трейдов
-            renderTrades();
-        }
-
-        // Инициализация продаж
-        function initializeSales() {
-            // Обработчик кнопки создания продажи
-            document.getElementById('create-sale-btn').addEventListener('click', function() {
-                showNotification('Функция создания продажи в разработке', 'info');
-            });
-            
-            // Первоначальная отрисовка продаж
-            renderSales();
-        }
-
-        // Инициализация модальных окон
-        function initializeModals() {
-            // Закрытие модальных окон
-            document.querySelectorAll('.close-modal').forEach(closeBtn => {
-                closeBtn.addEventListener('click', function() {
-                    const modal = this.closest('.modal');
-                    closeModal(modal.id);
-                });
-            });
-            
-            // Закрытие по клику вне модального окна
-            document.querySelectorAll('.modal').forEach(modal => {
-                modal.addEventListener('click', function(e) {
-                    if (e.target === this) {
-                        closeModal(this.id);
-                    }
-                });
-            });
-            
-            // Кнопки отмены
-            document.getElementById('cancel-edit-profile-btn').addEventListener('click', function() {
-                closeModal('edit-profile-modal');
-            });
-            
-            document.getElementById('cancel-trade-btn').addEventListener('click', function() {
-                closeModal('create-trade-modal');
             });
         }
 
-        // Инициализация уведомлений
-        function initializeNotifications() {
-            // Настройки уведомлений
-            document.getElementById('notif-messages').addEventListener('change', function() {
-                state.notifications.messages = this.checked;
-            });
-            
-            document.getElementById('notif-trades').addEventListener('change', function() {
-                state.notifications.trades = this.checked;
-            });
-            
-            document.getElementById('notif-updates').addEventListener('change', function() {
-                state.notifications.updates = this.checked;
-            });
-        }
-
-        // Функции для работы с модальными окнами
-        function openModal(modalId) {
-            document.getElementById(modalId).style.display = 'flex';
-        }
-
-        function closeModal(modalId) {
-            document.getElementById(modalId).style.display = 'none';
-        }
-
-        // Функция показа уведомлений
         function showNotification(message, type = 'info') {
-            const notification = elements.notification;
+            const notification = document.getElementById('notification');
             const icon = notification.querySelector('.notification-icon i');
             const messageEl = notification.querySelector('.notification-message');
             
-            // Устанавливаем иконку в зависимости от типа
             icon.className = 'fas ' + (
                 type === 'success' ? 'fa-check' :
                 type === 'error' ? 'fa-exclamation-triangle' :
@@ -1247,7 +1387,6 @@
                 'fa-info-circle'
             );
             
-            // Устанавливаем цвет в зависимости от типа
             notification.querySelector('.notification-icon').style.backgroundColor = 
                 type === 'success' ? 'var(--success)' :
                 type === 'error' ? 'var(--danger)' :
@@ -1255,12 +1394,9 @@
                 'var(--secondary)';
             
             messageEl.textContent = message;
-            
-            // Показываем уведомление
             notification.classList.remove('hide');
             notification.style.display = 'flex';
             
-            // Автоматически скрываем через 3 секунды
             setTimeout(() => {
                 notification.classList.add('hide');
                 setTimeout(() => {
@@ -1269,136 +1405,58 @@
             }, 3000);
         }
 
-        // Обновление сводки трейда
-        function updateTradeSummary() {
-            const summary = document.getElementById('trade-summary');
-            const giveCategory = state.currentTrade.give.category;
-            const wantCategory = state.currentTrade.want.category;
-            
-            if (giveCategory && wantCategory) {
-                document.getElementById('summary-give').textContent = 
-                    `${mockData.categories[giveCategory]} - ${state.currentTrade.give.description}`;
-                document.getElementById('summary-want').textContent = 
-                    `${mockData.categories[wantCategory]} - ${state.currentTrade.want.description}`;
-                summary.style.display = 'block';
-            } else {
-                summary.style.display = 'none';
-            }
-        }
+        // Заглушки для остальных функций
+        function initializeModals() {}
+        function initializeEventListeners() {}
+        function showContactAdminModal() { showNotification('Функция связи с админом в разработке', 'info'); }
+        function showTutorialModal() { showNotification('Туториал в разработке', 'info'); }
+        function showSearchTradesModal() { showNotification('Поиск трейдов в разработке', 'info'); }
+        function showMyTradesModal() { showNotification('Просмотр трейдов в разработке', 'info'); }
+        function showSearchSalesModal() { showNotification('Поиск продаж в разработке', 'info'); }
+        function showMySalesModal() { showNotification('Просмотр продаж в разработке', 'info'); }
 
-        // Отрисовка списка трейдов
-        function renderTrades() {
-            const tradesList = elements.myTradesList;
-            tradesList.innerHTML = '';
-            
-            if (state.trades.length === 0) {
-                tradesList.innerHTML = `
-                    <div class="empty-state">
-                        <i class="fas fa-exchange-alt"></i>
-                        <p>У вас пока нет трейдов</p>
-                    </div>
-                `;
-                return;
-            }
-            
-            state.trades.forEach(trade => {
-                const tradeElement = document.createElement('div');
-                tradeElement.className = 'trade-item';
-                tradeElement.innerHTML = `
-                    <div class="trade-icon">
-                        <i class="fas fa-exchange-alt"></i>
-                    </div>
-                    <div class="trade-details">
-                        <div class="trade-title">${mockData.categories[trade.give.category]} → ${mockData.categories[trade.want.category]}</div>
-                        <div class="trade-description">${trade.give.description}</div>
-                    </div>
-                    <span class="badge ${trade.status === 'active' ? 'badge-success' : 'badge-warning'}">
-                        ${trade.status === 'active' ? 'Активен' : 'На модерации'}
-                    </span>
-                `;
-                tradesList.appendChild(tradeElement);
-            });
-        }
+        // Заглушки для админ-функций
+        function showModerateTradesModal() { showNotification('Модерация трейдов в разработке', 'info'); }
+        function showModerateSalesModal() { showNotification('Модерация продаж в разработке', 'info'); }
+        function showModerateComplaintsModal() { showNotification('Модерация жалоб в разработке', 'info'); }
+        function showBanUserModal() { showNotification('Бан пользователей в разработке', 'info'); }
+        function showUnbanUserModal() { showNotification('Разбан пользователей в разработке', 'info'); }
+        function showAllowUsernameChangeModal() { showNotification('Разрешение смены ника в разработке', 'info'); }
+        function showPromoteAdminModal() { showNotification('Назначение админов в разработке', 'info'); }
+        function showDemoteAdminModal() { showNotification('Снятие админов в разработке', 'info'); }
+        function showBroadcastModal() { showNotification('Рассылка в разработке', 'info'); }
+        function showStatsModal() { showNotification('Статистика в разработке', 'info'); }
+        function showViewMessagesModal() { showNotification('Просмотр переписок в разработке', 'info'); }
 
-        // Отрисовка списка продаж
-        function renderSales() {
-            const salesList = elements.mySalesList;
-            salesList.innerHTML = '';
-            
-            if (state.sales.length === 0) {
-                salesList.innerHTML = `
-                    <div class="empty-state">
-                        <i class="fas fa-shopping-cart"></i>
-                        <p>У вас пока нет продаж</p>
-                    </div>
-                `;
-                return;
-            }
-            
-            state.sales.forEach(sale => {
-                const saleElement = document.createElement('div');
-                saleElement.className = 'trade-item';
-                saleElement.innerHTML = `
-                    <div class="trade-icon">
-                        <i class="fas fa-shopping-cart"></i>
-                    </div>
-                    <div class="trade-details">
-                        <div class="trade-title">${mockData.categories[sale.category]}</div>
-                        <div class="trade-description">${sale.description}</div>
-                    </div>
-                    <span class="badge badge-success">${sale.price}</span>
-                `;
-                salesList.appendChild(saleElement);
-            });
-        }
-
-        // Эффект пульсации для кнопок
+        // Добавляем эффект ripple для всех кнопок
         document.addEventListener('click', function(e) {
-            if (e.target.classList.contains('btn')) {
-                const button = e.target;
+            if (e.target.classList.contains('btn') || e.target.closest('.btn')) {
+                const button = e.target.classList.contains('btn') ? e.target : e.target.closest('.btn');
                 const ripple = document.createElement('span');
                 const rect = button.getBoundingClientRect();
                 const size = Math.max(rect.width, rect.height);
                 const x = e.clientX - rect.left - size / 2;
                 const y = e.clientY - rect.top - size / 2;
                 
-                ripple.style.width = ripple.style.height = size + 'px';
-                ripple.style.left = x + 'px';
-                ripple.style.top = y + 'px';
-                ripple.classList.add('ripple');
+                ripple.style.cssText = `
+                    position: absolute;
+                    border-radius: 50%;
+                    background-color: rgba(255, 255, 255, 0.7);
+                    transform: scale(0);
+                    animation: ripple-animation 0.6s linear;
+                    width: ${size}px;
+                    height: ${size}px;
+                    left: ${x}px;
+                    top: ${y}px;
+                `;
                 
+                button.style.position = 'relative';
+                button.style.overflow = 'hidden';
                 button.appendChild(ripple);
                 
-                setTimeout(() => {
-                    ripple.remove();
-                }, 600);
+                setTimeout(() => ripple.remove(), 600);
             }
         });
-
-        // Добавляем стили для эффекта пульсации
-        const style = document.createElement('style');
-        style.textContent = `
-            .ripple {
-                position: absolute;
-                border-radius: 50%;
-                background-color: rgba(255, 255, 255, 0.7);
-                transform: scale(0);
-                animation: ripple-animation 0.6s linear;
-            }
-            
-            @keyframes ripple-animation {
-                to {
-                    transform: scale(4);
-                    opacity: 0;
-                }
-            }
-            
-            .btn {
-                position: relative;
-                overflow: hidden;
-            }
-        `;
-        document.head.appendChild(style);
     </script>
 </body>
-    </html>
+                                                     </html>
