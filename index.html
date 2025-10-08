@@ -3,19 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QuizMaster - создание онлайн тестов</title>
+    <title>Once Upon a Tower</title>
     <style>
-        :root {
-            --primary-color: #1abc9c;
-            --primary-dark: #16a085;
-            --primary-light: #a3e4d7;
-            --secondary-color: #3498db;
-            --text-color: #2c3e50;
-            --light-bg: #ecf0f1;
-            --white: #ffffff;
-            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-        
         * {
             margin: 0;
             padding: 0;
@@ -24,667 +13,1049 @@
         }
         
         body {
-            background-color: var(--light-bg);
-            color: var(--text-color);
-            line-height: 1.6;
-        }
-        
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 20px;
-        }
-        
-        header {
-            background-color: var(--primary-color);
-            color: white;
-            padding: 1rem 0;
-            box-shadow: var(--shadow);
-        }
-        
-        .header-content {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .logo {
-            font-size: 1.8rem;
-            font-weight: bold;
-        }
-        
-        nav ul {
-            display: flex;
-            list-style: none;
-        }
-        
-        nav li {
-            margin-left: 1.5rem;
-        }
-        
-        nav a {
-            color: white;
-            text-decoration: none;
-            padding: 0.5rem 1rem;
-            border-radius: 4px;
-            transition: background-color 0.3s ease;
-        }
-        
-        nav a:hover {
-            background-color: var(--primary-dark);
-        }
-        
-        .tabs {
-            display: flex;
-            background-color: var(--white);
-            border-radius: 8px 8px 0 0;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #fff;
             overflow: hidden;
-            margin-top: 2rem;
-            box-shadow: var(--shadow);
+            user-select: none;
         }
         
-        .tab {
-            padding: 1rem 2rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            flex: 1;
-            text-align: center;
-            background-color: var(--white);
-            color: var(--text-color);
+        #game-container {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+            overflow: hidden;
         }
         
-        .tab.active {
-            background-color: var(--primary-color);
-            color: white;
-        }
-        
-        .tab:hover:not(.active) {
-            background-color: var(--primary-light);
-        }
-        
-        .tab-content {
-            display: none;
-            padding: 2rem;
-            background-color: var(--white);
-            border-radius: 0 0 8px 8px;
-            box-shadow: var(--shadow);
-            animation: fadeIn 0.5s ease;
-        }
-        
-        .tab-content.active {
-            display: block;
-        }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        .btn {
-            background-color: var(--primary-color);
-            color: white;
-            border: none;
-            padding: 0.7rem 1.5rem;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-            font-size: 1rem;
-        }
-        
-        .btn:hover {
-            background-color: var(--primary-dark);
-        }
-        
-        .btn-secondary {
-            background-color: var(--secondary-color);
-        }
-        
-        .btn-secondary:hover {
-            background-color: #2980b9;
-        }
-        
-        .form-group {
-            margin-bottom: 1.5rem;
-        }
-        
-        label {
-            display: block;
-            margin-bottom: 0.5rem;
-            font-weight: 600;
-        }
-        
-        input, textarea, select {
+        #game-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
             width: 100%;
-            padding: 0.7rem;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-size: 1rem;
-        }
-        
-        .question-item {
-            background-color: var(--light-bg);
-            padding: 1.5rem;
-            border-radius: 8px;
-            margin-bottom: 1.5rem;
-            border-left: 4px solid var(--primary-color);
-        }
-        
-        .option-item {
-            display: flex;
-            align-items: center;
-            margin-bottom: 0.5rem;
-        }
-        
-        .option-item input[type="text"] {
-            flex: 1;
-            margin-right: 1rem;
-        }
-        
-        .option-item input[type="checkbox"],
-        .option-item input[type="radio"] {
-            width: auto;
-            margin-right: 0.5rem;
-        }
-        
-        .quiz-card {
-            background-color: var(--white);
-            border-radius: 8px;
-            padding: 1.5rem;
-            margin-bottom: 1.5rem;
-            box-shadow: var(--shadow);
-            transition: transform 0.3s ease;
-        }
-        
-        .quiz-card:hover {
-            transform: translateY(-5px);
-        }
-        
-        .quiz-title {
-            font-size: 1.3rem;
-            margin-bottom: 0.5rem;
-            color: var(--primary-dark);
-        }
-        
-        .quiz-description {
-            color: #666;
-            margin-bottom: 1rem;
-        }
-        
-        .quiz-meta {
-            display: flex;
-            justify-content: space-between;
-            color: #888;
-            font-size: 0.9rem;
-        }
-        
-        .progress-bar {
-            height: 8px;
-            background-color: #eee;
-            border-radius: 4px;
-            margin: 1rem 0;
-            overflow: hidden;
-        }
-        
-        .progress {
             height: 100%;
-            background-color: var(--primary-color);
-            width: 0%;
-            transition: width 0.5s ease;
+            z-index: 1;
         }
         
-        .statistics {
+        .screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
             display: flex;
-            justify-content: space-around;
-            margin: 2rem 0;
-            text-align: center;
-        }
-        
-        .stat-item {
-            flex: 1;
-            padding: 1rem;
-        }
-        
-        .stat-value {
-            font-size: 2rem;
-            font-weight: bold;
-            color: var(--primary-color);
-        }
-        
-        .stat-label {
-            font-size: 0.9rem;
-            color: #666;
-        }
-        
-        footer {
-            background-color: var(--text-color);
-            color: white;
-            text-align: center;
-            padding: 2rem 0;
-            margin-top: 3rem;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 10;
+            transition: opacity 0.5s ease;
         }
         
         .hidden {
-            display: none;
+            display: none !important;
+        }
+        
+        h1 {
+            font-size: 4rem;
+            margin-bottom: 2rem;
+            text-align: center;
+            color: #ffcc00;
+            text-shadow: 0 0 10px rgba(255, 204, 0, 0.7);
+        }
+        
+        h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1.5rem;
+            color: #ffcc00;
+        }
+        
+        .btn {
+            background: linear-gradient(to bottom, #ffcc00, #ff9900);
+            color: #1a1a2e;
+            border: none;
+            padding: 15px 30px;
+            margin: 10px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(255, 204, 0, 0.4);
+        }
+        
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(255, 204, 0, 0.6);
+        }
+        
+        .btn:active {
+            transform: translateY(1px);
+        }
+        
+        .btn-secondary {
+            background: linear-gradient(to bottom, #4a4a8a, #2d2d5a);
+            color: #fff;
+        }
+        
+        #shop-screen, #upgrades-screen, #skins-screen {
+            padding: 20px;
+            overflow-y: auto;
+        }
+        
+        .shop-items, .upgrades-list, .skins-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+            width: 90%;
+            max-width: 1200px;
+            margin-top: 20px;
+        }
+        
+        .shop-item, .upgrade-item, .skin-item {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+        
+        .shop-item:hover, .upgrade-item:hover, .skin-item:hover {
+            transform: translateY(-5px);
+            border-color: #ffcc00;
+        }
+        
+        .shop-item img, .upgrade-item img, .skin-item img {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 15px;
+            border-radius: 10px;
+        }
+        
+        .item-title {
+            font-size: 1.3rem;
+            margin-bottom: 10px;
+            color: #ffcc00;
+        }
+        
+        .item-description {
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+            color: #ccc;
+        }
+        
+        .item-price {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #ffcc00;
+            margin-bottom: 15px;
+        }
+        
+        .owned {
+            background: rgba(0, 255, 0, 0.2);
+        }
+        
+        .equipped {
+            border-color: #00ff00;
+        }
+        
+        #hud {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            z-index: 5;
+            background: rgba(0, 0, 0, 0.6);
+            padding: 15px;
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .hud-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .hud-icon {
+            width: 30px;
+            height: 30px;
+            background: #ffcc00;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            color: #1a1a2e;
+        }
+        
+        .hud-value {
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+        
+        #game-over-screen {
+            text-align: center;
+        }
+        
+        #final-stats {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 15px;
+            margin: 20px 0;
+            max-width: 500px;
+        }
+        
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+        
+        .stat-value {
+            color: #ffcc00;
+            font-weight: bold;
+        }
+        
+        #tower {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 200px;
+            height: 500px;
+            background: linear-gradient(to right, #8b4513, #a0522d);
+            z-index: 2;
+            border: 5px solid #5d2906;
+            border-bottom: none;
+            border-radius: 20px 20px 0 0;
+        }
+        
+        #player {
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            background: #ff0000;
+            border-radius: 50%;
+            z-index: 3;
+            transition: all 0.1s ease;
+        }
+        
+        .enemy {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            background: #00ff00;
+            border-radius: 5px;
+            z-index: 3;
+        }
+        
+        .projectile {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: #ffff00;
+            border-radius: 50%;
+            z-index: 3;
+        }
+        
+        .coin {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: #ffcc00;
+            border-radius: 50%;
+            z-index: 3;
+            animation: spin 2s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        #controls {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 20px;
+            z-index: 5;
+        }
+        
+        .control-btn {
+            width: 80px;
+            height: 80px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 2rem;
+            color: white;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .control-btn:active {
+            background: rgba(255, 255, 255, 0.4);
+            transform: scale(0.9);
+        }
+        
+        #pause-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 5;
+            background: rgba(0, 0, 0, 0.6);
+            color: white;
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            font-size: 1.5rem;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .notification {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 1.5rem;
+            z-index: 20;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .show {
+            opacity: 1;
         }
     </style>
 </head>
 <body>
-    <header>
-        <div class="container">
-            <div class="header-content">
-                <div class="logo">QuizMaster</div>
-                <nav>
-                    <ul>
-                        <li><a href="#" class="tab-link" data-tab="create">Создать тест</a></li>
-                        <li><a href="#" class="tab-link" data-tab="browse">Найти тесты</a></li>
-                        <li><a href="#" class="tab-link" data-tab="results">Мои результаты</a></li>
-                    </ul>
-                </nav>
-            </div>
-        </div>
-    </header>
-    
-    <div class="container">
-        <div class="tabs">
-            <div class="tab active" data-tab="create">Создание теста</div>
-            <div class="tab" data-tab="browse">Каталог тестов</div>
-            <div class="tab" data-tab="results">Результаты</div>
-        </div>
+    <div id="game-container">
+        <canvas id="game-canvas"></canvas>
         
-        <div class="tab-content active" id="create-tab">
-            <h2>Создание нового теста</h2>
-            <div class="form-group">
-                <label for="quiz-title">Название теста</label>
-                <input type="text" id="quiz-title" placeholder="Введите название теста">
+        <div id="hud">
+            <div class="hud-item">
+                <div class="hud-icon">❤</div>
+                <div class="hud-value" id="health">100</div>
             </div>
-            
-            <div class="form-group">
-                <label for="quiz-description">Описание теста</label>
-                <textarea id="quiz-description" rows="3" placeholder="Опишите ваш тест"></textarea>
+            <div class="hud-item">
+                <div class="hud-icon">⚡</div>
+                <div class="hud-value" id="energy">100</div>
             </div>
-            
-            <div class="form-group">
-                <label>Настройка оценки:</label>
-                <div style="display: flex; gap: 1rem;">
-                    <div style="flex: 1;">
-                        <label for="pass-percent">Минимальный процент для прохождения</label>
-                        <input type="number" id="pass-percent" min="0" max="100" value="70">
-                    </div>
-                    <div style="flex: 1;">
-                        <label for="excellent-percent">Процент для отличной оценки</label>
-                        <input type="number" id="excellent-percent" min="0" max="100" value="90">
-                    </div>
-                </div>
+            <div class="hud-item">
+                <div class="hud-icon">💰</div>
+                <div class="hud-value" id="coins">0</div>
             </div>
-            
-            <h3>Вопросы теста</h3>
-            <div id="questions-container">
-                <!-- Вопросы будут добавляться здесь -->
+            <div class="hud-item">
+                <div class="hud-icon">🏆</div>
+                <div class="hud-value" id="score">0</div>
             </div>
-            
-            <button class="btn" id="add-question-btn">Добавить вопрос</button>
-            <button class="btn btn-secondary" id="publish-btn" style="float: right;">Опубликовать тест</button>
-        </div>
-        
-        <div class="tab-content" id="browse-tab">
-            <h2>Каталог тестов</h2>
-            <div class="form-group">
-                <input type="text" placeholder="Поиск тестов...">
-            </div>
-            
-            <div id="quiz-list">
-                <div class="quiz-card">
-                    <div class="quiz-title">Тест по истории России</div>
-                    <div class="quiz-description">Проверьте свои знания по истории России от древних времен до наших дней</div>
-                    <div class="quiz-meta">
-                        <span>15 вопросов</span>
-                        <span>Автор: Иван Петров</span>
-                    </div>
-                    <button class="btn" data-quiz="1">Пройти тест</button>
-                </div>
-                
-                <div class="quiz-card">
-                    <div class="quiz-title">География мира</div>
-                    <div class="quiz-description">Сможете ли вы определить страны по их контурам и столицы по описанию?</div>
-                    <div class="quiz-meta">
-                        <span>20 вопросов</span>
-                        <span>Автор: Анна Сидорова</span>
-                    </div>
-                    <button class="btn" data-quiz="2">Пройти тест</button>
-                </div>
+            <div class="hud-item">
+                <div class="hud-icon">⬆</div>
+                <div class="hud-value" id="floor">1</div>
             </div>
         </div>
         
-        <div class="tab-content" id="results-tab">
-            <h2>Мои результаты</h2>
-            <div id="user-results">
-                <div class="quiz-card">
-                    <div class="quiz-title">Тест по истории России</div>
-                    <div class="progress-bar">
-                        <div class="progress" style="width: 80%"></div>
-                    </div>
-                    <div class="quiz-meta">
-                        <span>Результат: 80%</span>
-                        <span>Лучше, чем у 65% пользователей</span>
-                    </div>
-                </div>
-                
-                <div class="quiz-card">
-                    <div class="quiz-title">География мира</div>
-                    <div class="progress-bar">
-                        <div class="progress" style="width: 65%"></div>
-                    </div>
-                    <div class="quiz-meta">
-                        <span>Результат: 65%</span>
-                        <span>Лучше, чем у 42% пользователей</span>
-                    </div>
-                </div>
-            </div>
+        <button id="pause-btn">⏸</button>
+        
+        <div id="controls">
+            <div class="control-btn" id="left-btn">←</div>
+            <div class="control-btn" id="jump-btn">↑</div>
+            <div class="control-btn" id="attack-btn">⚔</div>
+            <div class="control-btn" id="right-btn">→</div>
         </div>
         
-        <!-- Модальное окно прохождения теста -->
-        <div id="quiz-modal" class="hidden">
-            <div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: flex; justify-content: center; align-items: center; z-index: 1000;">
-                <div style="background: white; padding: 2rem; border-radius: 8px; width: 90%; max-width: 800px; max-height: 90vh; overflow-y: auto;">
-                    <div id="quiz-content">
-                        <!-- Содержимое теста будет загружено сюда -->
-                    </div>
-                    <div style="text-align: center; margin-top: 2rem;">
-                        <button class="btn" id="prev-question">Назад</button>
-                        <button class="btn" id="next-question">Далее</button>
-                        <button class="btn btn-secondary" id="submit-quiz" style="display: none;">Завершить тест</button>
-                    </div>
-                </div>
-            </div>
+        <div id="main-menu" class="screen">
+            <h1>Once Upon a Tower</h1>
+            <button class="btn" id="start-btn">Начать игру</button>
+            <button class="btn btn-secondary" id="shop-btn">Магазин</button>
+            <button class="btn btn-secondary" id="upgrades-btn">Усиления</button>
+            <button class="btn btn-secondary" id="skins-btn">Скины</button>
         </div>
         
-        <!-- Модальное окно результатов -->
-        <div id="results-modal" class="hidden">
-            <div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: flex; justify-content: center; align-items: center; z-index: 1000;">
-                <div style="background: white; padding: 2rem; border-radius: 8px; width: 90%; max-width: 600px;">
-                    <h2 style="text-align: center; margin-bottom: 1.5rem;">Результаты теста</h2>
-                    <div class="statistics">
-                        <div class="stat-item">
-                            <div class="stat-value" id="user-score">0%</div>
-                            <div class="stat-label">Ваш результат</div>
-                        </div>
-                        <div class="stat-item">
-                            <div class="stat-value" id="user-rank">0%</div>
-                            <div class="stat-label">Лучше, чем у других</div>
-                        </div>
-                    </div>
-                    <div class="progress-bar">
-                        <div class="progress" id="result-progress" style="width: 0%"></div>
-                    </div>
-                    <div style="text-align: center; margin-top: 2rem;">
-                        <button class="btn" id="close-results">Закрыть</button>
-                    </div>
+        <div id="shop-screen" class="screen hidden">
+            <h2>Магазин</h2>
+            <div class="shop-items">
+                <div class="shop-item">
+                    <div class="item-title">Зелье здоровья</div>
+                    <div class="item-description">Восстанавливает 50 здоровья</div>
+                    <div class="item-price">10 монет</div>
+                    <button class="btn">Купить</button>
+                </div>
+                <div class="shop-item">
+                    <div class="item-title">Зелье энергии</div>
+                    <div class="item-description">Восстанавливает 50 энергии</div>
+                    <div class="item-price">10 монет</div>
+                    <button class="btn">Купить</button>
+                </div>
+                <div class="shop-item">
+                    <div class="item-title">Усиление атаки</div>
+                    <div class="item-description">+10% к урону на 5 минут</div>
+                    <div class="item-price">25 монет</div>
+                    <button class="btn">Купить</button>
+                </div>
+                <div class="shop-item">
+                    <div class="item-title">Защитный щит</div>
+                    <div class="item-description">Поглощает 50 урона</div>
+                    <div class="item-price">30 монет</div>
+                    <button class="btn">Купить</button>
                 </div>
             </div>
+            <button class="btn btn-secondary" id="back-from-shop">Назад</button>
         </div>
+        
+        <div id="upgrades-screen" class="screen hidden">
+            <h2>Усиления</h2>
+            <div class="upgrades-list">
+                <div class="upgrade-item">
+                    <div class="item-title">Сила</div>
+                    <div class="item-description">Увеличивает урон от атак</div>
+                    <div class="item-price">Уровень: 1</div>
+                    <button class="btn">Улучшить (50 монет)</button>
+                </div>
+                <div class="upgrade-item">
+                    <div class="item-title">Здоровье</div>
+                    <div class="item-description">Увеличивает максимальное здоровье</div>
+                    <div class="item-price">Уровень: 1</div>
+                    <button class="btn">Улучшить (50 монет)</button>
+                </div>
+                <div class="upgrade-item">
+                    <div class="item-title">Энергия</div>
+                    <div class="item-description">Увеличивает максимальную энергию</div>
+                    <div class="item-price">Уровень: 1</div>
+                    <button class="btn">Улучшить (50 монет)</button>
+                </div>
+                <div class="upgrade-item">
+                    <div class="item-title">Скорость</div>
+                    <div class="item-description">Увеличивает скорость передвижения</div>
+                    <div class="item-price">Уровень: 1</div>
+                    <button class="btn">Улучшить (50 монет)</button>
+                </div>
+            </div>
+            <button class="btn btn-secondary" id="back-from-upgrades">Назад</button>
+        </div>
+        
+        <div id="skins-screen" class="screen hidden">
+            <h2>Скины</h2>
+            <div class="skins-grid">
+                <div class="skin-item equipped">
+                    <div class="item-title">Рыцарь</div>
+                    <div class="item-description">Стандартный скин</div>
+                    <button class="btn">Выбрано</button>
+                </div>
+                <div class="skin-item">
+                    <div class="item-title">Волшебник</div>
+                    <div class="item-description">+10% к восстановлению энергии</div>
+                    <div class="item-price">100 монет</div>
+                    <button class="btn">Купить</button>
+                </div>
+                <div class="skin-item">
+                    <div class="item-title">Лучник</div>
+                    <div class="item-description">+15% к дальности атаки</div>
+                    <div class="item-price">150 монет</div>
+                    <button class="btn">Купить</button>
+                </div>
+                <div class="skin-item">
+                    <div class="item-title">Ниндзя</div>
+                    <div class="item-description">+20% к скорости передвижения</div>
+                    <div class="item-price">200 монет</div>
+                    <button class="btn">Купить</button>
+                </div>
+            </div>
+            <button class="btn btn-secondary" id="back-from-skins">Назад</button>
+        </div>
+        
+        <div id="game-over-screen" class="screen hidden">
+            <h1>Игра окончена!</h1>
+            <div id="final-stats">
+                <div class="stat-row">
+                    <span>Этаж:</span>
+                    <span class="stat-value" id="final-floor">1</span>
+                </div>
+                <div class="stat-row">
+                    <span>Счёт:</span>
+                    <span class="stat-value" id="final-score">0</span>
+                </div>
+                <div class="stat-row">
+                    <span>Монеты:</span>
+                    <span class="stat-value" id="final-coins">0</span>
+                </div>
+                <div class="stat-row">
+                    <span>Враги побеждены:</span>
+                    <span class="stat-value" id="final-enemies">0</span>
+                </div>
+                <div class="stat-row">
+                    <span>Рекорд:</span>
+                    <span class="stat-value" id="final-highscore">0</span>
+                </div>
+            </div>
+            <button class="btn" id="restart-btn">Играть снова</button>
+            <button class="btn btn-secondary" id="menu-btn">Главное меню</button>
+        </div>
+        
+        <div id="notification" class="notification hidden"></div>
     </div>
-    
-    <footer>
-        <div class="container">
-            <p>QuizMaster &copy; 2023 - Создание и публикация онлайн тестов</p>
-        </div>
-    </footer>
 
     <script>
-        // Переключение вкладок
-        document.querySelectorAll('.tab, .tab-link').forEach(tab => {
-            tab.addEventListener('click', function() {
-                const tabId = this.getAttribute('data-tab');
-                
-                // Убираем активный класс у всех вкладок и контента
-                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-                
-                // Добавляем активный класс текущей вкладке и контенту
-                this.classList.add('active');
-                document.getElementById(`${tabId}-tab`).classList.add('active');
-            });
-        });
+        // Основные переменные игры
+        const canvas = document.getElementById('game-canvas');
+        const ctx = canvas.getContext('2d');
         
-        // Добавление вопросов
-        let questionCount = 0;
+        // Установка размеров canvas
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
         
-        document.getElementById('add-question-btn').addEventListener('click', function() {
-            questionCount++;
-            const questionHTML = `
-                <div class="question-item" id="question-${questionCount}">
-                    <div class="form-group">
-                        <label>Вопрос ${questionCount}</label>
-                        <input type="text" class="question-text" placeholder="Введите вопрос">
-                    </div>
-                    <div class="form-group">
-                        <label>Тип вопроса:</label>
-                        <select class="question-type">
-                            <option value="single">Один вариант ответа</option>
-                            <option value="multiple">Несколько вариантов ответа</option>
-                        </select>
-                    </div>
-                    <div class="options-container">
-                        <div class="option-item">
-                            <input type="text" placeholder="Вариант ответа 1">
-                            <input type="checkbox" class="correct-option" style="display: none;">
-                            <input type="radio" class="correct-option" name="correct-${questionCount}">
-                            <button class="btn remove-option" style="padding: 0.3rem 0.7rem;">×</button>
-                        </div>
-                        <div class="option-item">
-                            <input type="text" placeholder="Вариант ответа 2">
-                            <input type="checkbox" class="correct-option" style="display: none;">
-                            <input type="radio" class="correct-option" name="correct-${questionCount}">
-                            <button class="btn remove-option" style="padding: 0.3rem 0.7rem;">×</button>
-                        </div>
-                    </div>
-                    <button class="btn add-option" style="margin-top: 0.5rem;">Добавить вариант</button>
-                    <button class="btn remove-question" style="margin-top: 1rem; background-color: #e74c3c;">Удалить вопрос</button>
-                </div>
-            `;
-            
-            document.getElementById('questions-container').insertAdjacentHTML('beforeend', questionHTML);
-            
-            // Обновляем обработчики событий для нового вопроса
-            updateQuestionEventListeners(questionCount);
-        });
+        // Состояние игры
+        const gameState = {
+            currentScreen: 'main-menu',
+            isPaused: false,
+            player: {
+                x: canvas.width / 2,
+                y: canvas.height - 150,
+                width: 50,
+                height: 50,
+                speed: 5,
+                jumpForce: 15,
+                velocityY: 0,
+                isJumping: false,
+                health: 100,
+                maxHealth: 100,
+                energy: 100,
+                maxEnergy: 100,
+                attackDamage: 10,
+                coins: 0,
+                score: 0,
+                floor: 1,
+                skin: 'knight'
+            },
+            enemies: [],
+            projectiles: [],
+            coins: [],
+            platforms: [],
+            gravity: 0.8,
+            keys: {},
+            gameTime: 0,
+            enemySpawnTimer: 0,
+            coinSpawnTimer: 0,
+            upgrades: {
+                strength: 1,
+                health: 1,
+                energy: 1,
+                speed: 1
+            },
+            skins: {
+                knight: { owned: true, equipped: true, bonus: '' },
+                wizard: { owned: false, bonus: '+10% energy regen' },
+                archer: { owned: false, bonus: '+15% attack range' },
+                ninja: { owned: false, bonus: '+20% movement speed' }
+            },
+            highScore: 0
+        };
         
-        function updateQuestionEventListeners(questionId) {
-            const questionElement = document.getElementById(`question-${questionId}`);
+        // Инициализация игры
+        function init() {
+            // Создание начальных платформ
+            createPlatform(canvas.width / 2 - 100, canvas.height - 100, 200, 20);
+            createPlatform(canvas.width / 2 - 80, canvas.height - 200, 160, 20);
+            createPlatform(canvas.width / 2 - 60, canvas.height - 300, 120, 20);
             
-            // Изменение типа вопроса
-            questionElement.querySelector('.question-type').addEventListener('change', function() {
-                const isMultiple = this.value === 'multiple';
-                const options = questionElement.querySelectorAll('.correct-option');
-                
-                options.forEach(option => {
-                    if (isMultiple) {
-                        option.type = 'checkbox';
-                        option.style.display = 'inline-block';
-                    } else {
-                        option.type = 'radio';
-                        option.style.display = 'inline-block';
-                    }
-                });
-            });
+            // Настройка обработчиков событий
+            setupEventListeners();
             
-            // Добавление варианта ответа
-            questionElement.querySelector('.add-option').addEventListener('click', function() {
-                const optionsContainer = questionElement.querySelector('.options-container');
-                const optionCount = optionsContainer.children.length + 1;
-                const isMultiple = questionElement.querySelector('.question-type').value === 'multiple';
-                
-                const optionHTML = `
-                    <div class="option-item">
-                        <input type="text" placeholder="Вариант ответа ${optionCount}">
-                        <input type="${isMultiple ? 'checkbox' : 'radio'}" class="correct-option" ${isMultiple ? '' : `name="correct-${questionId}"`}>
-                        <button class="btn remove-option" style="padding: 0.3rem 0.7rem;">×</button>
-                    </div>
-                `;
-                
-                optionsContainer.insertAdjacentHTML('beforeend', optionHTML);
-                
-                // Добавляем обработчик для новой кнопки удаления
-                optionsContainer.lastElementChild.querySelector('.remove-option').addEventListener('click', function() {
-                    this.parentElement.remove();
-                });
-            });
-            
-            // Удаление варианта ответа
-            questionElement.querySelectorAll('.remove-option').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    this.parentElement.remove();
-                });
-            });
-            
-            // Удаление вопроса
-            questionElement.querySelector('.remove-question').addEventListener('click', function() {
-                questionElement.remove();
+            // Запуск игрового цикла
+            gameLoop();
+        }
+        
+        // Создание платформы
+        function createPlatform(x, y, width, height) {
+            gameState.platforms.push({
+                x: x,
+                y: y,
+                width: width,
+                height: height
             });
         }
         
-        // Публикация теста
-        document.getElementById('publish-btn').addEventListener('click', function() {
-            const title = document.getElementById('quiz-title').value;
-            const description = document.getElementById('quiz-description').value;
+        // Настройка обработчиков событий
+        function setupEventListeners() {
+            // Кнопки меню
+            document.getElementById('start-btn').addEventListener('click', startGame);
+            document.getElementById('shop-btn').addEventListener('click', () => showScreen('shop-screen'));
+            document.getElementById('upgrades-btn').addEventListener('click', () => showScreen('upgrades-screen'));
+            document.getElementById('skins-btn').addEventListener('click', () => showScreen('skins-screen'));
             
-            if (!title || !description || questionCount === 0) {
-                alert('Заполните все обязательные поля и добавьте хотя бы один вопрос!');
-                return;
-            }
+            // Кнопки назад
+            document.getElementById('back-from-shop').addEventListener('click', () => showScreen('main-menu'));
+            document.getElementById('back-from-upgrades').addEventListener('click', () => showScreen('main-menu'));
+            document.getElementById('back-from-skins').addEventListener('click', () => showScreen('main-menu'));
             
-            alert('Тест успешно опубликован!');
-            // В реальном приложении здесь был бы код для сохранения теста в базе данных
-        });
-        
-        // Прохождение теста
-        document.querySelectorAll('#quiz-list .btn').forEach(btn => {
-            btn.addEventListener('click', function() {
-                const quizId = this.getAttribute('data-quiz');
-                startQuiz(quizId);
-            });
-        });
-        
-        function startQuiz(quizId) {
-            // В реальном приложении здесь был бы запрос к серверу для получения данных теста
-            // Для демонстрации используем фиктивные данные
+            // Кнопки игрового экрана
+            document.getElementById('restart-btn').addEventListener('click', restartGame);
+            document.getElementById('menu-btn').addEventListener('click', () => showScreen('main-menu'));
+            document.getElementById('pause-btn').addEventListener('click', togglePause);
             
-            const quizData = {
-                title: "Тест по истории России",
-                questions: [
-                    {
-                        text: "В каком году произошло Крещение Руси?",
-                        type: "single",
-                        options: [
-                            { text: "988 год", correct: true },
-                            { text: "989 год", correct: false },
-                            { text: "990 год", correct: false },
-                            { text: "991 год", correct: false }
-                        ]
-                    },
-                    {
-                        text: "Какие из этих событий произошли в XVII веке?",
-                        type: "multiple",
-                        options: [
-                            { text: "Смутное время", correct: true },
-                            { text: "Восстание Степана Разина", correct: true },
-                            { text: "Отмена крепостного права", correct: false },
-                            { text: "Восстание декабристов", correct: false }
-                        ]
-                    }
-                ]
-            };
-            
-            // Отображаем модальное окно с тестом
-            const quizContent = document.getElementById('quiz-content');
-            quizContent.innerHTML = `
-                <h2>${quizData.title}</h2>
-                <div id="quiz-questions">
-                    ${quizData.questions.map((question, index) => `
-                        <div class="question-item ${index === 0 ? 'active' : ''}" data-index="${index}">
-                            <h3>Вопрос ${index + 1}</h3>
-                            <p>${question.text}</p>
-                            <div class="options">
-                                ${question.options.map((option, optIndex) => `
-                                    <div class="option-item">
-                                        <input type="${question.type === 'single' ? 'radio' : 'checkbox'}" 
-                                               name="question-${index}" 
-                                               value="${optIndex}" 
-                                               id="q${index}-opt${optIndex}">
-                                        <label for="q${index}-opt${optIndex}">${option.text}</label>
-                                    </div>
-                                `).join('')}
-                            </div>
-                        </div>
-                    `).join('')}
-                </div>
-            `;
-            
-            document.getElementById('quiz-modal').classList.remove('hidden');
-            
-            // Настройка навигации по вопросам
-            let currentQuestion = 0;
-            const questions = document.querySelectorAll('#quiz-questions .question-item');
-            const totalQuestions = questions.length;
-            
-            document.getElementById('prev-question').addEventListener('click', function() {
-                if (currentQuestion > 0) {
-                    questions[currentQuestion].classList.remove('active');
-                    currentQuestion--;
-                    questions[currentQuestion].classList.add('active');
-                    
-                    document.getElementById('next-question').style.display = 'inline-block';
-                    document.getElementById('submit-quiz').style.display = 'none';
-                    
-                    if (currentQuestion === 0) {
-                        document.getElementById('prev-question').style.display = 'none';
-                    }
+            // Управление с клавиатуры
+            window.addEventListener('keydown', (e) => {
+                gameState.keys[e.key] = true;
+                
+                // Пробел для прыжка
+                if (e.key === ' ' && !gameState.player.isJumping) {
+                    jump();
+                }
+                
+                // P для паузы
+                if (e.key === 'p' || e.key === 'P') {
+                    togglePause();
                 }
             });
             
-            document.getElementById('next-question').addEventListener('click', function() {
-                if (currentQuestion < totalQuestions - 1) {
-                    questions[currentQuestion].classList.remove('active');
-                    currentQuestion++;
-                    questions[currentQuestion].classList.add('active');
-                    
-                    document.getElementById('prev-question').style.display = 'inline-block';
-                    
-                    if (currentQuestion === totalQuestions - 1) {
-                        document.getElementById('next-question').style.display = 'none';
-                        document.getElementById('submit-quiz').style.display = 'inline-block';
-                    }
-                }
+            window.addEventListener('keyup', (e) => {
+                gameState.keys[e.key] = false;
             });
             
-            // Сброс стилей при первом запуске
-            document.getElementById('prev-question').style.display = 'none';
-            if (totalQuestions === 1) {
-                document.getElementById('next-question').style.display = 'none';
-                document.getElementById('submit-quiz').style.display = 'inline-block';
-            }
+            // Сенсорное управление
+            document.getElementById('left-btn').addEventListener('touchstart', () => gameState.keys['ArrowLeft'] = true);
+            document.getElementById('left-btn').addEventListener('touchend', () => gameState.keys['ArrowLeft'] = false);
             
-            // Завершение теста
-            document.getElementById('submit-quiz').addEventListener('click', function() {
-                // В реальном приложении здесь был бы код для проверки ответов
-                const score = Math.floor(Math.random() * 40) + 60; // Случайный результат от 60 до 100%
-                const rank = Math.floor(Math.random() * 40) + 50; // Случайный рейтинг от 50 до 90%
-                
-                document.getElementById('user-score').textContent = `${score}%`;
-                document.getElementById('user-rank').textContent = `${rank}%`;
-                
-                const progressBar = document.getElementById('result-progress');
-                progressBar.style.width = `${score}%`;
-                
-                document.getElementById('quiz-modal').classList.add('hidden');
-                document.getElementById('results-modal').classList.remove('hidden');
+            document.getElementById('right-btn').addEventListener('touchstart', () => gameState.keys['ArrowRight'] = true);
+            document.getElementById('right-btn').addEventListener('touchend', () => gameState.keys['ArrowRight'] = false);
+            
+            document.getElementById('jump-btn').addEventListener('touchstart', jump);
+            document.getElementById('attack-btn').addEventListener('touchstart', attack);
+            
+            // Адаптация к изменению размера окна
+            window.addEventListener('resize', () => {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
             });
         }
         
-        // Закрытие модальных окон
-        document.getElementById('close-results').addEventListener('click', function() {
-            document.getElementById('results-modal').classList.add('hidden');
-        });
+        // Показать экран
+        function showScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(screen => {
+                screen.classList.add('hidden');
+            });
+            document.getElementById(screenId).classList.remove('hidden');
+            gameState.currentScreen = screenId;
+        }
+        
+        // Начать игру
+        function startGame() {
+            showScreen('game-container');
+            gameState.isPaused = false;
+            resetGame();
+        }
+        
+        // Перезапустить игру
+        function restartGame() {
+            resetGame();
+            showScreen('game-container');
+            gameState.isPaused = false;
+        }
+        
+        // Сброс состояния игры
+        function resetGame() {
+            gameState.player.x = canvas.width / 2;
+            gameState.player.y = canvas.height - 150;
+            gameState.player.health = 100;
+            gameState.player.energy = 100;
+            gameState.player.score = 0;
+            gameState.player.floor = 1;
+            gameState.player.velocityY = 0;
+            gameState.player.isJumping = false;
+            gameState.enemies = [];
+            gameState.projectiles = [];
+            gameState.coins = [];
+            gameState.gameTime = 0;
+            gameState.enemySpawnTimer = 0;
+            gameState.coinSpawnTimer = 0;
+            
+            // Обновление HUD
+            updateHUD();
+        }
+        
+        // Переключение паузы
+        function togglePause() {
+            gameState.isPaused = !gameState.isPaused;
+            if (gameState.isPaused) {
+                showNotification("ПАУЗА");
+            } else {
+                document.getElementById('notification').classList.remove('show');
+            }
+        }
+        
+        // Показать уведомление
+        function showNotification(text) {
+            const notification = document.getElementById('notification');
+            notification.textContent = text;
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 2000);
+        }
+        
+        // Прыжок
+        function jump() {
+            if (!gameState.player.isJumping) {
+                gameState.player.velocityY = -gameState.player.jumpForce;
+                gameState.player.isJumping = true;
+            }
+        }
+        
+        // Атака
+        function attack() {
+            if (gameState.player.energy >= 10) {
+                gameState.player.energy -= 10;
+                
+                // Создание снаряда
+                gameState.projectiles.push({
+                    x: gameState.player.x,
+                    y: gameState.player.y,
+                    width: 10,
+                    height: 10,
+                    speed: 10,
+                    damage: gameState.player.attackDamage
+                });
+                
+                updateHUD();
+            }
+        }
+        
+        // Обновление HUD
+        function updateHUD() {
+            document.getElementById('health').textContent = Math.max(0, Math.floor(gameState.player.health));
+            document.getElementById('energy').textContent = Math.max(0, Math.floor(gameState.player.energy));
+            document.getElementById('coins').textContent = gameState.player.coins;
+            document.getElementById('score').textContent = gameState.player.score;
+            document.getElementById('floor').textContent = gameState.player.floor;
+        }
+        
+        // Игровой цикл
+        function gameLoop() {
+            if (gameState.currentScreen === 'game-container' && !gameState.isPaused) {
+                update();
+                render();
+            }
+            
+            requestAnimationFrame(gameLoop);
+        }
+        
+        // Обновление игровой логики
+        function update() {
+            // Увеличение времени игры
+            gameState.gameTime++;
+            
+            // Обновление игрока
+            updatePlayer();
+            
+            // Обновление врагов
+            updateEnemies();
+            
+            // Обновление снарядов
+            updateProjectiles();
+            
+            // Обновление монет
+            updateCoins();
+            
+            // Спавн врагов
+            gameState.enemySpawnTimer++;
+            if (gameState.enemySpawnTimer > 120) { // Каждые 2 секунды при 60 FPS
+                spawnEnemy();
+                gameState.enemySpawnTimer = 0;
+            }
+            
+            // Спавн монет
+            gameState.coinSpawnTimer++;
+            if (gameState.coinSpawnTimer > 180) { // Каждые 3 секунды
+                spawnCoin();
+                gameState.coinSpawnTimer = 0;
+            }
+            
+            // Восстановление энергии
+            if (gameState.player.energy < gameState.player.maxEnergy) {
+                gameState.player.energy += 0.1;
+            }
+        }
+        
+        // Обновление игрока
+        function updatePlayer() {
+            // Движение влево/вправо
+            if (gameState.keys['ArrowLeft'] || gameState.keys['a'] || gameState.keys['A']) {
+                gameState.player.x -= gameState.player.speed;
+            }
+            if (gameState.keys['ArrowRight'] || gameState.keys['d'] || gameState.keys['D']) {
+                gameState.player.x += gameState.player.speed;
+            }
+            
+            // Ограничение игрока в пределах экрана
+            if (gameState.player.x < 0) gameState.player.x = 0;
+            if (gameState.player.x > canvas.width - gameState.player.width) {
+                gameState.player.x = canvas.width - gameState.player.width;
+            }
+            
+            // Гравитация
+            gameState.player.velocityY += gameState.gravity;
+            gameState.player.y += gameState.player.velocityY;
+            
+            // Проверка столкновения с платформами
+            let onPlatform = false;
+            for (const platform of gameState.platforms) {
+                if (
+                    gameState.player.x < platform.x + platform.width &&
+                    gameState.player.x + gameState.player.width > platform.x &&
+                    gameState.player.y + gameState.player.height > platform.y &&
+                    gameState.player.y + gameState.player.height < platform.y + platform.height &&
+                    gameState.player.velocityY > 0
+                ) {
+                    gameState.player.y = platform.y - gameState.player.height;
+                    gameState.player.velocityY = 0;
+                    gameState.player.isJumping = false;
+                    onPlatform = true;
+                }
+            }
+            
+            // Если игрок падает за пределы экрана
+            if (gameState.player.y > canvas.height) {
+                gameOver();
+            }
+        }
+        
+        // Обновление врагов
+        function updateEnemies() {
+            for (let i = gameState.enemies.length - 1; i >= 0; i--) {
+                const enemy = gameState.enemies[i];
+                
+                // Движение врага к игроку
+                if (enemy.x < gameState.player.x) {
+                    enemy.x += enemy.speed;
+                } else {
+                    enemy.x -= enemy.speed;
+                }
+                
+                // Гравитация для врагов
+                enemy.velocityY += gameState.gravity;
+                enemy.y += enemy.velocityY;
+                
+                // Проверка столкновения с платформами
+                for (const platform of gameState.platforms) {
+                    if (
+                        enemy.x < platform.x + platform.width &&
+                        enemy.x + enemy.width > platform.x &&
+                        enemy.y + enemy.height > platform.y &&
+                        enemy.y + enemy.height < platform.y + platform.height &&
+                        enemy.velocityY > 0
+                    ) {
+                        enemy.y = platform.y - enemy.height;
+                        enemy.velocityY = 0;
+                    }
+                }
+                
+                // Проверка столкновения с игроком
+                if (
+                    gameState.player.x < enemy.x + enemy.width &&
+                    gameState.player.x + gameState.player.width > enemy.x &&
+                    gameState.player.y < enemy.y + enemy.height &&
+                    gameState.player.y + gameState.player.height > enemy.y
+                ) {
+                    // Урон игроку
+                    gameState.player.health -= enemy.damage;
+                    updateHUD();
+                    
+                    // Удаление врага
+                    gameState.enemies.splice(i, 1);
+                    
+                    if (gameState.player.health <= 0) {
+                        gameOver();
+                    }
+                }
+                
+                // Удаление врагов за пределами экрана
+                if (enemy.y > canvas.height) {
+                    gameState.enemies.splice(i, 1);
+                }
+            }
+        }
+        
+        // Обновление снарядов
+        function updateProjectiles() {
+            for (let i = gameState.projectiles.length - 1; i >= 0; i--) {
+                const projectile = gameState.projectiles[i];
+                
+                // Движение снаряда
+                projectile.x += projectile.speed;
+                
+                // Проверка столкновения с врагами
+                for (let j = gameState.enemies.length - 1; j >= 0; j--) {
+                    const enemy = gameState.enemies[j];
+                    
+                    if (
+                        projectile.x < enemy.x + enemy.width &&
+                        projectile.x + projectile.width > enemy.x &&
+                        projectile.y < enemy.y + enemy.height &&
+                        projectile.y + projectile.height > enemy.y
+                    ) {
+                        // Нанесение урона врагу
+                        enemy.health -= projectile.damage;
+                        
+                        // Удаление снаряда
+                        gameState.projectiles.splice(i, 1);
+                        
+                        // Если враг побежден
+                        if (enemy.health <= 0) {
+                            gameState.enemies.splice(j, 1);
+                            gameState.player.score += 10;
+                            gameState.player.coins += 5;
+                            updateHUD();
+                        }
+                        
+                        break;
+                    }
+                }
+                
+                // Удаление снарядов за пределами экрана
+                if (projectile.x > canvas.width) {
+                    gameState.projectiles.splice(i, 1);
+                }
+            }
+        }
+        
+        // Обновление монет
+        function updateCoins() {
+            for (let i = gameState.coins.length - 1; i >= 0; i--) {
+                const coin = gameState.coins[i];
+                
+                // Проверка сбора монеты игроком
+                if (
+                    gameState.player.x < coin.x + coin.width &&
+                    gameState.player.x + gameState.player.width > coin.x &&
+                    gameState.player.y < coin.y + coin.height &&
+                    gameState.player.y + gameState.player.height > coin.y
+                ) {
+                    gameState.player.coins += 1;
+                    gameState.coins.splice(i, 1);
+                    updateHUD();
+                    showNotification("+1 монета");
+                }
+                
+                // Удаление монет за пределами экрана
+                if (coin.y > canvas.height) {
+                    gameState.coins.splice(i, 1);
+                }
+            }
+        }
+        
+        // Спавн врага
+        function spawnEnemy() {
+            const enemyTypes = [
+                { health: 20, damage: 5, speed: 2, color: '#00ff00' },
+                { health: 30, damage: 10, speed: 1, color: '#ff9900' },
+                { health: 50, damage: 15, speed: 0.5, color: '#ff0000' }
+            ];
+            
+            const type = enemyTypes[Math.floor(Math.random() * enemyTypes.length)];
+            
+            gameState.enemies.push({
+                x: Math.random() * canvas.width,
+                y: 0,
+                width: 40,
+                height: 40,
+                health: type.health,
+                maxHealth: type.health,
+                damage: type.damage,
+                speed: type.speed,
+                velocityY: 0,
+                color: type.color
+            });
+        }
+        
+        // Спавн монеты
+        function spawnCoin() {
+            gameState.coins.push({
+                x: Math.random() * canvas.width,
+                y: 0,
+                width: 20,
+                height: 20,
+                velocityY: 0
+            });
+        }
+        
+        // Конец игры
+        function gameOver() {
+            // Обновление рекорда
+            if (gameState.player.score > gameState.highScore) {
+                gameState.highScore = gameState.player.score;
+            }
+            
+            // Обновление финальной статистики
+            document.getElementById('final-floor').textContent = gameState.player.floor;
+            document.getElementById('final-score').textContent = gameState.player.score;
+            document.getElementById('final-coins').textContent = gameState.player.coins;
+            document.getElementById('final-enemies').textContent = Math.floor(gameState.player.score / 10);
+            document.getElementById('final-highscore').textContent = gameState.highScore;
+            
+            showScreen('game-over-screen');
+        }
+        
+        // Отрисовка игры
+        function render() {
+            // Очистка canvas
+            ctx.fillStyle = '#1a1a2e';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Отрисовка платформ
+            ctx.fillStyle = '#8b4513';
+            for (const platform of gameState.platforms) {
+                ctx.fillRect(platform.x, platform.y, platform.width, platform.height);
+            }
+            
+            // Отрисовка игрока
+            ctx.fillStyle = '#ff0000';
+            ctx.fillRect(gameState.player.x, gameState.player.y, gameState.player.width, gameState.player.height);
+            
+            // Отрисовка врагов
+            for (const enemy of gameState.enemies) {
+                ctx.fillStyle = enemy.color;
+                ctx.fillRect(enemy.x, enemy.y, enemy.width, enemy.height);
+                
+                // Полоска здоровья
+                const healthPercent = enemy.health / enemy.maxHealth;
+                ctx.fillStyle = '#ff0000';
+                ctx.fillRect(enemy.x, enemy.y - 10, enemy.width, 5);
+                ctx.fillStyle = '#00ff00';
+                ctx.fillRect(enemy.x, enemy.y - 10, enemy.width * healthPercent, 5);
+            }
+            
+            // Отрисовка снарядов
+            ctx.fillStyle = '#ffff00';
+            for (const projectile of gameState.projectiles) {
+                ctx.fillRect(projectile.x, projectile.y, projectile.width, projectile.height);
+            }
+            
+            // Отрисовка монет
+            ctx.fillStyle = '#ffcc00';
+            for (const coin of gameState.coins) {
+                ctx.beginPath();
+                ctx.arc(coin.x + coin.width/2, coin.y + coin.height/2, coin.width/2, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+        
+        // Запуск игры
+        init();
     </script>
 </body>
-</html>
+                        </html>
