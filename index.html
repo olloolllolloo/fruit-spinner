@@ -12,41 +12,141 @@
       font-family: 'Segoe UI', sans-serif;
     }
     body {
-      background: #0c0c14;
-      color: #e0e0ff;
+      background: #000;
+      color: #0ff;
       min-height: 100vh;
-      padding: 20px;
+      overflow-x: hidden;
+      background-image: 
+        radial-gradient(circle at 10% 20%, rgba(255,0,255,0.1) 0%, transparent 20%),
+        radial-gradient(circle at 90% 80%, rgba(0,255,255,0.1) 0%, transparent 20%);
     }
     .container {
       max-width: 1000px;
       margin: 0 auto;
+      padding: 20px;
     }
     header {
       text-align: center;
-      margin-bottom: 30px;
-      padding: 20px;
-      border-bottom: 2px solid #ff00ff;
-      animation: pulseGlow 2s infinite alternate;
-    }
-    @keyframes pulseGlow {
-      from { text-shadow: 0 0 10px #ff00ff; }
-      to { text-shadow: 0 0 30px #00ffff, 0 0 60px #ff00ff; }
+      margin: 20px 0 30px;
+      text-shadow: 0 0 15px #f0f;
     }
     h1 {
-      font-size: 3.5em;
+      font-size: 4em;
       background: linear-gradient(90deg, #ff00ff, #00ffff);
       -webkit-background-clip: text;
       background-clip: text;
       color: transparent;
-      text-transform: uppercase;
-      letter-spacing: 3px;
+      letter-spacing: 4px;
+      animation: titleGlow 3s infinite alternate;
     }
+    @keyframes titleGlow {
+      0% { text-shadow: 0 0 10px #f0f; }
+      100% { text-shadow: 0 0 30px #0ff, 0 0 60px #f0f; }
+    }
+
+    .slot-machine {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin: 40px 0;
+      perspective: 1000px;
+    }
+    .reel-container {
+      width: 100px;
+      height: 120px;
+      position: relative;
+      overflow: hidden;
+      border: 3px solid #f0f;
+      border-radius: 12px;
+      box-shadow: 0 0 20px rgba(255,0,255,0.5);
+      background: #050510;
+    }
+    .reel {
+      display: flex;
+      flex-direction: column;
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      transition: transform 4s cubic-bezier(0.2, 0.8, 0.4, 1);
+    }
+    .symbol {
+      height: 120px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 50px;
+      text-shadow: 0 0 10px currentColor;
+    }
+
+    #spin-btn {
+      display: block;
+      margin: 20px auto;
+      padding: 15px 40px;
+      font-size: 1.5em;
+      background: linear-gradient(45deg, #ff00ff, #00ffff);
+      color: black;
+      border: none;
+      border-radius: 50px;
+      cursor: pointer;
+      font-weight: bold;
+      box-shadow: 0 0 25px rgba(255,0,255,0.7);
+      transition: all 0.2s;
+    }
+    #spin-btn:hover {
+      transform: scale(1.1);
+      box-shadow: 0 0 40px #0ff;
+    }
+    #spin-btn:disabled {
+      opacity: 0.6;
+      transform: none;
+      cursor: not-allowed;
+    }
+
+    .win-shake {
+      animation: screenShake 0.5s;
+    }
+    @keyframes screenShake {
+      0%, 100% { transform: translateX(0); }
+      10%, 30%, 50%, 70%, 90% { transform: translateX(-10px); }
+      20%, 40%, 60%, 80% { transform: translateX(10px); }
+    }
+
+    .jackpot {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      pointer-events: none;
+      opacity: 0;
+    }
+    .jackpot.show {
+      opacity: 1;
+      pointer-events: all;
+      animation: jackpotPulse 2s infinite;
+    }
+    .jackpot h2 {
+      font-size: 6em;
+      color: gold;
+      text-shadow: 0 0 30px gold;
+    }
+    @keyframes jackpotPulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+    }
+
     .auth, .dashboard {
-      background: #151525;
+      background: rgba(10,10,30,0.7);
       padding: 25px;
       border-radius: 15px;
       margin-bottom: 25px;
-      box-shadow: 0 0 20px rgba(255, 0, 255, 0.3);
+      border: 1px solid #f0f;
     }
     input, button {
       padding: 12px;
@@ -54,317 +154,179 @@
       border: none;
       border-radius: 8px;
       font-size: 16px;
-    }
-    input {
-      background: #222;
+      background: #111;
       color: white;
-      width: 200px;
     }
     button {
-      background: linear-gradient(45deg, #ff00ff, #00ffff);
+      background: linear-gradient(45deg, #f0f, #0ff);
       color: black;
       font-weight: bold;
       cursor: pointer;
-      transition: transform 0.2s;
-    }
-    button:hover {
-      transform: scale(1.05);
-    }
-    .slot-machine {
-      display: flex;
-      justify-content: center;
-      gap: 10px;
-      margin: 30px 0;
-    }
-    .reel {
-      width: 100px;
-      height: 100px;
-      background: #111;
-      border: 3px solid #ff00ff;
-      border-radius: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 40px;
-      overflow: hidden;
-      position: relative;
-    }
-    .reel.spinning::after {
-      content: "🌀";
-      position: absolute;
-      font-size: 30px;
-      animation: spin 0.5s infinite linear;
-    }
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
-    .win-animation {
-      animation: winPulse 1s 3;
-    }
-    @keyframes winPulse {
-      0%, 100% { transform: scale(1); }
-      50% { transform: scale(1.3); filter: drop-shadow(0 0 20px #00ff00); }
-    }
-    .artifacts {
-      margin-top: 20px;
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
-    .artifact {
-      font-size: 24px;
-      animation: float 3s infinite ease-in-out;
-    }
-    @keyframes float {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-10px); }
     }
     .hidden { display: none; }
-    .notification {
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      background: #ff0055;
-      color: white;
-      padding: 15px;
-      border-radius: 8px;
-      box-shadow: 0 0 15px rgba(255,0,85,0.7);
-      z-index: 1000;
-      animation: slideIn 0.5s, fadeOut 0.5s 2.5s forwards;
-    }
-    @keyframes slideIn {
-      from { transform: translateX(100%); opacity: 0; }
-      to { transform: translateX(0); opacity: 1; }
-    }
-    @keyframes fadeOut {
-      to { opacity: 0; visibility: hidden; }
-    }
   </style>
 </head>
 <body>
+  <div class="jackpot" id="jackpot">
+    <h2>💎 JACKPOT! 💎</h2>
+  </div>
+
   <div class="container">
-    <header>
-      <h1>💀 EBANUTYI CASINO 💀</h1>
-    </header>
+    <header><h1>💀 EBANUTYI CASINO 💀</h1></header>
 
-    <!-- AUTH -->
     <div id="auth" class="auth">
-      <h2>🔐 Вход / Регистрация</h2>
-      <input type="text" id="username" placeholder="Твой ник (латиница)" />
+      <h2>🔐 Введи ник</h2>
+      <input type="text" id="username" placeholder="Только латиница" />
       <br />
-      <button onclick="login()">Войти / Создать</button>
-      <p style="margin-top:10px; font-size:14px; color:#aaa;">
-        Ник не сохраняется после перезагрузки! Это демо-режим.
-      </p>
+      <button onclick="login()">Войти</button>
     </div>
 
-    <!-- DASHBOARD -->
     <div id="dashboard" class="dashboard hidden">
-      <h2>🎮 Привет, <span id="user-nick">...</span>!</h2>
-      <p>💰 Баланс: <span id="balance">1000</span> монет</p>
+      <h2>Привет, <span id="user-nick">...</span>!</h2>
+      <p>💰 Баланс: <span id="balance">1000</span></p>
+      <button onclick="location.reload()">🔄 Сменить аккаунт</button>
 
-      <button onclick="showTransfer()">💸 Перевести деньги</button>
-      <button onclick="location.reload()">🔄 Перезайти</button>
-
-      <div id="transfer-form" class="hidden" style="margin-top:20px;">
-        <input type="text" id="to-user" placeholder="Кому (ник)" />
-        <input type="number" id="transfer-amount" placeholder="Сумма" min="1" />
-        <button onclick="transferMoney()">📤 Отправить</button>
-      </div>
-
-      <h3 style="margin-top:30px;">🎰 СЛОТ-МАШИНА (ставка: 10 монет)</h3>
       <div class="slot-machine" id="slot-machine">
-        <div class="reel">😀</div>
-        <div class="reel">😎</div>
-        <div class="reel">🤑</div>
-        <div class="reel">🤩</div>
-        <div class="reel">💀</div>
+        <!-- Барабаны будут созданы через JS -->
       </div>
-      <button id="spin-btn" onclick="spin()">🔥 КРУТИТЬ!</button>
 
-      <div class="artifacts" id="artifacts">
-        <!-- Артефакты появятся при выигрыше -->
-      </div>
+      <button id="spin-btn" onclick="spin()">🔥 КРУТИТЬ (10 монет)</button>
     </div>
-
-    <footer style="text-align:center; margin-top:40px; color:#666;">
-      💎 EBANUTYI CASINO — все выигрыши виртуальны, но эмоции — настоящие.
-    </footer>
   </div>
 
   <script>
-    // === ДАННЫЕ ===
     const SYMBOLS = ["😀", "😎", "🤑", "🤩", "🥳", "😈", "💀", "👑", "💎", "✨"];
     const RARE = ["👑", "💎", "✨"];
     const MULTIPLIERS = { "👑": 5, "💎": 10, "✨": 20 };
 
-    let currentUser = null;
     let balance = 1000;
-    let artifacts = [];
+    let currentUser = null;
 
-    // === ХРАНЕНИЕ (в localStorage для демо) ===
-    function saveData() {
-      if (!currentUser) return;
-      localStorage.setItem(`casino_user_${currentUser}`, JSON.stringify({
-        balance,
-        artifacts
-      }));
-    }
-
-    function loadData() {
-      if (!currentUser) return;
-      const data = localStorage.getItem(`casino_user_${currentUser}`);
-      if (data) {
-        const parsed = JSON.parse(data);
-        balance = parsed.balance;
-        artifacts = parsed.artifacts || [];
-      } else {
-        balance = 1000;
-        artifacts = [];
+    // Создаём барабаны
+    function initSlot() {
+      const machine = document.getElementById('slot-machine');
+      machine.innerHTML = '';
+      for (let i = 0; i < 5; i++) {
+        const container = document.createElement('div');
+        container.className = 'reel-container';
+        const reel = document.createElement('div');
+        reel.className = 'reel';
+        reel.id = `reel-${i}`;
+        // Заполняем много символов для плавного скролла
+        for (let j = 0; j < 50; j++) {
+          const sym = document.createElement('div');
+          sym.className = 'symbol';
+          sym.textContent = SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)];
+          reel.appendChild(sym);
+        }
+        container.appendChild(reel);
+        machine.appendChild(container);
       }
-      updateUI();
     }
 
-    // === UI ===
-    function updateUI() {
-      document.getElementById('balance').textContent = balance;
-      const artEl = document.getElementById('artifacts');
-      artEl.innerHTML = '';
-      artifacts.forEach(art => {
-        const span = document.createElement('span');
-        span.className = 'artifact';
-        span.textContent = art;
-        artEl.appendChild(span);
-      });
-      saveData();
-    }
-
-    function showNotification(msg) {
-      const notif = document.createElement('div');
-      notif.className = 'notification';
-      notif.textContent = msg;
-      document.body.appendChild(notif);
-      setTimeout(() => notif.remove(), 3000);
-    }
-
-    // === АВТОРИЗАЦИЯ ===
     function login() {
       const nick = document.getElementById('username').value.trim();
       if (!nick || !/^[a-zA-Z0-9_]{3,15}$/.test(nick)) {
-        showNotification("Ник должен быть 3-15 латинских символов!");
+        alert("Ник: 3-15 латинских символов!");
         return;
       }
       currentUser = nick;
-      loadData();
       document.getElementById('user-nick').textContent = nick;
       document.getElementById('auth').classList.add('hidden');
       document.getElementById('dashboard').classList.remove('hidden');
+      initSlot();
     }
 
-    // === ПЕРЕВОД ===
-    function showTransfer() {
-      document.getElementById('transfer-form').classList.toggle('hidden');
+    function getRandomResult() {
+      return Array(5).fill().map(() => SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)]);
     }
 
-    function transferMoney() {
-      const to = document.getElementById('to-user').value.trim();
-      const amount = parseInt(document.getElementById('transfer-amount').value);
-      if (!to || !amount || amount <= 0) {
-        showNotification("Заполни все поля!");
-        return;
-      }
-      if (amount > balance) {
-        showNotification("Недостаточно монет!");
-        return;
-      }
-      // В демо — просто уменьшаем баланс (реальный мультиплеер невозможен без сервера)
-      balance -= amount;
-      updateUI();
-      showNotification(`📤 Отправлено ${amount} монет игроку ${to}!`);
-      document.getElementById('transfer-form').classList.add('hidden');
-    }
-
-    // === СЛОТ ===
-    function spin() {
+    async function spin() {
       if (balance < 10) {
-        showNotification("Нужно минимум 10 монет!");
+        alert("Нужно 10 монет!");
         return;
       }
       balance -= 10;
-      updateUI();
+      document.getElementById('balance').textContent = balance;
 
-      const reels = document.querySelectorAll('.reel');
       const spinBtn = document.getElementById('spin-btn');
       spinBtn.disabled = true;
-      spinBtn.textContent = "🌀 КРУЧУ...";
 
-      reels.forEach(reel => reel.classList.add('spinning'));
+      const result = getRandomResult();
+      const reels = Array.from(document.querySelectorAll('.reel'));
 
-      // Имитация кручения
-      let spins = 0;
-      const spinInterval = setInterval(() => {
-        reels.forEach(reel => {
-          reel.textContent = SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)];
-        });
-        spins++;
-        if (spins > 15) {
-          clearInterval(spinInterval);
-          finishSpin();
+      // Анимация кручения: каждый барабан крутится разное время
+      const promises = reels.map(async (reel, i) => {
+        // Случайное количество "лишних" оборотов (для реалистичности)
+        const extraSpins = 3 + Math.random() * 2;
+        const totalSymbols = 50;
+        const targetIndex = Math.floor(Math.random() * 10); // позиция в первых 10
+        const finalOffset = -(targetIndex + extraSpins * 10) * 120;
+
+        reel.style.transition = `transform ${2 + i * 0.3}s cubic-bezier(0.2, 0.8, 0.4, 1)`;
+        reel.style.transform = `translateY(${finalOffset}px)`;
+
+        // Ждём окончания анимации
+        await new Promise(r => setTimeout(r, (2 + i * 0.3) * 1000));
+        
+        // Обновляем DOM, чтобы результат был именно нужным
+        const symbols = reel.querySelectorAll('.symbol');
+        // Перезаписываем символы так, чтобы targetIndex был нужным
+        for (let j = 0; j < symbols.length; j++) {
+          symbols[j].textContent = SYMBOLS[(j - targetIndex + 100) % SYMBOLS.length];
         }
-      }, 100);
+        // Фиксируем позицию
+        reel.style.transition = 'none';
+        reel.style.transform = `translateY(${-targetIndex * 120}px)`;
+      });
 
-      function finishSpin() {
-        const result = [
-          SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)],
-          SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)],
-          SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)],
-          SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)],
-          SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)]
-        ];
+      await Promise.all(promises);
 
-        reels.forEach((reel, i) => {
-          reel.classList.remove('spinning');
-          reel.textContent = result[i];
-        });
-
-        // Проверка выигрыша
-        const counts = {};
-        result.forEach(sym => counts[sym] = (counts[sym] || 0) + 1);
-
-        let win = 0;
-        let winSymbols = [];
-        for (const [sym, count] of Object.entries(counts)) {
-          if (count >= 3) {
-            const mult = MULTIPLIERS[sym] || 2;
-            const prize = count * mult * 5;
-            win += prize;
-            winSymbols.push(sym);
-          }
+      // Проверка выигрыша
+      const counts = {};
+      result.forEach(sym => counts[sym] = (counts[sym] || 0) + 1);
+      let win = 0;
+      let isJackpot = false;
+      for (const [sym, count] of Object.entries(counts)) {
+        if (count >= 3) {
+          const mult = MULTIPLIERS[sym] || 2;
+          win += count * mult * 10;
+          if (RARE.includes(sym) && count === 5) isJackpot = true;
         }
-
-        if (win > 0) {
-          balance += win;
-          // Эффект выигрыша
-          reels.forEach(r => r.classList.add('win-animation'));
-          setTimeout(() => reels.forEach(r => r.classList.remove('win-animation')), 1000);
-
-          // Артефакт за редкий символ
-          winSymbols.forEach(sym => {
-            if (RARE.includes(sym) && Math.random() > 0.7) {
-              artifacts.push(sym);
-            }
-          });
-
-          showNotification(`🎉 ВЫИГРЫШ: ${win} монет!`);
-        } else {
-          showNotification("💀 Проебал 10 монет. Крути дальше!");
-        }
-
-        updateUI();
-        spinBtn.disabled = false;
-        spinBtn.textContent = "🔥 КРУТИТЬ!";
       }
+
+      if (win > 0) {
+        balance += win;
+        document.body.classList.add('win-shake');
+        setTimeout(() => document.body.classList.remove('win-shake'), 500);
+
+        if (isJackpot) {
+          const jackpot = document.getElementById('jackpot');
+          jackpot.classList.add('show');
+          setTimeout(() => jackpot.classList.remove('show'), 3000);
+        }
+
+        alert(`🎉 ВЫИГРЫШ: ${win} монет!`);
+      } else {
+        alert("💀 Проебал. Крути дальше!");
+      }
+
+      document.getElementById('balance').textContent = balance;
+      spinBtn.disabled = false;
     }
+
+    // Инициализация
+    window.onload = () => {
+      // Для демо — сразу показываем слот, если ник в localStorage
+      const lastUser = localStorage.getItem('casino_user');
+      if (lastUser) {
+        currentUser = lastUser;
+        document.getElementById('user-nick').textContent = lastUser;
+        document.getElementById('auth').classList.add('hidden');
+        document.getElementById('dashboard').classList.remove('hidden');
+        initSlot();
+      }
+    };
   </script>
 </body>
 </html>
