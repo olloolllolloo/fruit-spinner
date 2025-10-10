@@ -27,15 +27,16 @@
             gap: 16px;
         }
 
-        /* Редактор кода */
+        /* Редактор кода - УВЕЛИЧЕН */
         .editor-container {
-            flex: 1;
+            flex: 2; /* Больше места */
             background: #161b22;
             border-radius: 12px;
             border: 1px solid #30363d;
             display: flex;
             flex-direction: column;
             overflow: hidden;
+            min-height: 400px; /* Минимальная высота */
         }
 
         .editor-header {
@@ -96,6 +97,7 @@
             resize: none;
             outline: none;
             overflow-y: auto;
+            min-height: 300px;
         }
 
         /* Окно результата */
@@ -334,7 +336,7 @@ triangular {id=2, place=500,300, side=80, color=000255000, borderline=1,00000000
                 const params = match[1];
                 const config = { type: 'rectangle' };
 
-                // Парсинг параметров
+                // Парсинг параметров - ИСПРАВЛЕННЫЙ ПАРСЕР
                 this.parseParams(params, config, lineNumber);
 
                 // Валидация обязательных параметров
@@ -352,7 +354,7 @@ triangular {id=2, place=500,300, side=80, color=000255000, borderline=1,00000000
                 const params = match[1];
                 const config = { type: 'triangular' };
 
-                // Парсинг параметров
+                // Парсинг параметров - ИСПРАВЛЕННЫЙ ПАРСЕР
                 this.parseParams(params, config, lineNumber);
 
                 // Валидация обязательных параметров
@@ -362,12 +364,39 @@ triangular {id=2, place=500,300, side=80, color=000255000, borderline=1,00000000
             }
 
             parseParams(paramsString, config, lineNumber) {
-                const params = paramsString.split(',').map(p => p.trim());
+                // ИСПРАВЛЕННЫЙ ПАРСЕР - разбираем параметры правильно
+                const params = [];
+                let currentParam = '';
+                let bracketCount = 0;
+                
+                for (let i = 0; i < paramsString.length; i++) {
+                    const char = paramsString[i];
+                    
+                    if (char === '(') bracketCount++;
+                    if (char === ')') bracketCount--;
+                    
+                    if (char === ',' && bracketCount === 0) {
+                        params.push(currentParam.trim());
+                        currentParam = '';
+                    } else {
+                        currentParam += char;
+                    }
+                }
+                
+                if (currentParam.trim()) {
+                    params.push(currentParam.trim());
+                }
                 
                 for (const param of params) {
-                    const [key, value] = param.split('=').map(p => p.trim());
+                    const equalsIndex = param.indexOf('=');
+                    if (equalsIndex === -1) {
+                        throw new Error(`Неправильный формат параметра: ${param}`);
+                    }
                     
-                    if (!key || value === undefined) {
+                    const key = param.substring(0, equalsIndex).trim();
+                    const value = param.substring(equalsIndex + 1).trim();
+                    
+                    if (!key || !value) {
                         throw new Error(`Неправильный формат параметра: ${param}`);
                     }
 
@@ -402,7 +431,15 @@ triangular {id=2, place=500,300, side=80, color=000255000, borderline=1,00000000
             }
 
             parsePlace(value, lineNumber) {
-                const coords = value.split(',').map(coord => this.parseNumber(coord.trim(), 'coordinate', lineNumber));
+                // ИСПРАВЛЕННЫЙ ПАРСЕР координат
+                const coords = value.split(',').map(coord => {
+                    const num = parseInt(coord.trim());
+                    if (isNaN(num)) {
+                        throw new Error(`Координата должна быть числом: ${coord}`);
+                    }
+                    return num;
+                });
+                
                 if (coords.length !== 2) {
                     throw new Error('Параметр place должен содержать 2 координаты через запятую');
                 }
@@ -426,6 +463,7 @@ triangular {id=2, place=500,300, side=80, color=000255000, borderline=1,00000000
             }
 
             parseBorderline(value, lineNumber) {
+                // ИСПРАВЛЕННЫЙ ПАРСЕР borderline
                 const parts = value.split(',').map(p => p.trim());
                 if (parts.length !== 2) {
                     throw new Error('Borderline должен содержать толщину и цвет через запятую');
