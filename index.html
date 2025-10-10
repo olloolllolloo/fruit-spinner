@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gacha Simulator</title>
+    <title>ShapeScript Playground</title>
     <style>
         * {
             margin: 0;
@@ -12,603 +12,376 @@
         }
 
         body {
-            font-family: 'Arial', sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
+            font-family: 'Courier New', monospace;
+            background: #1e1e1e;
+            color: #ffffff;
+            height: 100vh;
+            overflow: hidden;
         }
 
         .container {
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 20px;
-            padding: 30px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-            max-width: 500px;
-            width: 100%;
-            text-align: center;
-        }
-
-        h1 {
-            color: #333;
-            margin-bottom: 10px;
-            font-size: 2.5em;
-        }
-
-        .subtitle {
-            color: #666;
-            margin-bottom: 30px;
-            font-size: 1.1em;
-        }
-
-        .gacha-machine {
-            background: linear-gradient(145deg, #ff6b6b, #ffa726);
-            border-radius: 15px;
-            padding: 30px;
-            margin-bottom: 20px;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .fruit-display {
-            height: 120px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 3em;
-            background: rgba(255, 255, 255, 0.9);
-            border-radius: 10px;
-            margin-bottom: 20px;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .fruit {
-            font-size: 2.5em;
-            transition: all 0.5s ease;
-            position: absolute;
-            opacity: 0;
-        }
-
-        .fruit.active {
-            opacity: 1;
-            transform: scale(1.1);
-        }
-
-        .spin-btn {
-            background: linear-gradient(145deg, #4ecdc4, #44a08d);
-            color: white;
-            border: none;
-            padding: 15px 30px;
-            font-size: 1.2em;
-            border-radius: 50px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            margin-bottom: 10px;
-            width: 100%;
-        }
-
-        .spin-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
-        }
-
-        .spin-btn:disabled {
-            background: #ccc;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        .cooldown {
-            color: #ff6b6b;
-            font-size: 0.9em;
-            margin-bottom: 20px;
-        }
-
-        .stats-btn {
-            background: linear-gradient(145deg, #a8e6cf, #88d8b0);
-            color: #333;
-            border: none;
-            padding: 12px 25px;
-            font-size: 1em;
-            border-radius: 25px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            margin: 5px;
-        }
-
-        .stats-btn:hover {
-            transform: translateY(-2px);
-        }
-
-        .inventory {
-            margin-top: 20px;
-            text-align: left;
-        }
-
-        .inventory h3 {
-            color: #333;
-            margin-bottom: 15px;
-            text-align: center;
-        }
-
-        .inventory-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: auto 1fr;
             gap: 10px;
-            max-height: 300px;
-            overflow-y: auto;
-        }
-
-        .inventory-item {
-            background: #f8f9fa;
+            height: 100vh;
             padding: 10px;
-            border-radius: 10px;
+        }
+
+        .header {
+            grid-column: 1 / -1;
             text-align: center;
-            border: 2px solid #e9ecef;
+            padding: 10px;
+            background: #2d2d2d;
+            border-radius: 5px;
         }
 
-        .fruit-name {
-            font-size: 1.1em;
-            margin-bottom: 5px;
+        .editor-panel {
+            display: flex;
+            flex-direction: column;
+            background: #252526;
+            border-radius: 5px;
+            overflow: hidden;
         }
 
-        .fruit-count {
-            color: #666;
-            font-size: 0.9em;
+        .output-panel {
+            background: #1e1e1e;
+            border-radius: 5px;
+            position: relative;
+            overflow: hidden;
         }
 
-        .fruit-common { color: #6c757d; }
-        .fruit-rare { color: #007bff; }
-        .fruit-epic { color: #6f42c1; }
-        .fruit-legendary { color: #dc3545; }
-        .fruit-mythical { color: #fd7e14; }
+        .panel-header {
+            background: #2d2d2d;
+            padding: 10px;
+            border-bottom: 1px solid #3e3e3e;
+        }
 
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
+        .code-editor {
+            flex: 1;
+            background: #1e1e1e;
+            color: #d4d4d4;
+            border: none;
+            padding: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 1.5;
+            resize: none;
+            outline: none;
+        }
+
+        #canvas {
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
+            background: #1e1e1e;
         }
 
-        .modal-content {
-            background: white;
-            padding: 30px;
-            border-radius: 15px;
-            max-width: 500px;
-            width: 90%;
-            max-height: 80vh;
-            overflow-y: auto;
-        }
-
-        .close-btn {
-            float: right;
-            font-size: 1.5em;
-            cursor: pointer;
-            color: #666;
-        }
-
-        .stats-item {
-            margin: 10px 0;
+        .controls {
             padding: 10px;
-            background: #f8f9fa;
-            border-radius: 8px;
+            background: #2d2d2d;
+            border-top: 1px solid #3e3e3e;
         }
 
-        .loading {
+        button {
+            background: #0e639c;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 3px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+
+        button:hover {
+            background: #1177bb;
+        }
+
+        .error-console {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(255, 0, 0, 0.1);
+            border-top: 1px solid #ff4444;
+            padding: 10px;
+            color: #ff6b6b;
+            font-size: 12px;
+            max-height: 100px;
+            overflow-y: auto;
             display: none;
-            text-align: center;
-            margin: 20px 0;
-        }
-
-        .spinner {
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #3498db;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 2s linear infinite;
-            margin: 0 auto;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        @keyframes roll {
-            0% { transform: translateY(100px) rotate(0deg); opacity: 0; }
-            50% { opacity: 1; }
-            100% { transform: translateY(0) rotate(360deg); opacity: 1; }
-        }
-
-        .rolling .fruit {
-            animation: roll 0.5s ease-out;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>🎰 Gacha Simulator</h1>
-        <div class="subtitle">Испытай удачу и собери все фрукты!</div>
+        <div class="header">
+            <h1>ShapeScript Playground</h1>
+            <p>Create geometric animations with ShapeScript language</p>
+        </div>
         
-        <div class="gacha-machine">
-            <div class="fruit-display" id="fruitDisplay">
-                <div class="fruit" id="fruit1">?</div>
-                <div class="fruit" id="fruit2">?</div>
-                <div class="fruit" id="fruit3">?</div>
+        <div class="editor-panel">
+            <div class="panel-header">
+                <h3>ShapeScript Code Editor</h3>
             </div>
-            <button class="spin-btn" id="spinBtn" onclick="spinGacha()">🎰 Крутить</button>
-            <div class="cooldown" id="cooldownText"></div>
-        </div>
+            <textarea id="editor" class="code-editor" spellcheck="false">
+circle {
+    id: "mainCircle"
+    center: [400, 300]
+    radius: 50
+    fill: "#ff0000"
+    stroke: "#000000"
+    strokeWidth: 2
+}
 
-        <div>
-            <button class="stats-btn" onclick="showStats()">📊 Статистика</button>
-            <button class="stats-btn" onclick="showInventory()">🎒 Инвентарь</button>
-        </div>
+rectangle {
+    id: "myRect"
+    x: 200, y: 150
+    width: 100, height: 80
+    fill: "linear-gradient(45deg, #00ff00, #0000ff)"
+    cornerRadius: 10
+}
 
-        <div class="inventory" id="inventorySection" style="display: none;">
-            <h3>Ваш инвентарь</h3>
-            <div class="inventory-grid" id="inventoryGrid"></div>
-        </div>
+animation "pulse" {
+    target: "mainCircle"
+    duration: 2000
+    loop: true
+    keyframes: {
+        0%: { radius: 50, fill: "#ff0000" }
+        50%: { radius: 80, fill: "#ffff00" }
+        100%: { radius: 50, fill: "#ff0000" }
+    }
+}
 
-        <div class="loading" id="loading">
-            <div class="spinner"></div>
-            <p>Загрузка...</p>
+animation "move" {
+    target: "myRect"
+    duration: 3000
+    loop: true
+    keyframes: {
+        from: { x: 200, y: 150, rotation: 0 }
+        to: { x: 500, y: 400, rotation: 360 }
+    }
+}
+            </textarea>
+            <div class="controls">
+                <button onclick="runCode()">Run ShapeScript</button>
+                <button onclick="clearCanvas()">Clear</button>
+                <button onclick="showExamples()">Examples</button>
+            </div>
         </div>
-    </div>
-
-    <!-- Модальное окно статистики -->
-    <div class="modal" id="statsModal">
-        <div class="modal-content">
-            <span class="close-btn" onclick="closeModal('statsModal')">&times;</span>
-            <h3>📊 Ваша статистика</h3>
-            <div id="statsContent"></div>
-        </div>
-    </div>
-
-    <!-- Модальное окно инвентаря -->
-    <div class="modal" id="inventoryModal">
-        <div class="modal-content">
-            <span class="close-btn" onclick="closeModal('inventoryModal')">&times;</span>
-            <h3>🎒 Ваш инвентарь</h3>
-            <div class="inventory-grid" id="modalInventoryGrid"></div>
+        
+        <div class="output-panel">
+            <div class="panel-header">
+                <h3>Visual Output</h3>
+            </div>
+            <canvas id="canvas" width="800" height="600"></canvas>
+            <div id="errorConsole" class="error-console"></div>
         </div>
     </div>
 
     <script>
-        // ========== КОНФИГУРАЦИЯ ФРУКТОВ ==========
-        const FRUITS = {
-            "Ракета": { emoji: "🚀", rarity: "common", chance: 30.0, color: "fruit-common" },
-            "Вращение": { emoji: "🔄", rarity: "common", chance: 28.5, color: "fruit-common" },
-            "Клинок": { emoji: "⚔️", rarity: "common", chance: 27.0, color: "fruit-common" },
-            "Пружина": { emoji: "🦘", rarity: "common", chance: 25.5, color: "fruit-common" },
-            "Бомба": { emoji: "💣", rarity: "common", chance: 24.0, color: "fruit-common" },
-            "Дым": { emoji: "💨", rarity: "common", chance: 22.5, color: "fruit-common" },
-            "Шипы": { emoji: "🌵", rarity: "common", chance: 21.0, color: "fruit-common" },
-            "Пламя": { emoji: "🔥", rarity: "rare", chance: 19.6, color: "fruit-rare" },
-            "Лёд": { emoji: "❄️", rarity: "rare", chance: 18.2, color: "fruit-rare" },
-            "Песок": { emoji: "🏜️", rarity: "rare", chance: 16.9, color: "fruit-rare" },
-            "Тьма": { emoji: "🌑", rarity: "rare", chance: 15.6, color: "fruit-rare" },
-            "Орёл": { emoji: "🦅", rarity: "rare", chance: 14.4, color: "fruit-rare" },
-            "Алмаз": { emoji: "💎", rarity: "rare", chance: 13.2, color: "fruit-rare" },
-            "Свет": { emoji: "💡", rarity: "epic", chance: 12.1, color: "fruit-epic" },
-            "Резина": { emoji: "🧱", rarity: "epic", chance: 11.0, color: "fruit-epic" },
-            "Призрак": { emoji: "👻", rarity: "epic", chance: 10.0, color: "fruit-epic" },
-            "Магма": { emoji: "🌋", rarity: "epic", chance: 9.1, color: "fruit-epic" },
-            "Дрожь": { emoji: "🌊", rarity: "epic", chance: 8.2, color: "fruit-epic" },
-            "Будда": { emoji: "🙏", rarity: "legendary", chance: 7.4, color: "fruit-legendary" },
-            "Любовь": { emoji: "💖", rarity: "legendary", chance: 6.6, color: "fruit-legendary" },
-            "Творение": { emoji: "🌟", rarity: "legendary", chance: 5.9, color: "fruit-legendary" },
-            "Паук": { emoji: "🕷️", rarity: "legendary", chance: 5.2, color: "fruit-legendary" },
-            "Звук": { emoji: "🔊", rarity: "legendary", chance: 4.6, color: "fruit-legendary" },
-            "Феникс": { emoji: "🦚", rarity: "legendary", chance: 4.0, color: "fruit-legendary" },
-            "Портал": { emoji: "🌀", rarity: "legendary", chance: 3.5, color: "fruit-legendary" },
-            "Молния": { emoji: "⚡", rarity: "legendary", chance: 3.0, color: "fruit-legendary" },
-            "Боль": { emoji: "💢", rarity: "legendary", chance: 2.6, color: "fruit-legendary" },
-            "Метель": { emoji: "🌨️", rarity: "legendary", chance: 2.2, color: "fruit-legendary" },
-            "Гравитация": { emoji: "🌌", rarity: "mythical", chance: 1.0, color: "fruit-mythical" },
-            "Мамонт": { emoji: "🐘", rarity: "mythical", chance: 0.75, color: "fruit-mythical" },
-            "Т-Рекс": { emoji: "🦖", rarity: "mythical", chance: 0.56, color: "fruit-mythical" },
-            "Тесто": { emoji: "🍞", rarity: "mythical", chance: 0.42, color: "fruit-mythical" },
-            "Тень": { emoji: "👤", rarity: "mythical", chance: 0.31, color: "fruit-mythical" },
-            "Яд": { emoji: "☠️", rarity: "mythical", chance: 0.23, color: "fruit-mythical" },
-            "Контроль": { emoji: "🎮", rarity: "mythical", chance: 0.17, color: "fruit-mythical" },
-            "Газ": { emoji: "💨", rarity: "mythical", chance: 0.125, color: "fruit-mythical" },
-            "Дух": { emoji: "👁️", rarity: "mythical", chance: 0.092, color: "fruit-mythical" },
-            "Леопард": { emoji: "🐆", rarity: "mythical", chance: 0.067, color: "fruit-mythical" },
-            "Йети": { emoji: "🧊", rarity: "mythical", chance: 0.048, color: "fruit-mythical" },
-            "Кицунэ": { emoji: "🦊", rarity: "mythical", chance: 0.032, color: "fruit-mythical" },
-            "Дракон": { emoji: "🐉", rarity: "mythical", chance: 0.01, color: "fruit-mythical" }
-        };
+        class ShapeScriptEngine {
+            constructor(canvas) {
+                this.canvas = canvas;
+                this.ctx = canvas.getContext('2d');
+                this.shapes = new Map();
+                this.animations = new Map();
+                this.animationId = null;
+            }
 
-        // ========== ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ ==========
-        let userData = {
-            inventory: {},
-            totalSpins: 0,
-            lastSpin: 0,
-            isAdmin: false
-        };
+            parse(code) {
+                try {
+                    // Упрощенный парсер для демонстрации
+                    this.shapes.clear();
+                    this.animations.clear();
+                    
+                    // Базовая обработка фигур
+                    const circleMatches = code.matchAll(/circle\s*\{([^}]+)\}/g);
+                    for (const match of circleMatches) {
+                        const config = this.parseConfig(match[1]);
+                        if (config.id) {
+                            this.shapes.set(config.id, {
+                                type: 'circle',
+                                ...config
+                            });
+                        }
+                    }
 
-        const COOLDOWN = 2 * 60 * 60 * 1000; // 2 часа
+                    const rectMatches = code.matchAll(/rectangle\s*\{([^}]+)\}/g);
+                    for (const match of rectMatches) {
+                        const config = this.parseConfig(match[1]);
+                        if (config.id) {
+                            this.shapes.set(config.id, {
+                                type: 'rectangle',
+                                ...config
+                            });
+                        }
+                    }
 
-        // ========== БАЗА ДАННЫХ (LocalStorage) ==========
-        function loadUserData() {
-            try {
-                const saved = localStorage.getItem('gachaUserData');
-                if (saved) {
-                    const parsed = JSON.parse(saved);
-                    userData = { ...userData, ...parsed };
+                    // Обработка анимаций
+                    const animMatches = code.matchAll(/animation\s*"([^"]+)"\s*\{([^}]+)\}/g);
+                    for (const match of animMatches) {
+                        const animName = match[1];
+                        const config = this.parseConfig(match[2]);
+                        this.animations.set(animName, config);
+                    }
+
+                } catch (error) {
+                    this.showError(error.message);
                 }
-                updateCooldown();
-            } catch (error) {
-                console.error('Ошибка загрузки данных:', error);
             }
-        }
 
-        function saveUserData() {
-            try {
-                localStorage.setItem('gachaUserData', JSON.stringify(userData));
-                return true;
-            } catch (error) {
-                console.error('Ошибка сохранения:', error);
-                return false;
+            parseConfig(configStr) {
+                const config = {};
+                const lines = configStr.split('\n');
+                
+                for (const line of lines) {
+                    const match = line.match(/(\w+)\s*:\s*(.+)/);
+                    if (match) {
+                        const key = match[1].trim();
+                        let value = match[2].trim().replace(/,$/, '');
+                        
+                        // Парсинг значений
+                        if (value.startsWith('[') && value.endsWith(']')) {
+                            value = JSON.parse(value);
+                        } else if (value.startsWith('"') && value.endsWith('"')) {
+                            value = value.slice(1, -1);
+                        } else if (!isNaN(value)) {
+                            value = parseFloat(value);
+                        } else if (value === 'true') {
+                            value = true;
+                        } else if (value === 'false') {
+                            value = false;
+                        }
+                        
+                        config[key] = value;
+                    }
+                }
+                return config;
             }
-        }
 
-        // ========== ЛОГИКА ГАЧИ ==========
-        function chooseThreeFruits() {
-            const selectedFruits = [];
-            const availableFruits = { ...FRUITS };
-            
-            for (let i = 0; i < 3; i++) {
-                if (Object.keys(availableFruits).length === 0) break;
+            render() {
+                this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
                 
-                const fruitsList = Object.keys(availableFruits);
-                const probabilities = Object.values(availableFruits).map(fruit => fruit.chance);
+                // Отрисовка всех фигур
+                for (const [id, shape] of this.shapes) {
+                    this.drawShape(shape);
+                }
+            }
+
+            drawShape(shape) {
+                this.ctx.save();
                 
-                let total = probabilities.reduce((sum, prob) => sum + prob, 0);
-                let random = Math.random() * total;
-                
-                let chosenFruit = null;
-                for (let j = 0; j < fruitsList.length; j++) {
-                    random -= availableFruits[fruitsList[j]].chance;
-                    if (random <= 0) {
-                        chosenFruit = fruitsList[j];
-                        break;
+                if (shape.type === 'circle') {
+                    this.ctx.beginPath();
+                    this.ctx.arc(shape.center[0], shape.center[1], shape.radius, 0, 2 * Math.PI);
+                    
+                    if (shape.fill) {
+                        this.ctx.fillStyle = shape.fill;
+                        this.ctx.fill();
+                    }
+                    
+                    if (shape.stroke) {
+                        this.ctx.strokeStyle = shape.stroke;
+                        this.ctx.lineWidth = shape.strokeWidth || 1;
+                        this.ctx.stroke();
                     }
                 }
                 
-                selectedFruits.push(chosenFruit);
-                delete availableFruits[chosenFruit];
-            }
-            
-            return selectedFruits;
-        }
-
-        async function spinGacha() {
-            const spinBtn = document.getElementById('spinBtn');
-            const fruitDisplay = document.getElementById('fruitDisplay');
-            const now = Date.now();
-            
-            if (now - userData.lastSpin < COOLDOWN && !userData.isAdmin) {
-                alert('Подождите перед следующим кручением!');
-                return;
-            }
-
-            spinBtn.disabled = true;
-            fruitDisplay.classList.add('rolling');
-
-            const fruits = chooseThreeFruits();
-            const fruitElements = [
-                document.getElementById('fruit1'),
-                document.getElementById('fruit2'),
-                document.getElementById('fruit3')
-            ];
-
-            // Анимация прокрутки
-            for (let i = 0; i < 10; i++) {
-                for (let j = 0; j < 3; j++) {
-                    const randomFruit = Object.keys(FRUITS)[Math.floor(Math.random() * Object.keys(FRUITS).length)];
-                    fruitElements[j].textContent = FRUITS[randomFruit].emoji;
-                    fruitElements[j].className = `fruit ${FRUITS[randomFruit].color}`;
-                }
-                await new Promise(resolve => setTimeout(resolve, 100));
-            }
-
-            // Финальный результат
-            const finalFruit = fruits[Math.floor(Math.random() * fruits.length)];
-            for (let j = 0; j < 3; j++) {
-                fruitElements[j].textContent = FRUITS[fruits[j]].emoji;
-                fruitElements[j].className = `fruit ${FRUITS[fruits[j]].color}`;
-                fruitElements[j].style.opacity = '1';
-                fruitElements[j].style.transform = 'scale(1.1)';
-            }
-
-            // Сохраняем результат
-            userData.inventory[finalFruit] = (userData.inventory[finalFruit] || 0) + 1;
-            userData.totalSpins++;
-            userData.lastSpin = now;
-
-            saveUserData();
-            updateCooldown();
-
-            fruitDisplay.classList.remove('rolling');
-            spinBtn.disabled = false;
-
-            setTimeout(() => {
-                alert(`🎉 Вам выпал: ${finalFruit} ${FRUITS[finalFruit].emoji}`);
-            }, 500);
-        }
-
-        // ========== ИНТЕРФЕЙС ==========
-        function showStats() {
-            const statsContent = document.getElementById('statsContent');
-            let statsHTML = '';
-
-            statsHTML += `<div class="stats-item">Всего кручений: ${userData.totalSpins}</div>`;
-            
-            const sortedInventory = Object.entries(userData.inventory)
-                .sort((a, b) => b[1] - a[1]);
-
-            if (sortedInventory.length === 0) {
-                statsHTML += '<div class="stats-item">У вас еще нет фруктов</div>';
-            } else {
-                sortedInventory.forEach(([fruit, count]) => {
-                    const percentage = (count / userData.totalSpins * 100).toFixed(1);
-                    statsHTML += `
-                        <div class="stats-item ${FRUITS[fruit].color}">
-                            ${FRUITS[fruit].emoji} ${fruit} - ${count} (${percentage}%)
-                        </div>
-                    `;
-                });
-            }
-
-            statsContent.innerHTML = statsHTML;
-            document.getElementById('statsModal').style.display = 'flex';
-        }
-
-        function showInventory() {
-            const modalInventoryGrid = document.getElementById('modalInventoryGrid');
-            renderInventory(modalInventoryGrid);
-            document.getElementById('inventoryModal').style.display = 'flex';
-        }
-
-        function renderInventory(container) {
-            if (Object.keys(userData.inventory).length === 0) {
-                container.innerHTML = '<div style="text-align: center; color: #666;">Инвентарь пуст</div>';
-                return;
-            }
-
-            const sortedInventory = Object.entries(userData.inventory)
-                .sort((a, b) => FRUITS[b[0]].chance - FRUITS[a[0]].chance);
-
-            container.innerHTML = sortedInventory.map(([fruit, count]) => `
-                <div class="inventory-item">
-                    <div class="fruit-name ${FRUITS[fruit].color}">
-                        ${FRUITS[fruit].emoji} ${fruit}
-                    </div>
-                    <div class="fruit-count">Количество: ${count}</div>
-                </div>
-            `).join('');
-        }
-
-        function updateCooldown() {
-            const cooldownText = document.getElementById('cooldownText');
-            const now = Date.now();
-            const remaining = COOLDOWN - (now - userData.lastSpin);
-
-            if (userData.isAdmin) {
-                cooldownText.textContent = '👑 Админ: крутить можно всегда!';
-                cooldownText.style.color = '#4ecdc4';
-            } else if (remaining > 0) {
-                const hours = Math.floor(remaining / (60 * 60 * 1000));
-                const minutes = Math.floor((remaining % (60 * 60 * 1000)) / (60 * 1000));
-                cooldownText.textContent = `⏰ До следующего кручения: ${hours}ч ${minutes}м`;
-                cooldownText.style.color = '#ff6b6b';
-            } else {
-                cooldownText.textContent = '✅ Можно крутить!';
-                cooldownText.style.color = '#4ecdc4';
-            }
-        }
-
-        function closeModal(modalId) {
-            document.getElementById(modalId).style.display = 'none';
-        }
-
-        // ========== АДМИН ФУНКЦИИ ==========
-        function toggleAdmin() {
-            userData.isAdmin = !userData.isAdmin;
-            saveUserData();
-            updateCooldown();
-            alert(userData.isAdmin ? '👑 Режим админа включен!' : '👤 Режим админа выключен');
-        }
-
-        function resetData() {
-            if (confirm('Вы уверены? Все данные будут удалены!')) {
-                userData = {
-                    inventory: {},
-                    totalSpins: 0,
-                    lastSpin: 0,
-                    isAdmin: userData.isAdmin
-                };
-                saveUserData();
-                updateCooldown();
-                alert('Данные сброшены!');
-            }
-        }
-
-        // ========== ИНИЦИАЛИЗАЦИЯ ==========
-        document.addEventListener('DOMContentLoaded', function() {
-            loadUserData();
-            
-            // Скрываем loading после загрузки
-            setTimeout(() => {
-                document.getElementById('loading').style.display = 'none';
-            }, 1000);
-            
-            // Секретные комбинации для админа
-            let konamiCode = [];
-            const konamiSequence = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'KeyB', 'KeyA'];
-            
-            document.addEventListener('keydown', (e) => {
-                konamiCode.push(e.code);
-                if (konamiCode.length > konamiSequence.length) {
-                    konamiCode.shift();
+                else if (shape.type === 'rectangle') {
+                    if (shape.fill) {
+                        this.ctx.fillStyle = shape.fill;
+                        this.ctx.fillRect(shape.x, shape.y, shape.width, shape.height);
+                    }
+                    
+                    if (shape.stroke) {
+                        this.ctx.strokeStyle = shape.stroke;
+                        this.ctx.lineWidth = shape.strokeWidth || 1;
+                        this.ctx.strokeRect(shape.x, shape.y, shape.width, shape.height);
+                    }
                 }
                 
-                if (konamiCode.join() === konamiSequence.join()) {
-                    toggleAdmin();
-                    konamiCode = [];
-                }
-            });
-        });
+                this.ctx.restore();
+            }
 
-        // ========== ЭКСПОРТ ДЛЯ ИНТЕГРАЦИИ С ТЕЛЕГРАМ БОТОМ ==========
-        window.GachaAPI = {
-            // Получить данные пользователя для сохранения в основную базу
-            getUserData: () => userData,
-            
-            // Загрузить данные из основной базы
-            setUserData: (data) => {
-                userData = { ...userData, ...data };
-                saveUserData();
-                updateCooldown();
-            },
-            
-            // Админ функции
-            setAdmin: (isAdmin) => {
-                userData.isAdmin = isAdmin;
-                saveUserData();
-                updateCooldown();
-            },
-            
-            // Добавить фрукты (для админов)
-            addFruit: (fruitName, count = 1) => {
-                if (FRUITS[fruitName]) {
-                    userData.inventory[fruitName] = (userData.inventory[fruitName] || 0) + count;
-                    saveUserData();
-                    return true;
+            animate() {
+                if (this.animationId) {
+                    cancelAnimationFrame(this.animationId);
                 }
-                return false;
-            },
+
+                const animateFrame = () => {
+                    this.render();
+                    this.animationId = requestAnimationFrame(animateFrame);
+                };
+                
+                animateFrame();
+            }
+
+            showError(message) {
+                const errorConsole = document.getElementById('errorConsole');
+                errorConsole.style.display = 'block';
+                errorConsole.textContent = 'Error: ' + message;
+            }
+
+            clear() {
+                this.shapes.clear();
+                this.animations.clear();
+                if (this.animationId) {
+                    cancelAnimationFrame(this.animationId);
+                    this.animationId = null;
+                }
+                this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+                document.getElementById('errorConsole').style.display = 'none';
+            }
+        }
+
+        // Инициализация движка
+        const canvas = document.getElementById('canvas');
+        const engine = new ShapeScriptEngine(canvas);
+
+        function runCode() {
+            const code = document.getElementById('editor').value;
+            engine.parse(code);
+            engine.render();
+            engine.animate();
+        }
+
+        function clearCanvas() {
+            engine.clear();
+        }
+
+        function showExamples() {
+            const examples = {
+                basic: `circle {
+    id: "demoCircle"
+    center: [400, 300]
+    radius: 60
+    fill: "#ff6b6b"
+    stroke: "#ff0000"
+    strokeWidth: 3
+}`,
+                multiple: `circle {
+    id: "circle1"
+    center: [200, 200]
+    radius: 40
+    fill: "#4ecdc4"
+}
+
+rectangle {
+    id: "rect1"
+    x: 350, y: 150
+    width: 120, height: 80
+    fill: "#45b7d1"
+    cornerRadius: 15
+}`
+            };
             
-            // Получить статистику для админ панели
-            getStats: () => ({
-                totalSpins: userData.totalSpins,
-                inventory: userData.inventory,
-                lastSpin: userData.lastSpin,
-                isAdmin: userData.isAdmin
-            })
-        };
+            // Можно добавить диалог выбора примеров
+            document.getElementById('editor').value = examples.multiple;
+            runCode();
+        }
+
+        // Запуск начального кода
+        setTimeout(runCode, 100);
     </script>
 </body>
-    </html>
+</html>
