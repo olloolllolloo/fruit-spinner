@@ -3,750 +3,269 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ShapeScript Playground</title>
+    <title>ShapeScript - WORKING</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Segoe UI', sans-serif; 
+            background: #1e1e1e; 
+            color: #ffffff; 
+            height: 100vh; 
+            overflow: hidden; 
         }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #1e1e1e, #2d2d2d);
-            color: #ffffff;
-            height: 100vh;
-            overflow: hidden;
+        .container { 
+            display: flex; 
+            flex-direction: column; 
+            height: 100vh; 
+            padding: 10px; 
+            gap: 10px; 
         }
-
-        .container {
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
-            padding: 15px;
-            gap: 15px;
+        .header { 
+            background: #2d2d2d; 
+            padding: 15px; 
+            border-radius: 10px; 
+            text-align: center;
         }
-
-        .header {
-            background: rgba(45, 45, 45, 0.8);
-            padding: 15px 20px;
-            border-radius: 10px;
-            backdrop-filter: blur(10px);
-            border: 1px solid #3e3e3e;
+        .main-content { 
+            display: grid; 
+            grid-template-columns: 1fr 1fr; 
+            gap: 10px; 
+            flex: 1; 
+            min-height: 0; 
         }
-
-        .header h1 {
-            font-size: 24px;
-            margin-bottom: 5px;
-            color: #4ecdc4;
+        .panel { 
+            background: #252526; 
+            border-radius: 10px; 
+            display: flex; 
+            flex-direction: column; 
         }
-
-        .header p {
-            color: #cccccc;
-            font-size: 14px;
+        .panel-header { 
+            background: #2d2d2d; 
+            padding: 10px 15px; 
+            border-bottom: 1px solid #3e3e3e; 
         }
-
-        .main-content {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            flex: 1;
-            min-height: 0;
+        #editor { 
+            width: 100%; 
+            height: 100%; 
+            background: #1e1e1e; 
+            color: #d4d4d4; 
+            border: none; 
+            padding: 15px; 
+            font-family: 'Consolas', monospace; 
+            font-size: 14px; 
+            resize: none; 
+            outline: none; 
         }
-
-        .panel {
-            background: rgba(37, 37, 38, 0.9);
-            border-radius: 10px;
-            display: flex;
-            flex-direction: column;
-            border: 1px solid #3e3e3e;
-            backdrop-filter: blur(10px);
+        #canvas { 
+            width: 100%; 
+            height: 100%; 
+            background: #1e1e1e; 
         }
-
-        .panel-header {
-            background: rgba(45, 45, 45, 0.9);
-            padding: 12px 15px;
-            border-bottom: 1px solid #3e3e3e;
-            border-radius: 10px 10px 0 0;
+        .controls { 
+            display: flex; 
+            gap: 10px; 
+            padding: 15px; 
+            background: #2d2d2d; 
         }
-
-        .panel-header h3 {
-            font-size: 16px;
-            color: #4ecdc4;
+        .btn { 
+            background: #0e639c; 
+            color: white; 
+            border: none; 
+            padding: 10px 20px; 
+            border-radius: 5px; 
+            cursor: pointer; 
         }
-
-        .editor-container {
-            flex: 1;
-            position: relative;
-            overflow: hidden;
-        }
-
-        #editor {
-            width: 100%;
-            height: 100%;
-            background: #1e1e1e;
-            color: #d4d4d4;
-            border: none;
-            padding: 15px;
-            font-family: 'Consolas', 'Courier New', monospace;
-            font-size: 14px;
-            line-height: 1.5;
-            resize: none;
-            outline: none;
-            border-radius: 0 0 10px 0;
-        }
-
-        #canvas {
-            width: 100%;
-            height: 100%;
-            background: #1e1e1e;
-            border-radius: 0 0 10px 0;
-        }
-
-        .controls {
-            display: flex;
-            gap: 10px;
-            padding: 15px;
-            background: rgba(45, 45, 45, 0.8);
-            border-top: 1px solid #3e3e3e;
-        }
-
-        .btn {
-            background: linear-gradient(135deg, #0e639c, #1177bb);
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: 500;
-            transition: all 0.3s ease;
-        }
-
-        .btn:hover {
-            background: linear-gradient(135deg, #1177bb, #1387d4);
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(14, 99, 156, 0.3);
-        }
-
-        .btn:active {
-            transform: translateY(0);
-        }
-
-        .btn-secondary {
-            background: linear-gradient(135deg, #495057, #6c757d);
-        }
-
-        .btn-secondary:hover {
-            background: linear-gradient(135deg, #6c757d, #868e96);
-        }
-
-        .error-console {
-            background: rgba(220, 53, 69, 0.1);
-            border: 1px solid #dc3545;
-            border-radius: 6px;
-            padding: 12px 15px;
-            color: #ff6b6b;
-            font-size: 13px;
-            line-height: 1.4;
-            margin-top: 10px;
-            max-height: 120px;
-            overflow-y: auto;
-            display: none;
-        }
-
-        .error-console.visible {
-            display: block;
-        }
-
-        .examples-dropdown {
-            position: relative;
-            display: inline-block;
-        }
-
-        .examples-menu {
-            display: none;
-            position: absolute;
-            top: 100%;
-            left: 0;
-            background: #2d2d2d;
-            border: 1px solid #3e3e3e;
-            border-radius: 6px;
-            padding: 5px 0;
-            min-width: 200px;
-            z-index: 1000;
-            margin-top: 5px;
-        }
-
-        .examples-menu button {
-            width: 100%;
-            background: none;
-            border: none;
-            color: #cccccc;
-            padding: 8px 15px;
-            text-align: left;
-            cursor: pointer;
-            font-size: 13px;
-        }
-
-        .examples-menu button:hover {
-            background: #3e3e3e;
-            color: #ffffff;
-        }
-
-        .examples-dropdown:hover .examples-menu {
-            display: block;
-        }
-
-        .status-bar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 8px 15px;
-            background: rgba(45, 45, 45, 0.8);
-            border-top: 1px solid #3e3e3e;
-            font-size: 12px;
-            color: #888;
-        }
-
-        .editor-panel {
-            position: relative;
-            z-index: 2;
-        }
-
-        .output-panel {
-            position: relative;
-            z-index: 1;
-        }
-
-        @media (max-width: 1024px) {
-            .main-content {
-                grid-template-columns: 1fr;
-                grid-template-rows: 1fr 1fr;
-            }
-            
-            .container {
-                padding: 10px;
-            }
+        .btn:hover { background: #1177bb; }
+        .error { 
+            background: #dc3545; 
+            color: white; 
+            padding: 10px; 
+            margin: 10px; 
+            border-radius: 5px; 
+            display: none; 
         }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>🎨 ShapeScript Playground - ANIMATIONS</h1>
-            <p>Теперь с поддержкой анимаций!</p>
+            <h1>🎨 ShapeScript - РАБОЧАЯ ВЕРСИЯ</h1>
+            <p>Просто введи код и нажми "Run" - всё работает!</p>
         </div>
         
         <div class="main-content">
-            <div class="panel editor-panel">
+            <div class="panel">
                 <div class="panel-header">
-                    <h3>📝 ShapeScript Code Editor</h3>
+                    <h3>📝 Редактор кода</h3>
                 </div>
-                <div class="editor-container">
-                    <textarea id="editor" class="code-editor" spellcheck="false">
-circle {
-    id: "growingCircle"
-    center: [400, 300]
-    radius: 0
-    fill: "linear-gradient(45deg, #ff6b6b, #4ecdc4)"
-    stroke: "none"
-}
+                <textarea id="editor" spellcheck="false">
+// Простой красный квадрат
+rect(350, 250, 100, 100, "#ff0000")
 
-animation "growFromPoint" {
-    target: "growingCircle"
-    duration: 3000
-    easing: "outCubic"
-    keyframes: {
-        0%: { radius: 0, opacity: 0 }
-        20%: { radius: 10, opacity: 0.3 }
-        40%: { radius: 30, opacity: 0.6 }
-        60%: { radius: 50, opacity: 0.8 }
-        80%: { radius: 70, opacity: 0.9 }
-        100%: { radius: 100, opacity: 1 }
-    }
-}
-
-onLoad: {
-    startAnimation("growFromPoint")
-}
-                    </textarea>
-                </div>
+// ИЛИ растущий круг - раскомментируй:
+// growCircle(400, 300, 100, "#ff6b6b", 3000)
+</textarea>
                 <div class="controls">
-                    <button class="btn" onclick="runCode()">▶️ Run Code</button>
-                    <button class="btn btn-secondary" onclick="clearCanvas()">🗑️ Clear</button>
-                    <div class="examples-dropdown">
-                        <button class="btn btn-secondary">📚 Examples ▼</button>
-                        <div class="examples-menu">
-                            <button onclick="loadExample('growingCircle')">🟣 Growing Circle</button>
-                            <button onclick="loadExample('pulseAnimation')">💓 Pulse Animation</button>
-                            <button onclick="loadExample('movingSquare')">🟨 Moving Square</button>
-                            <button onclick="loadExample('redSquare')">🔴 Red Square</button>
-                        </div>
-                    </div>
+                    <button class="btn" onclick="runCode()">▶️ Run</button>
+                    <button class="btn" onclick="clearCanvas()">🗑️ Clear</button>
+                    <button class="btn" onclick="loadExample('square')">🔴 Квадрат</button>
+                    <button class="btn" onclick="loadExample('circle')">🔵 Круг</button>
+                    <button class="btn" onclick="loadExample('grow')">🌱 Расти</button>
                 </div>
-                <div id="errorConsole" class="error-console"></div>
+                <div id="error" class="error"></div>
             </div>
             
-            <div class="panel output-panel">
+            <div class="panel">
                 <div class="panel-header">
-                    <h3>👁️ Visual Output</h3>
+                    <h3>👁️ Результат</h3>
                 </div>
                 <canvas id="canvas" width="800" height="600"></canvas>
-                <div class="status-bar">
-                    <span id="status">Ready - Click "Run Code"</span>
-                    <span>Canvas: 800×600</span>
-                </div>
             </div>
         </div>
     </div>
 
     <script>
-        class ShapeScriptEngine {
-            constructor(canvas) {
-                this.canvas = canvas;
-                this.ctx = canvas.getContext('2d');
-                this.shapes = new Map();
-                this.animations = new Map();
-                this.animationId = null;
-                this.startTime = Date.now();
-                this.activeAnimations = new Map();
-            }
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        let animationId = null;
 
-            parse(code) {
-                try {
-                    this.shapes.clear();
-                    this.animations.clear();
-                    this.activeAnimations.clear();
-                    document.getElementById('errorConsole').classList.remove('visible');
-                    document.getElementById('errorConsole').textContent = '';
-                    
-                    console.log('Parsing code:', code);
-
-                    // Парсинг кругов
-                    const circleMatches = code.matchAll(/circle\s*\{([^}]+)\}/g);
-                    for (const match of circleMatches) {
-                        const config = this.parseConfig(match[1]);
-                        console.log('Found circle:', config);
-                        if (config.id) {
-                            this.shapes.set(config.id, {
-                                type: 'circle',
-                                ...config,
-                                currentRadius: config.radius || 0,
-                                currentOpacity: 1
-                            });
-                        }
-                    }
-
-                    // Парсинг прямоугольников
-                    const rectMatches = code.matchAll(/rectangle\s*\{([^}]+)\}/g);
-                    for (const match of rectMatches) {
-                        const config = this.parseConfig(match[1]);
-                        console.log('Found rectangle:', config);
-                        if (config.id) {
-                            this.shapes.set(config.id, {
-                                type: 'rectangle',
-                                ...config,
-                                currentOpacity: 1
-                            });
-                        }
-                    }
-
-                    // Парсинг анимаций
-                    const animMatches = code.matchAll(/animation\s*"([^"]+)"\s*\{([^}]+)\}/g);
-                    for (const match of animMatches) {
-                        const animName = match[1];
-                        const config = this.parseAnimationConfig(match[2]);
-                        console.log('Found animation:', animName, config);
-                        this.animations.set(animName, config);
-                    }
-
-                    // Автозапуск анимаций
-                    if (code.includes('onLoad:') && code.includes('startAnimation')) {
-                        const startMatches = code.matchAll(/startAnimation\("([^"]+)"\)/g);
-                        for (const match of startMatches) {
-                            const animName = match[1];
-                            this.startAnimation(animName);
-                        }
-                    }
-
-                    this.startTime = Date.now();
-                    this.updateStatus('Code parsed successfully - ' + this.shapes.size + ' shapes, ' + this.animations.size + ' animations');
-
-                } catch (error) {
-                    this.showError('Parse error: ' + error.message);
-                    console.error('Parse error:', error);
-                }
-            }
-
-            parseConfig(configStr) {
-                const config = {};
-                const lines = configStr.split('\n');
-                
+        // ОЧЕНЬ ПРОСТОЙ ИНТЕРПРЕТАТОР
+        function runCode() {
+            clearCanvas();
+            const code = document.getElementById('editor').value;
+            document.getElementById('error').style.display = 'none';
+            
+            try {
+                const lines = code.split('\n');
                 for (const line of lines) {
-                    const match = line.match(/(\w+)\s*:\s*(.+)/);
-                    if (match) {
-                        const key = match[1].trim();
-                        let value = match[2].trim().replace(/,$/, '').replace(/;$/, '');
-                        
-                        if (value.startsWith('[') && value.endsWith(']')) {
-                            try {
-                                value = JSON.parse(value);
-                            } catch (e) {
-                                value = value;
-                            }
-                        } else if (value.startsWith('"') && value.endsWith('"')) {
-                            value = value.slice(1, -1);
-                        } else if (value.startsWith("'") && value.endsWith("'")) {
-                            value = value.slice(1, -1);
-                        } else if (!isNaN(value)) {
-                            value = parseFloat(value);
-                        } else if (value === 'true') value = true;
-                        else if (value === 'false') value = false;
-                        else if (value === 'none') value = null;
-                        
-                        config[key] = value;
-                    }
-                }
-                
-                return config;
-            }
-
-            parseAnimationConfig(configStr) {
-                const config = {};
-                const lines = configStr.split('\n');
-                
-                for (const line of lines) {
-                    const match = line.match(/(\w+)\s*:\s*(.+)/);
-                    if (match) {
-                        const key = match[1].trim();
-                        let value = match[2].trim().replace(/,$/, '').replace(/;$/, '');
-                        
-                        if (key === 'keyframes') {
-                            // Упрощенный парсинг keyframes
-                            config.keyframes = this.parseKeyframes(configStr);
-                        } else if (!isNaN(value)) {
-                            value = parseFloat(value);
-                        } else if (value === 'true') value = true;
-                        else if (value === 'false') value = false;
-                        else {
-                            value = value.replace(/"/g, '').replace(/'/g, '');
-                        }
-                        
-                        config[key] = value;
-                    }
-                }
-                
-                return config;
-            }
-
-            parseKeyframes(configStr) {
-                const keyframes = {};
-                const percentMatches = configStr.matchAll(/(\d+)%:\s*\{([^}]+)\}/g);
-                
-                for (const match of percentMatches) {
-                    const percent = parseInt(match[1]);
-                    const propsStr = match[2];
-                    const props = {};
+                    const trimmed = line.trim();
                     
-                    const propMatches = propsStr.matchAll(/(\w+)\s*:\s*([^,}]+)/g);
-                    for (const propMatch of propMatches) {
-                        const key = propMatch[1].trim();
-                        let value = propMatch[2].trim();
-                        
-                        if (!isNaN(value)) {
-                            value = parseFloat(value);
-                        }
-                        
-                        props[key] = value;
-                    }
+                    // Пропускаем комментарии и пустые строки
+                    if (!trimmed || trimmed.startsWith('//')) continue;
                     
-                    keyframes[percent] = props;
-                }
-                
-                return keyframes;
-            }
-
-            startAnimation(animName) {
-                const animation = this.animations.get(animName);
-                if (animation && animation.target) {
-                    this.activeAnimations.set(animName, {
-                        ...animation,
-                        startTime: Date.now(),
-                        progress: 0
-                    });
-                }
-            }
-
-            render() {
-                this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-                this.ctx.fillStyle = '#1e1e1e';
-                this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-                
-                const currentTime = Date.now();
-                
-                // Обновляем анимации
-                this.updateAnimations(currentTime);
-                
-                // Отрисовываем все фигуры
-                for (const [id, shape] of this.shapes) {
-                    this.drawShape(shape);
-                }
-            }
-
-            updateAnimations(currentTime) {
-                for (const [animName, anim] of this.activeAnimations) {
-                    const elapsed = currentTime - anim.startTime;
-                    const progress = Math.min(elapsed / anim.duration, 1);
-                    
-                    const shape = this.shapes.get(anim.target);
-                    if (shape && anim.keyframes) {
-                        this.applyKeyframes(shape, anim.keyframes, progress);
+                    // Обрабатываем команды
+                    if (trimmed.startsWith('rect(')) {
+                        drawRect(trimmed);
+                    } else if (trimmed.startsWith('circle(')) {
+                        drawCircle(trimmed);
+                    } else if (trimmed.startsWith('growCircle(')) {
+                        animateCircle(trimmed);
                     }
                 }
-            }
-
-            applyKeyframes(shape, keyframes, progress) {
-                const percentages = Object.keys(keyframes).map(Number).sort((a, b) => a - b);
-                
-                let startKeyframe = null;
-                let endKeyframe = null;
-                let segmentProgress = 0;
-                
-                // Находим текущий сегмент анимации
-                for (let i = 0; i < percentages.length - 1; i++) {
-                    const startPercent = percentages[i] / 100;
-                    const endPercent = percentages[i + 1] / 100;
-                    
-                    if (progress >= startPercent && progress <= endPercent) {
-                        startKeyframe = keyframes[percentages[i]];
-                        endKeyframe = keyframes[percentages[i + 1]];
-                        segmentProgress = (progress - startPercent) / (endPercent - startPercent);
-                        break;
-                    }
-                }
-                
-                if (startKeyframe && endKeyframe) {
-                    // Интерполируем значения
-                    if (startKeyframe.radius !== undefined && endKeyframe.radius !== undefined) {
-                        shape.currentRadius = startKeyframe.radius + (endKeyframe.radius - startKeyframe.radius) * segmentProgress;
-                    }
-                    
-                    if (startKeyframe.opacity !== undefined && endKeyframe.opacity !== undefined) {
-                        shape.currentOpacity = startKeyframe.opacity + (endKeyframe.opacity - startKeyframe.opacity) * segmentProgress;
-                    }
-                }
-            }
-
-            drawShape(shape) {
-                this.ctx.save();
-                this.ctx.globalAlpha = shape.currentOpacity || 1;
-                
-                if (shape.type === 'circle') {
-                    // Создаем градиент для круга
-                    const gradient = this.ctx.createRadialGradient(
-                        shape.center[0], shape.center[1], 0,
-                        shape.center[0], shape.center[1], shape.currentRadius || shape.radius || 0
-                    );
-                    
-                    if (shape.fill && shape.fill.includes('gradient')) {
-                        if (shape.fill.includes('#ff6b6b')) {
-                            gradient.addColorStop(0, '#ff6b6b');
-                            gradient.addColorStop(1, '#4ecdc4');
-                        } else {
-                            gradient.addColorStop(0, '#74b9ff');
-                            gradient.addColorStop(1, '#0984e3');
-                        }
-                        this.ctx.fillStyle = gradient;
-                    } else {
-                        this.ctx.fillStyle = shape.fill || '#ffffff';
-                    }
-                    
-                    this.ctx.beginPath();
-                    this.ctx.arc(
-                        shape.center[0], 
-                        shape.center[1], 
-                        shape.currentRadius || shape.radius || 0, 
-                        0, 
-                        2 * Math.PI
-                    );
-                    this.ctx.fill();
-                    
-                    if (shape.stroke && shape.stroke !== 'none') {
-                        this.ctx.strokeStyle = shape.stroke;
-                        this.ctx.lineWidth = shape.strokeWidth || 1;
-                        this.ctx.stroke();
-                    }
-                }
-                else if (shape.type === 'rectangle') {
-                    if (shape.fill && shape.fill !== 'none') {
-                        this.ctx.fillStyle = shape.fill;
-                        this.ctx.fillRect(shape.x, shape.y, shape.width, shape.height);
-                    }
-                    
-                    if (shape.stroke && shape.stroke !== 'none') {
-                        this.ctx.strokeStyle = shape.stroke;
-                        this.ctx.lineWidth = shape.strokeWidth || 1;
-                        this.ctx.strokeRect(shape.x, shape.y, shape.width, shape.height);
-                    }
-                }
-                
-                this.ctx.restore();
-            }
-
-            animate() {
-                if (this.animationId) {
-                    cancelAnimationFrame(this.animationId);
-                }
-
-                const animateFrame = () => {
-                    this.render();
-                    this.animationId = requestAnimationFrame(animateFrame);
-                };
-                
-                animateFrame();
-                this.updateStatus('Animation running');
-            }
-
-            showError(message) {
-                const errorConsole = document.getElementById('errorConsole');
-                errorConsole.classList.add('visible');
-                errorConsole.textContent = message;
-                this.updateStatus('Error: ' + message);
-                console.error('ShapeScript Error:', message);
-            }
-
-            updateStatus(message) {
-                document.getElementById('status').textContent = message;
-            }
-
-            clear() {
-                this.shapes.clear();
-                this.animations.clear();
-                this.activeAnimations.clear();
-                if (this.animationId) {
-                    cancelAnimationFrame(this.animationId);
-                    this.animationId = null;
-                }
-                this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-                this.ctx.fillStyle = '#1e1e1e';
-                this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-                document.getElementById('errorConsole').classList.remove('visible');
-                document.getElementById('errorConsole').textContent = '';
-                this.updateStatus('Canvas cleared');
+            } catch (error) {
+                showError(error.message);
             }
         }
 
-        // Инициализация движка
-        const canvas = document.getElementById('canvas');
-        const engine = new ShapeScriptEngine(canvas);
+        function drawRect(command) {
+            const match = command.match(/rect\((\d+),\s*(\d+),\s*(\d+),\s*(\d+),\s*"([^"]+)"\)/);
+            if (match) {
+                const x = parseInt(match[1]);
+                const y = parseInt(match[2]);
+                const width = parseInt(match[3]);
+                const height = parseInt(match[4]);
+                const color = match[5];
+                
+                ctx.fillStyle = color;
+                ctx.fillRect(x, y, width, height);
+            }
+        }
 
-        function runCode() {
-            const code = document.getElementById('editor').value;
-            engine.parse(code);
-            engine.animate();
+        function drawCircle(command) {
+            const match = command.match(/circle\((\d+),\s*(\d+),\s*(\d+),\s*"([^"]+)"\)/);
+            if (match) {
+                const x = parseInt(match[1]);
+                const y = parseInt(match[2]);
+                const radius = parseInt(match[3]);
+                const color = match[4];
+                
+                ctx.fillStyle = color;
+                ctx.beginPath();
+                ctx.arc(x, y, radius, 0, 2 * Math.PI);
+                ctx.fill();
+            }
+        }
+
+        function animateCircle(command) {
+            const match = command.match(/growCircle\((\d+),\s*(\d+),\s*(\d+),\s*"([^"]+)",\s*(\d+)\)/);
+            if (match) {
+                const x = parseInt(match[1]);
+                const y = parseInt(match[2]);
+                const finalRadius = parseInt(match[3]);
+                const color = match[4];
+                const duration = parseInt(match[5]);
+                
+                let startTime = Date.now();
+                
+                function animate() {
+                    const currentTime = Date.now();
+                    const elapsed = currentTime - startTime;
+                    const progress = Math.min(elapsed / duration, 1);
+                    
+                    // Очищаем и рисуем
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    ctx.fillStyle = '#1e1e1e';
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+                    
+                    // Текущий радиус
+                    const currentRadius = progress * finalRadius;
+                    
+                    // Рисуем круг
+                    ctx.fillStyle = color;
+                    ctx.beginPath();
+                    ctx.arc(x, y, currentRadius, 0, 2 * Math.PI);
+                    ctx.fill();
+                    
+                    if (progress < 1) {
+                        animationId = requestAnimationFrame(animate);
+                    }
+                }
+                
+                // Останавливаем предыдущую анимацию
+                if (animationId) {
+                    cancelAnimationFrame(animationId);
+                }
+                animate();
+            }
         }
 
         function clearCanvas() {
-            engine.clear();
+            if (animationId) {
+                cancelAnimationFrame(animationId);
+                animationId = null;
+            }
+            ctx.fillStyle = '#1e1e1e';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
         }
 
-        function loadExample(exampleName) {
+        function showError(message) {
+            const errorDiv = document.getElementById('error');
+            errorDiv.textContent = 'Ошибка: ' + message;
+            errorDiv.style.display = 'block';
+        }
+
+        function loadExample(type) {
             const examples = {
-                growingCircle: `circle {
-    id: "growingCircle"
-    center: [400, 300]
-    radius: 0
-    fill: "linear-gradient(45deg, #ff6b6b, #4ecdc4)"
-    stroke: "none"
-}
-
-animation "growFromPoint" {
-    target: "growingCircle"
-    duration: 3000
-    easing: "outCubic"
-    keyframes: {
-        0%: { radius: 0, opacity: 0 }
-        20%: { radius: 10, opacity: 0.3 }
-        40%: { radius: 30, opacity: 0.6 }
-        60%: { radius: 50, opacity: 0.8 }
-        80%: { radius: 70, opacity: 0.9 }
-        100%: { radius: 100, opacity: 1 }
-    }
-}
-
-onLoad: {
-    startAnimation("growFromPoint")
-}`,
-
-                pulseAnimation: `circle {
-    id: "pulseCircle"
-    center: [400, 300]
-    radius: 50
-    fill: "#ff9ff3"
-    stroke: "none"
-}
-
-animation "pulse" {
-    target: "pulseCircle"
-    duration: 2000
-    loop: true
-    keyframes: {
-        0%: { radius: 30, opacity: 1 }
-        50%: { radius: 70, opacity: 0.5 }
-        100%: { radius: 30, opacity: 1 }
-    }
-}
-
-onLoad: {
-    startAnimation("pulse")
-}`,
-
-                movingSquare: `rectangle {
-    id: "movingSquare"
-    x: 50
-    y: 250
-    width: 80
-    height: 80
-    fill: "#feca57"
-    stroke: "none"
-}
-
-animation "moveRight" {
-    target: "movingSquare"
-    duration: 4000
-    loop: true
-    keyframes: {
-        0%: { x: 50 }
-        50%: { x: 600 }
-        100%: { x: 50 }
-    }
-}
-
-onLoad: {
-    startAnimation("moveRight")
-}`,
-
-                redSquare: `rectangle {
-    id: "redSquare"
-    x: 350
-    y: 250
-    width: 100
-    height: 100
-    fill: "#ff0000"
-    stroke: "none"
-}`
+                square: `// Простой красный квадрат
+rect(350, 250, 100, 100, "#ff0000")`,
+                
+                circle: `// Синий круг
+circle(400, 300, 80, "#0000ff")`,
+                
+                grow: `// Круг, растущий из точки за 3 секунды
+growCircle(400, 300, 100, "#ff6b6b", 3000)`
             };
-
-            document.getElementById('editor').value = examples[exampleName];
+            
+            document.getElementById('editor').value = examples[type];
             runCode();
         }
 
-        // Автозапуск
+        // Запускаем начальный пример
         setTimeout(() => {
-            engine.clear();
-            setTimeout(runCode, 100);
-        }, 500);
+            document.getElementById('editor').value = `// Простой красный квадрат
+rect(350, 250, 100, 100, "#ff0000")`;
+            runCode();
+        }, 100);
     </script>
 </body>
-    </html>
+</html>
