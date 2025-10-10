@@ -1,271 +1,591 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ShapeScript - WORKING</title>
+    <title>Geometry Engine</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { 
-            font-family: 'Segoe UI', sans-serif; 
-            background: #1e1e1e; 
-            color: #ffffff; 
-            height: 100vh; 
-            overflow: hidden; 
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
-        .container { 
-            display: flex; 
-            flex-direction: column; 
-            height: 100vh; 
-            padding: 10px; 
-            gap: 10px; 
+
+        body {
+            font-family: 'Consolas', 'Monaco', monospace;
+            background: #0d1117;
+            color: #e6edf3;
+            height: 100vh;
+            overflow: hidden;
         }
-        .header { 
-            background: #2d2d2d; 
-            padding: 15px; 
-            border-radius: 10px; 
-            text-align: center;
+
+        .app {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            padding: 16px;
+            gap: 16px;
         }
-        .main-content { 
-            display: grid; 
-            grid-template-columns: 1fr 1fr; 
-            gap: 10px; 
-            flex: 1; 
-            min-height: 0; 
+
+        /* Редактор кода */
+        .editor-container {
+            flex: 1;
+            background: #161b22;
+            border-radius: 12px;
+            border: 1px solid #30363d;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
         }
-        .panel { 
-            background: #252526; 
-            border-radius: 10px; 
-            display: flex; 
-            flex-direction: column; 
+
+        .editor-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid #30363d;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #1a1f29;
         }
-        .panel-header { 
-            background: #2d2d2d; 
-            padding: 10px 15px; 
-            border-bottom: 1px solid #3e3e3e; 
+
+        .editor-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #7ee787;
         }
-        #editor { 
-            width: 100%; 
-            height: 100%; 
-            background: #1e1e1e; 
-            color: #d4d4d4; 
-            border: none; 
-            padding: 15px; 
-            font-family: 'Consolas', monospace; 
-            font-size: 14px; 
-            resize: none; 
-            outline: none; 
+
+        .run-button {
+            background: #f2cc60;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
         }
-        #canvas { 
-            width: 100%; 
-            height: 100%; 
-            background: #1e1e1e; 
+
+        .run-button:hover {
+            background: #e6b800;
+            transform: scale(1.05);
         }
-        .controls { 
-            display: flex; 
-            gap: 10px; 
-            padding: 15px; 
-            background: #2d2d2d; 
+
+        .run-button:active {
+            transform: scale(0.95);
         }
-        .btn { 
-            background: #0e639c; 
-            color: white; 
-            border: none; 
-            padding: 10px 20px; 
-            border-radius: 5px; 
-            cursor: pointer; 
+
+        .play-icon {
+            width: 20px;
+            height: 20px;
+            border-left: 8px solid #0d1117;
+            border-top: 6px solid transparent;
+            border-bottom: 6px solid transparent;
+            margin-left: 2px;
         }
-        .btn:hover { background: #1177bb; }
-        .error { 
-            background: #dc3545; 
-            color: white; 
-            padding: 10px; 
-            margin: 10px; 
-            border-radius: 5px; 
-            display: none; 
+
+        .code-editor {
+            flex: 1;
+            background: #0d1117;
+            color: #e6edf3;
+            border: none;
+            padding: 20px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 14px;
+            line-height: 1.5;
+            resize: none;
+            outline: none;
+            overflow-y: auto;
+        }
+
+        /* Окно результата */
+        .result-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #0d1117;
+            z-index: 1000;
+            display: none;
+            flex-direction: column;
+        }
+
+        .result-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid #30363d;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #1a1f29;
+        }
+
+        .back-button {
+            background: #238636;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: background 0.2s ease;
+        }
+
+        .back-button:hover {
+            background: #2ea043;
+        }
+
+        .arrow {
+            width: 12px;
+            height: 12px;
+            border-left: 3px solid white;
+            border-top: 3px solid white;
+            transform: rotate(-45deg);
+        }
+
+        .canvas-container {
+            flex: 1;
+            background: #161b22;
+            position: relative;
+            overflow: hidden;
+        }
+
+        #renderCanvas {
+            width: 100%;
+            height: 100%;
+            background: #0d1117;
+        }
+
+        /* Панель ошибок */
+        .error-panel {
+            background: #da3633;
+            color: white;
+            padding: 16px 20px;
+            border-radius: 8px;
+            margin-top: 16px;
+            display: none;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .error-title {
+            font-weight: 600;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .error-icon {
+            width: 16px;
+            height: 16px;
+            background: white;
+            border-radius: 50%;
+            position: relative;
+        }
+
+        .error-icon::before,
+        .error-icon::after {
+            content: '';
+            position: absolute;
+            background: #da3633;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .error-icon::before {
+            width: 2px;
+            height: 8px;
+        }
+
+        .error-icon::after {
+            width: 8px;
+            height: 2px;
+        }
+
+        .error-line {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 8px 12px;
+            border-radius: 4px;
+            margin-top: 8px;
+            font-family: 'Consolas', monospace;
+            font-size: 13px;
+        }
+
+        .error-message {
+            margin-top: 4px;
+            opacity: 0.9;
+        }
+
+        /* Нумерация строк */
+        .line-numbers {
+            position: absolute;
+            left: 0;
+            top: 0;
+            padding: 20px 12px;
+            background: #0d1117;
+            border-right: 1px solid #30363d;
+            height: 100%;
+            text-align: right;
+            color: #484f58;
+            font-size: 14px;
+            line-height: 1.5;
+            user-select: none;
+        }
+
+        .code-wrapper {
+            position: relative;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .code-textarea {
+            padding-left: 60px !important;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>🎨 ShapeScript - РАБОЧАЯ ВЕРСИЯ</h1>
-            <p>Просто введи код и нажми "Run" - всё работает!</p>
+    <div class="app">
+        <!-- Редактор кода -->
+        <div class="editor-container">
+            <div class="editor-header">
+                <div class="editor-title">geometry.gs</div>
+                <button class="run-button" onclick="runCode()">
+                    <div class="play-icon"></div>
+                </button>
+            </div>
+            <div class="code-wrapper">
+                <div class="line-numbers" id="lineNumbers">1</div>
+                <textarea class="code-editor code-textarea" id="codeEditor" spellcheck="false" oninput="updateLineNumbers()">rectangle {id=1, place=350,250, side=100, color=255000000, borderline=2,255255255}
+triangular {id=2, place=500,300, side=80, color=000255000, borderline=1,000000000}</textarea>
+            </div>
         </div>
-        
-        <div class="main-content">
-            <div class="panel">
-                <div class="panel-header">
-                    <h3>📝 Редактор кода</h3>
-                </div>
-                <textarea id="editor" spellcheck="false">
-// Простой красный квадрат
-rect(350, 250, 100, 100, "#ff0000")
 
-// ИЛИ растущий круг - раскомментируй:
-// growCircle(400, 300, 100, "#ff6b6b", 3000)
-</textarea>
-                <div class="controls">
-                    <button class="btn" onclick="runCode()">▶️ Run</button>
-                    <button class="btn" onclick="clearCanvas()">🗑️ Clear</button>
-                    <button class="btn" onclick="loadExample('square')">🔴 Квадрат</button>
-                    <button class="btn" onclick="loadExample('circle')">🔵 Круг</button>
-                    <button class="btn" onclick="loadExample('grow')">🌱 Расти</button>
-                </div>
-                <div id="error" class="error"></div>
+        <!-- Панель ошибок -->
+        <div class="error-panel" id="errorPanel">
+            <div class="error-title">
+                <div class="error-icon"></div>
+                Ошибка выполнения
             </div>
-            
-            <div class="panel">
-                <div class="panel-header">
-                    <h3>👁️ Результат</h3>
-                </div>
-                <canvas id="canvas" width="800" height="600"></canvas>
-            </div>
+            <div id="errorContent"></div>
+        </div>
+    </div>
+
+    <!-- Окно результата -->
+    <div class="result-container" id="resultContainer">
+        <div class="result-header">
+            <div style="color: #7ee787;">Результат выполнения</div>
+            <button class="back-button" onclick="closeResult()">
+                <div class="arrow"></div>
+                Назад к редактору
+            </button>
+        </div>
+        <div class="canvas-container">
+            <canvas id="renderCanvas" width="1200" height="800"></canvas>
         </div>
     </div>
 
     <script>
-        const canvas = document.getElementById('canvas');
-        const ctx = canvas.getContext('2d');
-        let animationId = null;
+        class GeometryEngine {
+            constructor(canvas) {
+                this.canvas = canvas;
+                this.ctx = canvas.getContext('2d');
+                this.shapes = new Map();
+                this.errors = [];
+            }
 
-        // ОЧЕНЬ ПРОСТОЙ ИНТЕРПРЕТАТОР
-        function runCode() {
-            clearCanvas();
-            const code = document.getElementById('editor').value;
-            document.getElementById('error').style.display = 'none';
-            
-            try {
+            parse(code) {
+                this.shapes.clear();
+                this.errors = [];
+                
                 const lines = code.split('\n');
-                for (const line of lines) {
-                    const trimmed = line.trim();
-                    
-                    // Пропускаем комментарии и пустые строки
-                    if (!trimmed || trimmed.startsWith('//')) continue;
-                    
-                    // Обрабатываем команды
-                    if (trimmed.startsWith('rect(')) {
-                        drawRect(trimmed);
-                    } else if (trimmed.startsWith('circle(')) {
-                        drawCircle(trimmed);
-                    } else if (trimmed.startsWith('growCircle(')) {
-                        animateCircle(trimmed);
+                
+                for (let i = 0; i < lines.length; i++) {
+                    const line = lines[i].trim();
+                    if (!line) continue;
+
+                    try {
+                        if (line.startsWith('rectangle')) {
+                            this.parseRectangle(line, i + 1);
+                        } else if (line.startsWith('triangular')) {
+                            this.parseTriangular(line, i + 1);
+                        } else if (line) {
+                            throw new Error(`Неизвестная команда: ${line.split('{')[0]}`);
+                        }
+                    } catch (error) {
+                        this.errors.push({
+                            line: i + 1,
+                            message: error.message,
+                            code: line
+                        });
                     }
                 }
-            } catch (error) {
-                showError(error.message);
             }
-        }
 
-        function drawRect(command) {
-            const match = command.match(/rect\((\d+),\s*(\d+),\s*(\d+),\s*(\d+),\s*"([^"]+)"\)/);
-            if (match) {
-                const x = parseInt(match[1]);
-                const y = parseInt(match[2]);
-                const width = parseInt(match[3]);
-                const height = parseInt(match[4]);
-                const color = match[5];
-                
-                ctx.fillStyle = color;
-                ctx.fillRect(x, y, width, height);
+            parseRectangle(line, lineNumber) {
+                const match = line.match(/rectangle\s*\{([^}]+)\}/);
+                if (!match) {
+                    throw new Error('Неправильный формат команды rectangle');
+                }
+
+                const params = match[1];
+                const config = { type: 'rectangle' };
+
+                // Парсинг параметров
+                this.parseParams(params, config, lineNumber);
+
+                // Валидация обязательных параметров
+                this.validateRequiredParams(config, ['id', 'place', 'side', 'color'], lineNumber);
+
+                this.shapes.set(config.id, config);
             }
-        }
 
-        function drawCircle(command) {
-            const match = command.match(/circle\((\d+),\s*(\d+),\s*(\d+),\s*"([^"]+)"\)/);
-            if (match) {
-                const x = parseInt(match[1]);
-                const y = parseInt(match[2]);
-                const radius = parseInt(match[3]);
-                const color = match[4];
-                
-                ctx.fillStyle = color;
-                ctx.beginPath();
-                ctx.arc(x, y, radius, 0, 2 * Math.PI);
-                ctx.fill();
+            parseTriangular(line, lineNumber) {
+                const match = line.match(/triangular\s*\{([^}]+)\}/);
+                if (!match) {
+                    throw new Error('Неправильный формат команды triangular');
+                }
+
+                const params = match[1];
+                const config = { type: 'triangular' };
+
+                // Парсинг параметров
+                this.parseParams(params, config, lineNumber);
+
+                // Валидация обязательных параметров
+                this.validateRequiredParams(config, ['id', 'place', 'side', 'color'], lineNumber);
+
+                this.shapes.set(config.id, config);
             }
-        }
 
-        function animateCircle(command) {
-            const match = command.match(/growCircle\((\d+),\s*(\d+),\s*(\d+),\s*"([^"]+)",\s*(\d+)\)/);
-            if (match) {
-                const x = parseInt(match[1]);
-                const y = parseInt(match[2]);
-                const finalRadius = parseInt(match[3]);
-                const color = match[4];
-                const duration = parseInt(match[5]);
+            parseParams(paramsString, config, lineNumber) {
+                const params = paramsString.split(',').map(p => p.trim());
                 
-                let startTime = Date.now();
-                
-                function animate() {
-                    const currentTime = Date.now();
-                    const elapsed = currentTime - startTime;
-                    const progress = Math.min(elapsed / duration, 1);
+                for (const param of params) {
+                    const [key, value] = param.split('=').map(p => p.trim());
                     
-                    // Очищаем и рисуем
-                    ctx.clearRect(0, 0, canvas.width, canvas.height);
-                    ctx.fillStyle = '#1e1e1e';
-                    ctx.fillRect(0, 0, canvas.width, canvas.height);
-                    
-                    // Текущий радиус
-                    const currentRadius = progress * finalRadius;
-                    
-                    // Рисуем круг
-                    ctx.fillStyle = color;
-                    ctx.beginPath();
-                    ctx.arc(x, y, currentRadius, 0, 2 * Math.PI);
-                    ctx.fill();
-                    
-                    if (progress < 1) {
-                        animationId = requestAnimationFrame(animate);
+                    if (!key || value === undefined) {
+                        throw new Error(`Неправильный формат параметра: ${param}`);
+                    }
+
+                    switch (key) {
+                        case 'id':
+                            config.id = this.parseNumber(value, 'id', lineNumber);
+                            break;
+                        case 'place':
+                            config.place = this.parsePlace(value, lineNumber);
+                            break;
+                        case 'side':
+                            config.side = this.parseNumber(value, 'side', lineNumber);
+                            break;
+                        case 'color':
+                            config.color = this.parseColor(value, lineNumber);
+                            break;
+                        case 'borderline':
+                            config.borderline = this.parseBorderline(value, lineNumber);
+                            break;
+                        default:
+                            throw new Error(`Неизвестный параметр: ${key}`);
                     }
                 }
-                
-                // Останавливаем предыдущую анимацию
-                if (animationId) {
-                    cancelAnimationFrame(animationId);
+            }
+
+            parseNumber(value, paramName, lineNumber) {
+                const num = parseInt(value);
+                if (isNaN(num) || num < 0) {
+                    throw new Error(`Параметр ${paramName} должен быть положительным числом`);
                 }
-                animate();
+                return num;
+            }
+
+            parsePlace(value, lineNumber) {
+                const coords = value.split(',').map(coord => this.parseNumber(coord.trim(), 'coordinate', lineNumber));
+                if (coords.length !== 2) {
+                    throw new Error('Параметр place должен содержать 2 координаты через запятую');
+                }
+                return coords;
+            }
+
+            parseColor(value, lineNumber) {
+                if (value.length !== 9 || !/^\d+$/.test(value)) {
+                    throw new Error('Цвет должен быть 9-значным числом (RGB)');
+                }
+                
+                const r = parseInt(value.substring(0, 3));
+                const g = parseInt(value.substring(3, 6));
+                const b = parseInt(value.substring(6, 9));
+                
+                if (r > 255 || g > 255 || b > 255) {
+                    throw new Error('Значения RGB не могут превышать 255');
+                }
+                
+                return `rgb(${r}, ${g}, ${b})`;
+            }
+
+            parseBorderline(value, lineNumber) {
+                const parts = value.split(',').map(p => p.trim());
+                if (parts.length !== 2) {
+                    throw new Error('Borderline должен содержать толщину и цвет через запятую');
+                }
+                
+                const width = this.parseNumber(parts[0], 'border width', lineNumber);
+                const color = this.parseColor(parts[1], lineNumber);
+                
+                return { width, color };
+            }
+
+            validateRequiredParams(config, required, lineNumber) {
+                for (const param of required) {
+                    if (config[param] === undefined) {
+                        throw new Error(`Отсутствует обязательный параметр: ${param}`);
+                    }
+                }
+            }
+
+            render() {
+                // Очищаем canvas
+                this.ctx.fillStyle = '#0d1117';
+                this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+                
+                // Рендерим все фигуры
+                for (const [id, shape] of this.shapes) {
+                    try {
+                        if (shape.type === 'rectangle') {
+                            this.renderRectangle(shape);
+                        } else if (shape.type === 'triangular') {
+                            this.renderTriangular(shape);
+                        }
+                    } catch (error) {
+                        this.errors.push({
+                            line: 0,
+                            message: `Ошибка отрисовки фигуры ${id}: ${error.message}`,
+                            code: ''
+                        });
+                    }
+                }
+            }
+
+            renderRectangle(shape) {
+                const [x, y] = shape.place;
+                const size = shape.side;
+                
+                // Рисуем заливку
+                this.ctx.fillStyle = shape.color;
+                this.ctx.fillRect(x - size/2, y - size/2, size, size);
+                
+                // Рисуем обводку если есть
+                if (shape.borderline) {
+                    this.ctx.strokeStyle = shape.borderline.color;
+                    this.ctx.lineWidth = shape.borderline.width;
+                    this.ctx.strokeRect(x - size/2, y - size/2, size, size);
+                }
+            }
+
+            renderTriangular(shape) {
+                const [x, y] = shape.place;
+                const size = shape.side;
+                const height = (Math.sqrt(3) / 2) * size;
+                
+                // Вершины равностороннего треугольника
+                const points = [
+                    [x, y - height/2],           // Верхняя вершина
+                    [x - size/2, y + height/2],  // Левая нижняя
+                    [x + size/2, y + height/2]   // Правая нижняя
+                ];
+                
+                // Рисуем заливку
+                this.ctx.fillStyle = shape.color;
+                this.ctx.beginPath();
+                this.ctx.moveTo(points[0][0], points[0][1]);
+                this.ctx.lineTo(points[1][0], points[1][1]);
+                this.ctx.lineTo(points[2][0], points[2][1]);
+                this.ctx.closePath();
+                this.ctx.fill();
+                
+                // Рисуем обводку если есть
+                if (shape.borderline) {
+                    this.ctx.strokeStyle = shape.borderline.color;
+                    this.ctx.lineWidth = shape.borderline.width;
+                    this.ctx.stroke();
+                }
+            }
+
+            hasErrors() {
+                return this.errors.length > 0;
+            }
+
+            getErrors() {
+                return this.errors;
             }
         }
 
-        function clearCanvas() {
-            if (animationId) {
-                cancelAnimationFrame(animationId);
-                animationId = null;
-            }
-            ctx.fillStyle = '#1e1e1e';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
+        // Глобальные переменные
+        let engine = null;
+
+        // Инициализация
+        function init() {
+            const canvas = document.getElementById('renderCanvas');
+            engine = new GeometryEngine(canvas);
+            updateLineNumbers();
         }
 
-        function showError(message) {
-            const errorDiv = document.getElementById('error');
-            errorDiv.textContent = 'Ошибка: ' + message;
-            errorDiv.style.display = 'block';
-        }
-
-        function loadExample(type) {
-            const examples = {
-                square: `// Простой красный квадрат
-rect(350, 250, 100, 100, "#ff0000")`,
-                
-                circle: `// Синий круг
-circle(400, 300, 80, "#0000ff")`,
-                
-                grow: `// Круг, растущий из точки за 3 секунды
-growCircle(400, 300, 100, "#ff6b6b", 3000)`
-            };
+        // Запуск кода
+        function runCode() {
+            const code = document.getElementById('codeEditor').value;
+            const errorPanel = document.getElementById('errorPanel');
+            const errorContent = document.getElementById('errorContent');
             
-            document.getElementById('editor').value = examples[type];
-            runCode();
+            engine.parse(code);
+            
+            if (engine.hasErrors()) {
+                // Показываем ошибки
+                errorContent.innerHTML = '';
+                engine.getErrors().forEach(error => {
+                    const errorHTML = `
+                        <div class="error-line">
+                            Строка ${error.line}: ${error.code || ''}
+                        </div>
+                        <div class="error-message">${error.message}</div>
+                    `;
+                    errorContent.innerHTML += errorHTML;
+                });
+                errorPanel.style.display = 'block';
+            } else {
+                // Скрываем ошибки и показываем результат
+                errorPanel.style.display = 'none';
+                engine.render();
+                showResult();
+            }
         }
 
-        // Запускаем начальный пример
-        setTimeout(() => {
-            document.getElementById('editor').value = `// Простой красный квадрат
-rect(350, 250, 100, 100, "#ff0000")`;
-            runCode();
-        }, 100);
+        // Показать результат
+        function showResult() {
+            document.getElementById('resultContainer').style.display = 'flex';
+        }
+
+        // Закрыть результат
+        function closeResult() {
+            document.getElementById('resultContainer').style.display = 'none';
+        }
+
+        // Обновить нумерацию строк
+        function updateLineNumbers() {
+            const textarea = document.getElementById('codeEditor');
+            const lineNumbers = document.getElementById('lineNumbers');
+            const lines = textarea.value.split('\n').length;
+            
+            let numbersHTML = '';
+            for (let i = 1; i <= lines; i++) {
+                numbersHTML += i + '<br>';
+            }
+            lineNumbers.innerHTML = numbersHTML;
+        }
+
+        // Инициализация при загрузке
+        window.onload = init;
     </script>
 </body>
 </html>
