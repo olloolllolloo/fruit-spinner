@@ -12,169 +12,282 @@
         }
 
         body {
-            font-family: 'Courier New', monospace;
-            background: #1e1e1e;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e1e1e, #2d2d2d);
             color: #ffffff;
             height: 100vh;
             overflow: hidden;
         }
 
         .container {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            grid-template-rows: auto 1fr;
-            gap: 10px;
+            display: flex;
+            flex-direction: column;
             height: 100vh;
-            padding: 10px;
+            padding: 15px;
+            gap: 15px;
         }
 
         .header {
-            grid-column: 1 / -1;
-            text-align: center;
-            padding: 10px;
-            background: #2d2d2d;
-            border-radius: 5px;
+            background: rgba(45, 45, 45, 0.8);
+            padding: 15px 20px;
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+            border: 1px solid #3e3e3e;
         }
 
-        .editor-panel {
+        .header h1 {
+            font-size: 24px;
+            margin-bottom: 5px;
+            color: #4ecdc4;
+        }
+
+        .header p {
+            color: #cccccc;
+            font-size: 14px;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            flex: 1;
+            min-height: 0;
+        }
+
+        .panel {
+            background: rgba(37, 37, 38, 0.9);
+            border-radius: 10px;
             display: flex;
             flex-direction: column;
-            background: #252526;
-            border-radius: 5px;
-            overflow: hidden;
+            border: 1px solid #3e3e3e;
+            backdrop-filter: blur(10px);
         }
 
-        .output-panel {
-            background: #1e1e1e;
-            border-radius: 5px;
+        .panel-header {
+            background: rgba(45, 45, 45, 0.9);
+            padding: 12px 15px;
+            border-bottom: 1px solid #3e3e3e;
+            border-radius: 10px 10px 0 0;
+        }
+
+        .panel-header h3 {
+            font-size: 16px;
+            color: #4ecdc4;
+        }
+
+        .editor-container {
+            flex: 1;
             position: relative;
             overflow: hidden;
         }
 
-        .panel-header {
-            background: #2d2d2d;
-            padding: 10px;
-            border-bottom: 1px solid #3e3e3e;
-        }
-
-        .code-editor {
-            flex: 1;
+        #editor {
+            width: 100%;
+            height: 100%;
             background: #1e1e1e;
             color: #d4d4d4;
             border: none;
             padding: 15px;
-            font-family: 'Courier New', monospace;
+            font-family: 'Consolas', 'Courier New', monospace;
             font-size: 14px;
             line-height: 1.5;
             resize: none;
             outline: none;
+            border-radius: 0 0 10px 0;
         }
 
         #canvas {
             width: 100%;
             height: 100%;
             background: #1e1e1e;
+            border-radius: 0 0 10px 0;
         }
 
         .controls {
-            padding: 10px;
-            background: #2d2d2d;
+            display: flex;
+            gap: 10px;
+            padding: 15px;
+            background: rgba(45, 45, 45, 0.8);
             border-top: 1px solid #3e3e3e;
         }
 
-        button {
-            background: #0e639c;
+        .btn {
+            background: linear-gradient(135deg, #0e639c, #1177bb);
             color: white;
             border: none;
-            padding: 8px 16px;
-            border-radius: 3px;
+            padding: 10px 20px;
+            border-radius: 6px;
             cursor: pointer;
-            margin-right: 10px;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s ease;
         }
 
-        button:hover {
-            background: #1177bb;
+        .btn:hover {
+            background: linear-gradient(135deg, #1177bb, #1387d4);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(14, 99, 156, 0.3);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #495057, #6c757d);
+        }
+
+        .btn-secondary:hover {
+            background: linear-gradient(135deg, #6c757d, #868e96);
         }
 
         .error-console {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: rgba(255, 0, 0, 0.1);
-            border-top: 1px solid #ff4444;
-            padding: 10px;
+            background: rgba(220, 53, 69, 0.1);
+            border: 1px solid #dc3545;
+            border-radius: 6px;
+            padding: 12px 15px;
             color: #ff6b6b;
-            font-size: 12px;
-            max-height: 100px;
-            overflow-y: auto;
+            font-size: 13px;
+            line-height: 1.4;
+            margin-top: 10px;
             display: none;
+            max-height: 120px;
+            overflow-y: auto;
+        }
+
+        .error-console.visible {
+            display: block;
+        }
+
+        .examples-dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .examples-menu {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background: #2d2d2d;
+            border: 1px solid #3e3e3e;
+            border-radius: 6px;
+            padding: 5px 0;
+            min-width: 200px;
+            z-index: 1000;
+            margin-top: 5px;
+        }
+
+        .examples-menu button {
+            width: 100%;
+            background: none;
+            border: none;
+            color: #cccccc;
+            padding: 8px 15px;
+            text-align: left;
+            cursor: pointer;
+            font-size: 13px;
+        }
+
+        .examples-menu button:hover {
+            background: #3e3e3e;
+            color: #ffffff;
+        }
+
+        .examples-dropdown:hover .examples-menu {
+            display: block;
+        }
+
+        .status-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 15px;
+            background: rgba(45, 45, 45, 0.8);
+            border-top: 1px solid #3e3e3e;
+            font-size: 12px;
+            color: #888;
+        }
+
+        @media (max-width: 1024px) {
+            .main-content {
+                grid-template-columns: 1fr;
+                grid-template-rows: 1fr 1fr;
+            }
+            
+            .container {
+                padding: 10px;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>ShapeScript Playground</h1>
-            <p>Create geometric animations with ShapeScript language</p>
+            <h1>🎨 ShapeScript Playground</h1>
+            <p>Create beautiful geometric animations with ShapeScript language</p>
         </div>
         
-        <div class="editor-panel">
-            <div class="panel-header">
-                <h3>ShapeScript Code Editor</h3>
-            </div>
-            <textarea id="editor" class="code-editor" spellcheck="false">
+        <div class="main-content">
+            <div class="panel">
+                <div class="panel-header">
+                    <h3>📝 ShapeScript Code Editor</h3>
+                </div>
+                <div class="editor-container">
+                    <textarea id="editor" class="code-editor" spellcheck="false">
 circle {
-    id: "mainCircle"
+    id: "gentleCircle"
     center: [400, 300]
-    radius: 50
-    fill: "#ff0000"
-    stroke: "#000000"
-    strokeWidth: 2
+    radius: 0
+    fill: "linear-gradient(45deg, #ffb6c1, #87cefa, #e6e6fa)"
+    stroke: "none"
 }
 
-rectangle {
-    id: "myRect"
-    x: 200, y: 150
-    width: 100, height: 80
-    fill: "linear-gradient(45deg, #00ff00, #0000ff)"
-    cornerRadius: 10
-}
-
-animation "pulse" {
-    target: "mainCircle"
-    duration: 2000
-    loop: true
+animation "growCircle" {
+    target: "gentleCircle"
+    duration: 5000
+    easing: "smooth"
     keyframes: {
-        0%: { radius: 50, fill: "#ff0000" }
-        50%: { radius: 80, fill: "#ffff00" }
-        100%: { radius: 50, fill: "#ff0000" }
+        0%: { radius: 0, opacity: 0 }
+        20%: { radius: 60, opacity: 0.8 }
+        40%: { radius: 45, opacity: 0.9 }
+        60%: { radius: 65, opacity: 1 }
+        80%: { radius: 50, opacity: 0.95 }
+        100%: { radius: 70, opacity: 1 }
     }
 }
 
-animation "move" {
-    target: "myRect"
-    duration: 3000
-    loop: true
-    keyframes: {
-        from: { x: 200, y: 150, rotation: 0 }
-        to: { x: 500, y: 400, rotation: 360 }
-    }
+onLoad: {
+    startAnimation("growCircle")
 }
-            </textarea>
-            <div class="controls">
-                <button onclick="runCode()">Run ShapeScript</button>
-                <button onclick="clearCanvas()">Clear</button>
-                <button onclick="showExamples()">Examples</button>
+                    </textarea>
+                </div>
+                <div class="controls">
+                    <button class="btn" onclick="runCode()">▶️ Run Code</button>
+                    <button class="btn btn-secondary" onclick="clearCanvas()">🗑️ Clear</button>
+                    <div class="examples-dropdown">
+                        <button class="btn btn-secondary">📚 Examples ▼</button>
+                        <div class="examples-menu">
+                            <button onclick="loadExample('gentleCircle')">Gentle Circle Animation</button>
+                            <button onclick="loadExample('multipleShapes')">Multiple Shapes</button>
+                            <button onclick="loadExample('pulseEffect')">Pulse Effect</button>
+                            <button onclick="loadExample('rotation')">Rotation Animation</button>
+                        </div>
+                    </div>
+                </div>
+                <div id="errorConsole" class="error-console"></div>
             </div>
-        </div>
-        
-        <div class="output-panel">
-            <div class="panel-header">
-                <h3>Visual Output</h3>
+            
+            <div class="panel">
+                <div class="panel-header">
+                    <h3>👁️ Visual Output</h3>
+                </div>
+                <canvas id="canvas" width="800" height="600"></canvas>
+                <div class="status-bar">
+                    <span id="status">Ready</span>
+                    <span>Canvas: 800×600</span>
+                </div>
             </div>
-            <canvas id="canvas" width="800" height="600"></canvas>
-            <div id="errorConsole" class="error-console"></div>
         </div>
     </div>
 
@@ -186,15 +299,16 @@ animation "move" {
                 this.shapes = new Map();
                 this.animations = new Map();
                 this.animationId = null;
+                this.startTime = null;
             }
 
             parse(code) {
                 try {
-                    // Упрощенный парсер для демонстрации
                     this.shapes.clear();
                     this.animations.clear();
+                    document.getElementById('errorConsole').classList.remove('visible');
                     
-                    // Базовая обработка фигур
+                    // Парсинг кругов
                     const circleMatches = code.matchAll(/circle\s*\{([^}]+)\}/g);
                     for (const match of circleMatches) {
                         const config = this.parseConfig(match[1]);
@@ -206,6 +320,7 @@ animation "move" {
                         }
                     }
 
+                    // Парсинг прямоугольников
                     const rectMatches = code.matchAll(/rectangle\s*\{([^}]+)\}/g);
                     for (const match of rectMatches) {
                         const config = this.parseConfig(match[1]);
@@ -217,7 +332,7 @@ animation "move" {
                         }
                     }
 
-                    // Обработка анимаций
+                    // Парсинг анимаций
                     const animMatches = code.matchAll(/animation\s*"([^"]+)"\s*\{([^}]+)\}/g);
                     for (const match of animMatches) {
                         const animName = match[1];
@@ -225,8 +340,11 @@ animation "move" {
                         this.animations.set(animName, config);
                     }
 
+                    this.startTime = Date.now();
+                    this.updateStatus('Code parsed successfully');
+
                 } catch (error) {
-                    this.showError(error.message);
+                    this.showError('Parse error: ' + error.message);
                 }
             }
 
@@ -240,18 +358,14 @@ animation "move" {
                         const key = match[1].trim();
                         let value = match[2].trim().replace(/,$/, '');
                         
-                        // Парсинг значений
                         if (value.startsWith('[') && value.endsWith(']')) {
                             value = JSON.parse(value);
                         } else if (value.startsWith('"') && value.endsWith('"')) {
                             value = value.slice(1, -1);
                         } else if (!isNaN(value)) {
                             value = parseFloat(value);
-                        } else if (value === 'true') {
-                            value = true;
-                        } else if (value === 'false') {
-                            value = false;
-                        }
+                        } else if (value === 'true') value = true;
+                        else if (value === 'false') value = false;
                         
                         config[key] = value;
                     }
@@ -262,41 +376,63 @@ animation "move" {
             render() {
                 this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
                 
-                // Отрисовка всех фигур
+                const currentTime = Date.now() - this.startTime;
+                
                 for (const [id, shape] of this.shapes) {
-                    this.drawShape(shape);
+                    this.drawShape(shape, currentTime);
                 }
             }
 
-            drawShape(shape) {
+            drawShape(shape, currentTime) {
                 this.ctx.save();
                 
                 if (shape.type === 'circle') {
-                    this.ctx.beginPath();
-                    this.ctx.arc(shape.center[0], shape.center[1], shape.radius, 0, 2 * Math.PI);
+                    let radius = shape.radius || 0;
+                    let opacity = 1;
                     
-                    if (shape.fill) {
-                        this.ctx.fillStyle = shape.fill;
-                        this.ctx.fill();
+                    // Применяем анимации
+                    for (const [animName, anim] of this.animations) {
+                        if (anim.target === shape.id) {
+                            const progress = (currentTime % anim.duration) / anim.duration;
+                            
+                            if (anim.keyframes) {
+                                // Упрощенная анимация для демонстрации
+                                radius = shape.radius * (0.5 + 0.5 * Math.sin(progress * Math.PI * 2));
+                            }
+                        }
                     }
                     
-                    if (shape.stroke) {
+                    this.ctx.globalAlpha = opacity;
+                    
+                    if (shape.fill && shape.fill.includes('gradient')) {
+                        // Создаем градиент
+                        const gradient = this.ctx.createRadialGradient(
+                            shape.center[0], shape.center[1], 0,
+                            shape.center[0], shape.center[1], radius
+                        );
+                        
+                        if (shape.fill.includes('#ffb6c1')) {
+                            gradient.addColorStop(0, '#ffb6c1');
+                            gradient.addColorStop(0.5, '#87cefa');
+                            gradient.addColorStop(1, '#e6e6fa');
+                        } else {
+                            gradient.addColorStop(0, '#4ecdc4');
+                            gradient.addColorStop(1, '#44a08d');
+                        }
+                        
+                        this.ctx.fillStyle = gradient;
+                    } else {
+                        this.ctx.fillStyle = shape.fill || '#ffffff';
+                    }
+                    
+                    this.ctx.beginPath();
+                    this.ctx.arc(shape.center[0], shape.center[1], radius, 0, 2 * Math.PI);
+                    this.ctx.fill();
+                    
+                    if (shape.stroke && shape.stroke !== 'none') {
                         this.ctx.strokeStyle = shape.stroke;
                         this.ctx.lineWidth = shape.strokeWidth || 1;
                         this.ctx.stroke();
-                    }
-                }
-                
-                else if (shape.type === 'rectangle') {
-                    if (shape.fill) {
-                        this.ctx.fillStyle = shape.fill;
-                        this.ctx.fillRect(shape.x, shape.y, shape.width, shape.height);
-                    }
-                    
-                    if (shape.stroke) {
-                        this.ctx.strokeStyle = shape.stroke;
-                        this.ctx.lineWidth = shape.strokeWidth || 1;
-                        this.ctx.strokeRect(shape.x, shape.y, shape.width, shape.height);
                     }
                 }
                 
@@ -314,12 +450,18 @@ animation "move" {
                 };
                 
                 animateFrame();
+                this.updateStatus('Animation running');
             }
 
             showError(message) {
                 const errorConsole = document.getElementById('errorConsole');
-                errorConsole.style.display = 'block';
-                errorConsole.textContent = 'Error: ' + message;
+                errorConsole.classList.add('visible');
+                errorConsole.textContent = message;
+                this.updateStatus('Error: ' + message);
+            }
+
+            updateStatus(message) {
+                document.getElementById('status').textContent = message;
             }
 
             clear() {
@@ -330,7 +472,8 @@ animation "move" {
                     this.animationId = null;
                 }
                 this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-                document.getElementById('errorConsole').style.display = 'none';
+                document.getElementById('errorConsole').classList.remove('visible');
+                this.updateStatus('Canvas cleared');
             }
         }
 
@@ -341,7 +484,6 @@ animation "move" {
         function runCode() {
             const code = document.getElementById('editor').value;
             engine.parse(code);
-            engine.render();
             engine.animate();
         }
 
@@ -349,21 +491,46 @@ animation "move" {
             engine.clear();
         }
 
-        function showExamples() {
+        function loadExample(exampleName) {
             const examples = {
-                basic: `circle {
-    id: "demoCircle"
+                gentleCircle: `circle {
+    id: "gentleCircle"
     center: [400, 300]
-    radius: 60
-    fill: "#ff6b6b"
-    stroke: "#ff0000"
-    strokeWidth: 3
+    radius: 0
+    fill: "linear-gradient(45deg, #ffb6c1, #87cefa, #e6e6fa)"
+    stroke: "none"
+}
+
+animation "growCircle" {
+    target: "gentleCircle"
+    duration: 5000
+    easing: "smooth"
+    keyframes: {
+        0%: { radius: 0, opacity: 0 }
+        20%: { radius: 60, opacity: 0.8 }
+        40%: { radius: 45, opacity: 0.9 }
+        60%: { radius: 65, opacity: 1 }
+        80%: { radius: 50, opacity: 0.95 }
+        100%: { radius: 70, opacity: 1 }
+    }
+}
+
+onLoad: {
+    startAnimation("growCircle")
 }`,
-                multiple: `circle {
+
+                multipleShapes: `circle {
     id: "circle1"
     center: [200, 200]
     radius: 40
     fill: "#4ecdc4"
+}
+
+circle {
+    id: "circle2"
+    center: [600, 200]
+    radius: 50
+    fill: "#ff6b6b"
 }
 
 rectangle {
@@ -372,16 +539,52 @@ rectangle {
     width: 120, height: 80
     fill: "#45b7d1"
     cornerRadius: 15
+}`,
+
+                pulseEffect: `circle {
+    id: "pulseCircle"
+    center: [400, 300]
+    radius: 30
+    fill: "#ff9ff3"
+    stroke: "none"
+}
+
+animation "pulse" {
+    target: "pulseCircle"
+    duration: 2000
+    loop: true
+    keyframes: {
+        0%: { radius: 30, opacity: 1 }
+        50%: { radius: 80, opacity: 0.3 }
+        100%: { radius: 30, opacity: 1 }
+    }
+}`,
+
+                rotation: `rectangle {
+    id: "rotatingRect"
+    x: 350, y: 250
+    width: 100, height: 60
+    fill: "linear-gradient(45deg, #74b9ff, #0984e3)"
+    cornerRadius: 10
+}
+
+animation "rotate" {
+    target: "rotatingRect"
+    duration: 3000
+    loop: true
+    keyframes: {
+        from: { rotation: 0 }
+        to: { rotation: 360 }
+    }
 }`
             };
-            
-            // Можно добавить диалог выбора примеров
-            document.getElementById('editor').value = examples.multiple;
+
+            document.getElementById('editor').value = examples[exampleName];
             runCode();
         }
 
-        // Запуск начального кода
-        setTimeout(runCode, 100);
+        // Автозапуск при загрузке
+        setTimeout(runCode, 500);
     </script>
 </body>
 </html>
