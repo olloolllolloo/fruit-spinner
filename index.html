@@ -3,1059 +3,612 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Once Upon a Tower</title>
+    <title>Gacha Simulator</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
-        
+
         body {
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-            color: #fff;
-            overflow: hidden;
-            user-select: none;
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
         }
-        
-        #game-container {
-            width: 100vw;
-            height: 100vh;
+
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            max-width: 500px;
+            width: 100%;
+            text-align: center;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+        }
+
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 1.1em;
+        }
+
+        .gacha-machine {
+            background: linear-gradient(145deg, #ff6b6b, #ffa726);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 20px;
             position: relative;
             overflow: hidden;
         }
-        
-        #game-canvas {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 1;
-        }
-        
-        .screen {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+
+        .fruit-display {
+            height: 120px;
             display: flex;
-            flex-direction: column;
             justify-content: center;
             align-items: center;
-            background: rgba(0, 0, 0, 0.8);
-            z-index: 10;
-            transition: opacity 0.5s ease;
+            font-size: 3em;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 10px;
+            margin-bottom: 20px;
+            position: relative;
+            overflow: hidden;
         }
-        
-        .hidden {
-            display: none !important;
+
+        .fruit {
+            font-size: 2.5em;
+            transition: all 0.5s ease;
+            position: absolute;
+            opacity: 0;
         }
-        
-        h1 {
-            font-size: 4rem;
-            margin-bottom: 2rem;
-            text-align: center;
-            color: #ffcc00;
-            text-shadow: 0 0 10px rgba(255, 204, 0, 0.7);
+
+        .fruit.active {
+            opacity: 1;
+            transform: scale(1.1);
         }
-        
-        h2 {
-            font-size: 2.5rem;
-            margin-bottom: 1.5rem;
-            color: #ffcc00;
-        }
-        
-        .btn {
-            background: linear-gradient(to bottom, #ffcc00, #ff9900);
-            color: #1a1a2e;
+
+        .spin-btn {
+            background: linear-gradient(145deg, #4ecdc4, #44a08d);
+            color: white;
             border: none;
             padding: 15px 30px;
-            margin: 10px;
-            font-size: 1.2rem;
-            font-weight: bold;
+            font-size: 1.2em;
             border-radius: 50px;
             cursor: pointer;
             transition: all 0.3s ease;
-            box-shadow: 0 5px 15px rgba(255, 204, 0, 0.4);
+            margin-bottom: 10px;
+            width: 100%;
         }
-        
-        .btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 20px rgba(255, 204, 0, 0.6);
+
+        .spin-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
         }
-        
-        .btn:active {
-            transform: translateY(1px);
+
+        .spin-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
         }
-        
-        .btn-secondary {
-            background: linear-gradient(to bottom, #4a4a8a, #2d2d5a);
-            color: #fff;
+
+        .cooldown {
+            color: #ff6b6b;
+            font-size: 0.9em;
+            margin-bottom: 20px;
         }
-        
-        #shop-screen, #upgrades-screen, #skins-screen {
-            padding: 20px;
+
+        .stats-btn {
+            background: linear-gradient(145deg, #a8e6cf, #88d8b0);
+            color: #333;
+            border: none;
+            padding: 12px 25px;
+            font-size: 1em;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 5px;
+        }
+
+        .stats-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .inventory {
+            margin-top: 20px;
+            text-align: left;
+        }
+
+        .inventory h3 {
+            color: #333;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .inventory-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 10px;
+            max-height: 300px;
             overflow-y: auto;
         }
-        
-        .shop-items, .upgrades-list, .skins-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-            gap: 20px;
-            width: 90%;
-            max-width: 1200px;
-            margin-top: 20px;
-        }
-        
-        .shop-item, .upgrade-item, .skin-item {
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 15px;
-            padding: 20px;
+
+        .inventory-item {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 10px;
             text-align: center;
-            transition: all 0.3s ease;
-            border: 2px solid transparent;
+            border: 2px solid #e9ecef;
         }
-        
-        .shop-item:hover, .upgrade-item:hover, .skin-item:hover {
-            transform: translateY(-5px);
-            border-color: #ffcc00;
+
+        .fruit-name {
+            font-size: 1.1em;
+            margin-bottom: 5px;
         }
-        
-        .shop-item img, .upgrade-item img, .skin-item img {
-            width: 80px;
-            height: 80px;
-            margin-bottom: 15px;
-            border-radius: 10px;
+
+        .fruit-count {
+            color: #666;
+            font-size: 0.9em;
         }
-        
-        .item-title {
-            font-size: 1.3rem;
-            margin-bottom: 10px;
-            color: #ffcc00;
-        }
-        
-        .item-description {
-            font-size: 0.9rem;
-            margin-bottom: 15px;
-            color: #ccc;
-        }
-        
-        .item-price {
-            font-size: 1.2rem;
-            font-weight: bold;
-            color: #ffcc00;
-            margin-bottom: 15px;
-        }
-        
-        .owned {
-            background: rgba(0, 255, 0, 0.2);
-        }
-        
-        .equipped {
-            border-color: #00ff00;
-        }
-        
-        #hud {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            z-index: 5;
-            background: rgba(0, 0, 0, 0.6);
-            padding: 15px;
-            border-radius: 10px;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-        
-        .hud-item {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .hud-icon {
-            width: 30px;
-            height: 30px;
-            background: #ffcc00;
-            border-radius: 50%;
-            display: flex;
+
+        .fruit-common { color: #6c757d; }
+        .fruit-rare { color: #007bff; }
+        .fruit-epic { color: #6f42c1; }
+        .fruit-legendary { color: #dc3545; }
+        .fruit-mythical { color: #fd7e14; }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
             justify-content: center;
             align-items: center;
-            font-weight: bold;
-            color: #1a1a2e;
+            z-index: 1000;
         }
-        
-        .hud-value {
-            font-size: 1.2rem;
-            font-weight: bold;
-        }
-        
-        #game-over-screen {
-            text-align: center;
-        }
-        
-        #final-stats {
-            background: rgba(255, 255, 255, 0.1);
-            padding: 20px;
+
+        .modal-content {
+            background: white;
+            padding: 30px;
             border-radius: 15px;
-            margin: 20px 0;
             max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
         }
-        
-        .stat-row {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 10px;
-            font-size: 1.1rem;
+
+        .close-btn {
+            float: right;
+            font-size: 1.5em;
+            cursor: pointer;
+            color: #666;
         }
-        
-        .stat-value {
-            color: #ffcc00;
-            font-weight: bold;
+
+        .stats-item {
+            margin: 10px 0;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 8px;
         }
-        
-        #tower {
-            position: absolute;
-            bottom: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 200px;
-            height: 500px;
-            background: linear-gradient(to right, #8b4513, #a0522d);
-            z-index: 2;
-            border: 5px solid #5d2906;
-            border-bottom: none;
-            border-radius: 20px 20px 0 0;
+
+        .loading {
+            display: none;
+            text-align: center;
+            margin: 20px 0;
         }
-        
-        #player {
-            position: absolute;
-            width: 50px;
-            height: 50px;
-            background: #ff0000;
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3498db;
             border-radius: 50%;
-            z-index: 3;
-            transition: all 0.1s ease;
-        }
-        
-        .enemy {
-            position: absolute;
             width: 40px;
             height: 40px;
-            background: #00ff00;
-            border-radius: 5px;
-            z-index: 3;
-        }
-        
-        .projectile {
-            position: absolute;
-            width: 10px;
-            height: 10px;
-            background: #ffff00;
-            border-radius: 50%;
-            z-index: 3;
-        }
-        
-        .coin {
-            position: absolute;
-            width: 20px;
-            height: 20px;
-            background: #ffcc00;
-            border-radius: 50%;
-            z-index: 3;
             animation: spin 2s linear infinite;
+            margin: 0 auto;
         }
-        
+
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
-        
-        #controls {
-            position: absolute;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            display: flex;
-            gap: 20px;
-            z-index: 5;
+
+        @keyframes roll {
+            0% { transform: translateY(100px) rotate(0deg); opacity: 0; }
+            50% { opacity: 1; }
+            100% { transform: translateY(0) rotate(360deg); opacity: 1; }
         }
-        
-        .control-btn {
-            width: 80px;
-            height: 80px;
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 2rem;
-            color: white;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-        
-        .control-btn:active {
-            background: rgba(255, 255, 255, 0.4);
-            transform: scale(0.9);
-        }
-        
-        #pause-btn {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            z-index: 5;
-            background: rgba(0, 0, 0, 0.6);
-            color: white;
-            border: none;
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            font-size: 1.5rem;
-            cursor: pointer;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-        
-        .notification {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: rgba(0, 0, 0, 0.8);
-            color: white;
-            padding: 15px 30px;
-            border-radius: 10px;
-            font-size: 1.5rem;
-            z-index: 20;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-        
-        .show {
-            opacity: 1;
+
+        .rolling .fruit {
+            animation: roll 0.5s ease-out;
         }
     </style>
 </head>
 <body>
-    <div id="game-container">
-        <canvas id="game-canvas"></canvas>
+    <div class="container">
+        <h1>🎰 Gacha Simulator</h1>
+        <div class="subtitle">Испытай удачу и собери все фрукты!</div>
         
-        <div id="hud">
-            <div class="hud-item">
-                <div class="hud-icon">❤</div>
-                <div class="hud-value" id="health">100</div>
+        <div class="gacha-machine">
+            <div class="fruit-display" id="fruitDisplay">
+                <div class="fruit" id="fruit1">?</div>
+                <div class="fruit" id="fruit2">?</div>
+                <div class="fruit" id="fruit3">?</div>
             </div>
-            <div class="hud-item">
-                <div class="hud-icon">⚡</div>
-                <div class="hud-value" id="energy">100</div>
-            </div>
-            <div class="hud-item">
-                <div class="hud-icon">💰</div>
-                <div class="hud-value" id="coins">0</div>
-            </div>
-            <div class="hud-item">
-                <div class="hud-icon">🏆</div>
-                <div class="hud-value" id="score">0</div>
-            </div>
-            <div class="hud-item">
-                <div class="hud-icon">⬆</div>
-                <div class="hud-value" id="floor">1</div>
-            </div>
+            <button class="spin-btn" id="spinBtn" onclick="spinGacha()">🎰 Крутить</button>
+            <div class="cooldown" id="cooldownText"></div>
         </div>
-        
-        <button id="pause-btn">⏸</button>
-        
-        <div id="controls">
-            <div class="control-btn" id="left-btn">←</div>
-            <div class="control-btn" id="jump-btn">↑</div>
-            <div class="control-btn" id="attack-btn">⚔</div>
-            <div class="control-btn" id="right-btn">→</div>
+
+        <div>
+            <button class="stats-btn" onclick="showStats()">📊 Статистика</button>
+            <button class="stats-btn" onclick="showInventory()">🎒 Инвентарь</button>
         </div>
-        
-        <div id="main-menu" class="screen">
-            <h1>Once Upon a Tower</h1>
-            <button class="btn" id="start-btn">Начать игру</button>
-            <button class="btn btn-secondary" id="shop-btn">Магазин</button>
-            <button class="btn btn-secondary" id="upgrades-btn">Усиления</button>
-            <button class="btn btn-secondary" id="skins-btn">Скины</button>
+
+        <div class="inventory" id="inventorySection" style="display: none;">
+            <h3>Ваш инвентарь</h3>
+            <div class="inventory-grid" id="inventoryGrid"></div>
         </div>
-        
-        <div id="shop-screen" class="screen hidden">
-            <h2>Магазин</h2>
-            <div class="shop-items">
-                <div class="shop-item">
-                    <div class="item-title">Зелье здоровья</div>
-                    <div class="item-description">Восстанавливает 50 здоровья</div>
-                    <div class="item-price">10 монет</div>
-                    <button class="btn">Купить</button>
-                </div>
-                <div class="shop-item">
-                    <div class="item-title">Зелье энергии</div>
-                    <div class="item-description">Восстанавливает 50 энергии</div>
-                    <div class="item-price">10 монет</div>
-                    <button class="btn">Купить</button>
-                </div>
-                <div class="shop-item">
-                    <div class="item-title">Усиление атаки</div>
-                    <div class="item-description">+10% к урону на 5 минут</div>
-                    <div class="item-price">25 монет</div>
-                    <button class="btn">Купить</button>
-                </div>
-                <div class="shop-item">
-                    <div class="item-title">Защитный щит</div>
-                    <div class="item-description">Поглощает 50 урона</div>
-                    <div class="item-price">30 монет</div>
-                    <button class="btn">Купить</button>
-                </div>
-            </div>
-            <button class="btn btn-secondary" id="back-from-shop">Назад</button>
+
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p>Загрузка...</p>
         </div>
-        
-        <div id="upgrades-screen" class="screen hidden">
-            <h2>Усиления</h2>
-            <div class="upgrades-list">
-                <div class="upgrade-item">
-                    <div class="item-title">Сила</div>
-                    <div class="item-description">Увеличивает урон от атак</div>
-                    <div class="item-price">Уровень: 1</div>
-                    <button class="btn">Улучшить (50 монет)</button>
-                </div>
-                <div class="upgrade-item">
-                    <div class="item-title">Здоровье</div>
-                    <div class="item-description">Увеличивает максимальное здоровье</div>
-                    <div class="item-price">Уровень: 1</div>
-                    <button class="btn">Улучшить (50 монет)</button>
-                </div>
-                <div class="upgrade-item">
-                    <div class="item-title">Энергия</div>
-                    <div class="item-description">Увеличивает максимальную энергию</div>
-                    <div class="item-price">Уровень: 1</div>
-                    <button class="btn">Улучшить (50 монет)</button>
-                </div>
-                <div class="upgrade-item">
-                    <div class="item-title">Скорость</div>
-                    <div class="item-description">Увеличивает скорость передвижения</div>
-                    <div class="item-price">Уровень: 1</div>
-                    <button class="btn">Улучшить (50 монет)</button>
-                </div>
-            </div>
-            <button class="btn btn-secondary" id="back-from-upgrades">Назад</button>
+    </div>
+
+    <!-- Модальное окно статистики -->
+    <div class="modal" id="statsModal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal('statsModal')">&times;</span>
+            <h3>📊 Ваша статистика</h3>
+            <div id="statsContent"></div>
         </div>
-        
-        <div id="skins-screen" class="screen hidden">
-            <h2>Скины</h2>
-            <div class="skins-grid">
-                <div class="skin-item equipped">
-                    <div class="item-title">Рыцарь</div>
-                    <div class="item-description">Стандартный скин</div>
-                    <button class="btn">Выбрано</button>
-                </div>
-                <div class="skin-item">
-                    <div class="item-title">Волшебник</div>
-                    <div class="item-description">+10% к восстановлению энергии</div>
-                    <div class="item-price">100 монет</div>
-                    <button class="btn">Купить</button>
-                </div>
-                <div class="skin-item">
-                    <div class="item-title">Лучник</div>
-                    <div class="item-description">+15% к дальности атаки</div>
-                    <div class="item-price">150 монет</div>
-                    <button class="btn">Купить</button>
-                </div>
-                <div class="skin-item">
-                    <div class="item-title">Ниндзя</div>
-                    <div class="item-description">+20% к скорости передвижения</div>
-                    <div class="item-price">200 монет</div>
-                    <button class="btn">Купить</button>
-                </div>
-            </div>
-            <button class="btn btn-secondary" id="back-from-skins">Назад</button>
+    </div>
+
+    <!-- Модальное окно инвентаря -->
+    <div class="modal" id="inventoryModal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal('inventoryModal')">&times;</span>
+            <h3>🎒 Ваш инвентарь</h3>
+            <div class="inventory-grid" id="modalInventoryGrid"></div>
         </div>
-        
-        <div id="game-over-screen" class="screen hidden">
-            <h1>Игра окончена!</h1>
-            <div id="final-stats">
-                <div class="stat-row">
-                    <span>Этаж:</span>
-                    <span class="stat-value" id="final-floor">1</span>
-                </div>
-                <div class="stat-row">
-                    <span>Счёт:</span>
-                    <span class="stat-value" id="final-score">0</span>
-                </div>
-                <div class="stat-row">
-                    <span>Монеты:</span>
-                    <span class="stat-value" id="final-coins">0</span>
-                </div>
-                <div class="stat-row">
-                    <span>Враги побеждены:</span>
-                    <span class="stat-value" id="final-enemies">0</span>
-                </div>
-                <div class="stat-row">
-                    <span>Рекорд:</span>
-                    <span class="stat-value" id="final-highscore">0</span>
-                </div>
-            </div>
-            <button class="btn" id="restart-btn">Играть снова</button>
-            <button class="btn btn-secondary" id="menu-btn">Главное меню</button>
-        </div>
-        
-        <div id="notification" class="notification hidden"></div>
     </div>
 
     <script>
-        // Основные переменные игры
-        const canvas = document.getElementById('game-canvas');
-        const ctx = canvas.getContext('2d');
-        
-        // Установка размеров canvas
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-        
-        // Состояние игры
-        const gameState = {
-            currentScreen: 'main-menu',
-            isPaused: false,
-            player: {
-                x: canvas.width / 2,
-                y: canvas.height - 150,
-                width: 50,
-                height: 50,
-                speed: 5,
-                jumpForce: 15,
-                velocityY: 0,
-                isJumping: false,
-                health: 100,
-                maxHealth: 100,
-                energy: 100,
-                maxEnergy: 100,
-                attackDamage: 10,
-                coins: 0,
-                score: 0,
-                floor: 1,
-                skin: 'knight'
-            },
-            enemies: [],
-            projectiles: [],
-            coins: [],
-            platforms: [],
-            gravity: 0.8,
-            keys: {},
-            gameTime: 0,
-            enemySpawnTimer: 0,
-            coinSpawnTimer: 0,
-            upgrades: {
-                strength: 1,
-                health: 1,
-                energy: 1,
-                speed: 1
-            },
-            skins: {
-                knight: { owned: true, equipped: true, bonus: '' },
-                wizard: { owned: false, bonus: '+10% energy regen' },
-                archer: { owned: false, bonus: '+15% attack range' },
-                ninja: { owned: false, bonus: '+20% movement speed' }
-            },
-            highScore: 0
+        // ========== КОНФИГУРАЦИЯ ФРУКТОВ ==========
+        const FRUITS = {
+            "Ракета": { emoji: "🚀", rarity: "common", chance: 30.0, color: "fruit-common" },
+            "Вращение": { emoji: "🔄", rarity: "common", chance: 28.5, color: "fruit-common" },
+            "Клинок": { emoji: "⚔️", rarity: "common", chance: 27.0, color: "fruit-common" },
+            "Пружина": { emoji: "🦘", rarity: "common", chance: 25.5, color: "fruit-common" },
+            "Бомба": { emoji: "💣", rarity: "common", chance: 24.0, color: "fruit-common" },
+            "Дым": { emoji: "💨", rarity: "common", chance: 22.5, color: "fruit-common" },
+            "Шипы": { emoji: "🌵", rarity: "common", chance: 21.0, color: "fruit-common" },
+            "Пламя": { emoji: "🔥", rarity: "rare", chance: 19.6, color: "fruit-rare" },
+            "Лёд": { emoji: "❄️", rarity: "rare", chance: 18.2, color: "fruit-rare" },
+            "Песок": { emoji: "🏜️", rarity: "rare", chance: 16.9, color: "fruit-rare" },
+            "Тьма": { emoji: "🌑", rarity: "rare", chance: 15.6, color: "fruit-rare" },
+            "Орёл": { emoji: "🦅", rarity: "rare", chance: 14.4, color: "fruit-rare" },
+            "Алмаз": { emoji: "💎", rarity: "rare", chance: 13.2, color: "fruit-rare" },
+            "Свет": { emoji: "💡", rarity: "epic", chance: 12.1, color: "fruit-epic" },
+            "Резина": { emoji: "🧱", rarity: "epic", chance: 11.0, color: "fruit-epic" },
+            "Призрак": { emoji: "👻", rarity: "epic", chance: 10.0, color: "fruit-epic" },
+            "Магма": { emoji: "🌋", rarity: "epic", chance: 9.1, color: "fruit-epic" },
+            "Дрожь": { emoji: "🌊", rarity: "epic", chance: 8.2, color: "fruit-epic" },
+            "Будда": { emoji: "🙏", rarity: "legendary", chance: 7.4, color: "fruit-legendary" },
+            "Любовь": { emoji: "💖", rarity: "legendary", chance: 6.6, color: "fruit-legendary" },
+            "Творение": { emoji: "🌟", rarity: "legendary", chance: 5.9, color: "fruit-legendary" },
+            "Паук": { emoji: "🕷️", rarity: "legendary", chance: 5.2, color: "fruit-legendary" },
+            "Звук": { emoji: "🔊", rarity: "legendary", chance: 4.6, color: "fruit-legendary" },
+            "Феникс": { emoji: "🦚", rarity: "legendary", chance: 4.0, color: "fruit-legendary" },
+            "Портал": { emoji: "🌀", rarity: "legendary", chance: 3.5, color: "fruit-legendary" },
+            "Молния": { emoji: "⚡", rarity: "legendary", chance: 3.0, color: "fruit-legendary" },
+            "Боль": { emoji: "💢", rarity: "legendary", chance: 2.6, color: "fruit-legendary" },
+            "Метель": { emoji: "🌨️", rarity: "legendary", chance: 2.2, color: "fruit-legendary" },
+            "Гравитация": { emoji: "🌌", rarity: "mythical", chance: 1.0, color: "fruit-mythical" },
+            "Мамонт": { emoji: "🐘", rarity: "mythical", chance: 0.75, color: "fruit-mythical" },
+            "Т-Рекс": { emoji: "🦖", rarity: "mythical", chance: 0.56, color: "fruit-mythical" },
+            "Тесто": { emoji: "🍞", rarity: "mythical", chance: 0.42, color: "fruit-mythical" },
+            "Тень": { emoji: "👤", rarity: "mythical", chance: 0.31, color: "fruit-mythical" },
+            "Яд": { emoji: "☠️", rarity: "mythical", chance: 0.23, color: "fruit-mythical" },
+            "Контроль": { emoji: "🎮", rarity: "mythical", chance: 0.17, color: "fruit-mythical" },
+            "Газ": { emoji: "💨", rarity: "mythical", chance: 0.125, color: "fruit-mythical" },
+            "Дух": { emoji: "👁️", rarity: "mythical", chance: 0.092, color: "fruit-mythical" },
+            "Леопард": { emoji: "🐆", rarity: "mythical", chance: 0.067, color: "fruit-mythical" },
+            "Йети": { emoji: "🧊", rarity: "mythical", chance: 0.048, color: "fruit-mythical" },
+            "Кицунэ": { emoji: "🦊", rarity: "mythical", chance: 0.032, color: "fruit-mythical" },
+            "Дракон": { emoji: "🐉", rarity: "mythical", chance: 0.01, color: "fruit-mythical" }
         };
-        
-        // Инициализация игры
-        function init() {
-            // Создание начальных платформ
-            createPlatform(canvas.width / 2 - 100, canvas.height - 100, 200, 20);
-            createPlatform(canvas.width / 2 - 80, canvas.height - 200, 160, 20);
-            createPlatform(canvas.width / 2 - 60, canvas.height - 300, 120, 20);
-            
-            // Настройка обработчиков событий
-            setupEventListeners();
-            
-            // Запуск игрового цикла
-            gameLoop();
-        }
-        
-        // Создание платформы
-        function createPlatform(x, y, width, height) {
-            gameState.platforms.push({
-                x: x,
-                y: y,
-                width: width,
-                height: height
-            });
-        }
-        
-        // Настройка обработчиков событий
-        function setupEventListeners() {
-            // Кнопки меню
-            document.getElementById('start-btn').addEventListener('click', startGame);
-            document.getElementById('shop-btn').addEventListener('click', () => showScreen('shop-screen'));
-            document.getElementById('upgrades-btn').addEventListener('click', () => showScreen('upgrades-screen'));
-            document.getElementById('skins-btn').addEventListener('click', () => showScreen('skins-screen'));
-            
-            // Кнопки назад
-            document.getElementById('back-from-shop').addEventListener('click', () => showScreen('main-menu'));
-            document.getElementById('back-from-upgrades').addEventListener('click', () => showScreen('main-menu'));
-            document.getElementById('back-from-skins').addEventListener('click', () => showScreen('main-menu'));
-            
-            // Кнопки игрового экрана
-            document.getElementById('restart-btn').addEventListener('click', restartGame);
-            document.getElementById('menu-btn').addEventListener('click', () => showScreen('main-menu'));
-            document.getElementById('pause-btn').addEventListener('click', togglePause);
-            
-            // Управление с клавиатуры
-            window.addEventListener('keydown', (e) => {
-                gameState.keys[e.key] = true;
-                
-                // Пробел для прыжка
-                if (e.key === ' ' && !gameState.player.isJumping) {
-                    jump();
+
+        // ========== ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ ==========
+        let userData = {
+            inventory: {},
+            totalSpins: 0,
+            lastSpin: 0,
+            isAdmin: false
+        };
+
+        const COOLDOWN = 2 * 60 * 60 * 1000; // 2 часа
+
+        // ========== БАЗА ДАННЫХ (LocalStorage) ==========
+        function loadUserData() {
+            try {
+                const saved = localStorage.getItem('gachaUserData');
+                if (saved) {
+                    const parsed = JSON.parse(saved);
+                    userData = { ...userData, ...parsed };
                 }
+                updateCooldown();
+            } catch (error) {
+                console.error('Ошибка загрузки данных:', error);
+            }
+        }
+
+        function saveUserData() {
+            try {
+                localStorage.setItem('gachaUserData', JSON.stringify(userData));
+                return true;
+            } catch (error) {
+                console.error('Ошибка сохранения:', error);
+                return false;
+            }
+        }
+
+        // ========== ЛОГИКА ГАЧИ ==========
+        function chooseThreeFruits() {
+            const selectedFruits = [];
+            const availableFruits = { ...FRUITS };
+            
+            for (let i = 0; i < 3; i++) {
+                if (Object.keys(availableFruits).length === 0) break;
                 
-                // P для паузы
-                if (e.key === 'p' || e.key === 'P') {
-                    togglePause();
-                }
-            });
-            
-            window.addEventListener('keyup', (e) => {
-                gameState.keys[e.key] = false;
-            });
-            
-            // Сенсорное управление
-            document.getElementById('left-btn').addEventListener('touchstart', () => gameState.keys['ArrowLeft'] = true);
-            document.getElementById('left-btn').addEventListener('touchend', () => gameState.keys['ArrowLeft'] = false);
-            
-            document.getElementById('right-btn').addEventListener('touchstart', () => gameState.keys['ArrowRight'] = true);
-            document.getElementById('right-btn').addEventListener('touchend', () => gameState.keys['ArrowRight'] = false);
-            
-            document.getElementById('jump-btn').addEventListener('touchstart', jump);
-            document.getElementById('attack-btn').addEventListener('touchstart', attack);
-            
-            // Адаптация к изменению размера окна
-            window.addEventListener('resize', () => {
-                canvas.width = window.innerWidth;
-                canvas.height = window.innerHeight;
-            });
-        }
-        
-        // Показать экран
-        function showScreen(screenId) {
-            document.querySelectorAll('.screen').forEach(screen => {
-                screen.classList.add('hidden');
-            });
-            document.getElementById(screenId).classList.remove('hidden');
-            gameState.currentScreen = screenId;
-        }
-        
-        // Начать игру
-        function startGame() {
-            showScreen('game-container');
-            gameState.isPaused = false;
-            resetGame();
-        }
-        
-        // Перезапустить игру
-        function restartGame() {
-            resetGame();
-            showScreen('game-container');
-            gameState.isPaused = false;
-        }
-        
-        // Сброс состояния игры
-        function resetGame() {
-            gameState.player.x = canvas.width / 2;
-            gameState.player.y = canvas.height - 150;
-            gameState.player.health = 100;
-            gameState.player.energy = 100;
-            gameState.player.score = 0;
-            gameState.player.floor = 1;
-            gameState.player.velocityY = 0;
-            gameState.player.isJumping = false;
-            gameState.enemies = [];
-            gameState.projectiles = [];
-            gameState.coins = [];
-            gameState.gameTime = 0;
-            gameState.enemySpawnTimer = 0;
-            gameState.coinSpawnTimer = 0;
-            
-            // Обновление HUD
-            updateHUD();
-        }
-        
-        // Переключение паузы
-        function togglePause() {
-            gameState.isPaused = !gameState.isPaused;
-            if (gameState.isPaused) {
-                showNotification("ПАУЗА");
-            } else {
-                document.getElementById('notification').classList.remove('show');
-            }
-        }
-        
-        // Показать уведомление
-        function showNotification(text) {
-            const notification = document.getElementById('notification');
-            notification.textContent = text;
-            notification.classList.add('show');
-            
-            setTimeout(() => {
-                notification.classList.remove('show');
-            }, 2000);
-        }
-        
-        // Прыжок
-        function jump() {
-            if (!gameState.player.isJumping) {
-                gameState.player.velocityY = -gameState.player.jumpForce;
-                gameState.player.isJumping = true;
-            }
-        }
-        
-        // Атака
-        function attack() {
-            if (gameState.player.energy >= 10) {
-                gameState.player.energy -= 10;
+                const fruitsList = Object.keys(availableFruits);
+                const probabilities = Object.values(availableFruits).map(fruit => fruit.chance);
                 
-                // Создание снаряда
-                gameState.projectiles.push({
-                    x: gameState.player.x,
-                    y: gameState.player.y,
-                    width: 10,
-                    height: 10,
-                    speed: 10,
-                    damage: gameState.player.attackDamage
-                });
+                let total = probabilities.reduce((sum, prob) => sum + prob, 0);
+                let random = Math.random() * total;
                 
-                updateHUD();
-            }
-        }
-        
-        // Обновление HUD
-        function updateHUD() {
-            document.getElementById('health').textContent = Math.max(0, Math.floor(gameState.player.health));
-            document.getElementById('energy').textContent = Math.max(0, Math.floor(gameState.player.energy));
-            document.getElementById('coins').textContent = gameState.player.coins;
-            document.getElementById('score').textContent = gameState.player.score;
-            document.getElementById('floor').textContent = gameState.player.floor;
-        }
-        
-        // Игровой цикл
-        function gameLoop() {
-            if (gameState.currentScreen === 'game-container' && !gameState.isPaused) {
-                update();
-                render();
-            }
-            
-            requestAnimationFrame(gameLoop);
-        }
-        
-        // Обновление игровой логики
-        function update() {
-            // Увеличение времени игры
-            gameState.gameTime++;
-            
-            // Обновление игрока
-            updatePlayer();
-            
-            // Обновление врагов
-            updateEnemies();
-            
-            // Обновление снарядов
-            updateProjectiles();
-            
-            // Обновление монет
-            updateCoins();
-            
-            // Спавн врагов
-            gameState.enemySpawnTimer++;
-            if (gameState.enemySpawnTimer > 120) { // Каждые 2 секунды при 60 FPS
-                spawnEnemy();
-                gameState.enemySpawnTimer = 0;
-            }
-            
-            // Спавн монет
-            gameState.coinSpawnTimer++;
-            if (gameState.coinSpawnTimer > 180) { // Каждые 3 секунды
-                spawnCoin();
-                gameState.coinSpawnTimer = 0;
-            }
-            
-            // Восстановление энергии
-            if (gameState.player.energy < gameState.player.maxEnergy) {
-                gameState.player.energy += 0.1;
-            }
-        }
-        
-        // Обновление игрока
-        function updatePlayer() {
-            // Движение влево/вправо
-            if (gameState.keys['ArrowLeft'] || gameState.keys['a'] || gameState.keys['A']) {
-                gameState.player.x -= gameState.player.speed;
-            }
-            if (gameState.keys['ArrowRight'] || gameState.keys['d'] || gameState.keys['D']) {
-                gameState.player.x += gameState.player.speed;
-            }
-            
-            // Ограничение игрока в пределах экрана
-            if (gameState.player.x < 0) gameState.player.x = 0;
-            if (gameState.player.x > canvas.width - gameState.player.width) {
-                gameState.player.x = canvas.width - gameState.player.width;
-            }
-            
-            // Гравитация
-            gameState.player.velocityY += gameState.gravity;
-            gameState.player.y += gameState.player.velocityY;
-            
-            // Проверка столкновения с платформами
-            let onPlatform = false;
-            for (const platform of gameState.platforms) {
-                if (
-                    gameState.player.x < platform.x + platform.width &&
-                    gameState.player.x + gameState.player.width > platform.x &&
-                    gameState.player.y + gameState.player.height > platform.y &&
-                    gameState.player.y + gameState.player.height < platform.y + platform.height &&
-                    gameState.player.velocityY > 0
-                ) {
-                    gameState.player.y = platform.y - gameState.player.height;
-                    gameState.player.velocityY = 0;
-                    gameState.player.isJumping = false;
-                    onPlatform = true;
-                }
-            }
-            
-            // Если игрок падает за пределы экрана
-            if (gameState.player.y > canvas.height) {
-                gameOver();
-            }
-        }
-        
-        // Обновление врагов
-        function updateEnemies() {
-            for (let i = gameState.enemies.length - 1; i >= 0; i--) {
-                const enemy = gameState.enemies[i];
-                
-                // Движение врага к игроку
-                if (enemy.x < gameState.player.x) {
-                    enemy.x += enemy.speed;
-                } else {
-                    enemy.x -= enemy.speed;
-                }
-                
-                // Гравитация для врагов
-                enemy.velocityY += gameState.gravity;
-                enemy.y += enemy.velocityY;
-                
-                // Проверка столкновения с платформами
-                for (const platform of gameState.platforms) {
-                    if (
-                        enemy.x < platform.x + platform.width &&
-                        enemy.x + enemy.width > platform.x &&
-                        enemy.y + enemy.height > platform.y &&
-                        enemy.y + enemy.height < platform.y + platform.height &&
-                        enemy.velocityY > 0
-                    ) {
-                        enemy.y = platform.y - enemy.height;
-                        enemy.velocityY = 0;
-                    }
-                }
-                
-                // Проверка столкновения с игроком
-                if (
-                    gameState.player.x < enemy.x + enemy.width &&
-                    gameState.player.x + gameState.player.width > enemy.x &&
-                    gameState.player.y < enemy.y + enemy.height &&
-                    gameState.player.y + gameState.player.height > enemy.y
-                ) {
-                    // Урон игроку
-                    gameState.player.health -= enemy.damage;
-                    updateHUD();
-                    
-                    // Удаление врага
-                    gameState.enemies.splice(i, 1);
-                    
-                    if (gameState.player.health <= 0) {
-                        gameOver();
-                    }
-                }
-                
-                // Удаление врагов за пределами экрана
-                if (enemy.y > canvas.height) {
-                    gameState.enemies.splice(i, 1);
-                }
-            }
-        }
-        
-        // Обновление снарядов
-        function updateProjectiles() {
-            for (let i = gameState.projectiles.length - 1; i >= 0; i--) {
-                const projectile = gameState.projectiles[i];
-                
-                // Движение снаряда
-                projectile.x += projectile.speed;
-                
-                // Проверка столкновения с врагами
-                for (let j = gameState.enemies.length - 1; j >= 0; j--) {
-                    const enemy = gameState.enemies[j];
-                    
-                    if (
-                        projectile.x < enemy.x + enemy.width &&
-                        projectile.x + projectile.width > enemy.x &&
-                        projectile.y < enemy.y + enemy.height &&
-                        projectile.y + projectile.height > enemy.y
-                    ) {
-                        // Нанесение урона врагу
-                        enemy.health -= projectile.damage;
-                        
-                        // Удаление снаряда
-                        gameState.projectiles.splice(i, 1);
-                        
-                        // Если враг побежден
-                        if (enemy.health <= 0) {
-                            gameState.enemies.splice(j, 1);
-                            gameState.player.score += 10;
-                            gameState.player.coins += 5;
-                            updateHUD();
-                        }
-                        
+                let chosenFruit = null;
+                for (let j = 0; j < fruitsList.length; j++) {
+                    random -= availableFruits[fruitsList[j]].chance;
+                    if (random <= 0) {
+                        chosenFruit = fruitsList[j];
                         break;
                     }
                 }
                 
-                // Удаление снарядов за пределами экрана
-                if (projectile.x > canvas.width) {
-                    gameState.projectiles.splice(i, 1);
-                }
+                selectedFruits.push(chosenFruit);
+                delete availableFruits[chosenFruit];
             }
+            
+            return selectedFruits;
         }
-        
-        // Обновление монет
-        function updateCoins() {
-            for (let i = gameState.coins.length - 1; i >= 0; i--) {
-                const coin = gameState.coins[i];
-                
-                // Проверка сбора монеты игроком
-                if (
-                    gameState.player.x < coin.x + coin.width &&
-                    gameState.player.x + gameState.player.width > coin.x &&
-                    gameState.player.y < coin.y + coin.height &&
-                    gameState.player.y + gameState.player.height > coin.y
-                ) {
-                    gameState.player.coins += 1;
-                    gameState.coins.splice(i, 1);
-                    updateHUD();
-                    showNotification("+1 монета");
-                }
-                
-                // Удаление монет за пределами экрана
-                if (coin.y > canvas.height) {
-                    gameState.coins.splice(i, 1);
-                }
+
+        async function spinGacha() {
+            const spinBtn = document.getElementById('spinBtn');
+            const fruitDisplay = document.getElementById('fruitDisplay');
+            const now = Date.now();
+            
+            if (now - userData.lastSpin < COOLDOWN && !userData.isAdmin) {
+                alert('Подождите перед следующим кручением!');
+                return;
             }
-        }
-        
-        // Спавн врага
-        function spawnEnemy() {
-            const enemyTypes = [
-                { health: 20, damage: 5, speed: 2, color: '#00ff00' },
-                { health: 30, damage: 10, speed: 1, color: '#ff9900' },
-                { health: 50, damage: 15, speed: 0.5, color: '#ff0000' }
+
+            spinBtn.disabled = true;
+            fruitDisplay.classList.add('rolling');
+
+            const fruits = chooseThreeFruits();
+            const fruitElements = [
+                document.getElementById('fruit1'),
+                document.getElementById('fruit2'),
+                document.getElementById('fruit3')
             ];
-            
-            const type = enemyTypes[Math.floor(Math.random() * enemyTypes.length)];
-            
-            gameState.enemies.push({
-                x: Math.random() * canvas.width,
-                y: 0,
-                width: 40,
-                height: 40,
-                health: type.health,
-                maxHealth: type.health,
-                damage: type.damage,
-                speed: type.speed,
-                velocityY: 0,
-                color: type.color
-            });
-        }
-        
-        // Спавн монеты
-        function spawnCoin() {
-            gameState.coins.push({
-                x: Math.random() * canvas.width,
-                y: 0,
-                width: 20,
-                height: 20,
-                velocityY: 0
-            });
-        }
-        
-        // Конец игры
-        function gameOver() {
-            // Обновление рекорда
-            if (gameState.player.score > gameState.highScore) {
-                gameState.highScore = gameState.player.score;
+
+            // Анимация прокрутки
+            for (let i = 0; i < 10; i++) {
+                for (let j = 0; j < 3; j++) {
+                    const randomFruit = Object.keys(FRUITS)[Math.floor(Math.random() * Object.keys(FRUITS).length)];
+                    fruitElements[j].textContent = FRUITS[randomFruit].emoji;
+                    fruitElements[j].className = `fruit ${FRUITS[randomFruit].color}`;
+                }
+                await new Promise(resolve => setTimeout(resolve, 100));
             }
-            
-            // Обновление финальной статистики
-            document.getElementById('final-floor').textContent = gameState.player.floor;
-            document.getElementById('final-score').textContent = gameState.player.score;
-            document.getElementById('final-coins').textContent = gameState.player.coins;
-            document.getElementById('final-enemies').textContent = Math.floor(gameState.player.score / 10);
-            document.getElementById('final-highscore').textContent = gameState.highScore;
-            
-            showScreen('game-over-screen');
-        }
-        
-        // Отрисовка игры
-        function render() {
-            // Очистка canvas
-            ctx.fillStyle = '#1a1a2e';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-            
-            // Отрисовка платформ
-            ctx.fillStyle = '#8b4513';
-            for (const platform of gameState.platforms) {
-                ctx.fillRect(platform.x, platform.y, platform.width, platform.height);
+
+            // Финальный результат
+            const finalFruit = fruits[Math.floor(Math.random() * fruits.length)];
+            for (let j = 0; j < 3; j++) {
+                fruitElements[j].textContent = FRUITS[fruits[j]].emoji;
+                fruitElements[j].className = `fruit ${FRUITS[fruits[j]].color}`;
+                fruitElements[j].style.opacity = '1';
+                fruitElements[j].style.transform = 'scale(1.1)';
             }
+
+            // Сохраняем результат
+            userData.inventory[finalFruit] = (userData.inventory[finalFruit] || 0) + 1;
+            userData.totalSpins++;
+            userData.lastSpin = now;
+
+            saveUserData();
+            updateCooldown();
+
+            fruitDisplay.classList.remove('rolling');
+            spinBtn.disabled = false;
+
+            setTimeout(() => {
+                alert(`🎉 Вам выпал: ${finalFruit} ${FRUITS[finalFruit].emoji}`);
+            }, 500);
+        }
+
+        // ========== ИНТЕРФЕЙС ==========
+        function showStats() {
+            const statsContent = document.getElementById('statsContent');
+            let statsHTML = '';
+
+            statsHTML += `<div class="stats-item">Всего кручений: ${userData.totalSpins}</div>`;
             
-            // Отрисовка игрока
-            ctx.fillStyle = '#ff0000';
-            ctx.fillRect(gameState.player.x, gameState.player.y, gameState.player.width, gameState.player.height);
+            const sortedInventory = Object.entries(userData.inventory)
+                .sort((a, b) => b[1] - a[1]);
+
+            if (sortedInventory.length === 0) {
+                statsHTML += '<div class="stats-item">У вас еще нет фруктов</div>';
+            } else {
+                sortedInventory.forEach(([fruit, count]) => {
+                    const percentage = (count / userData.totalSpins * 100).toFixed(1);
+                    statsHTML += `
+                        <div class="stats-item ${FRUITS[fruit].color}">
+                            ${FRUITS[fruit].emoji} ${fruit} - ${count} (${percentage}%)
+                        </div>
+                    `;
+                });
+            }
+
+            statsContent.innerHTML = statsHTML;
+            document.getElementById('statsModal').style.display = 'flex';
+        }
+
+        function showInventory() {
+            const modalInventoryGrid = document.getElementById('modalInventoryGrid');
+            renderInventory(modalInventoryGrid);
+            document.getElementById('inventoryModal').style.display = 'flex';
+        }
+
+        function renderInventory(container) {
+            if (Object.keys(userData.inventory).length === 0) {
+                container.innerHTML = '<div style="text-align: center; color: #666;">Инвентарь пуст</div>';
+                return;
+            }
+
+            const sortedInventory = Object.entries(userData.inventory)
+                .sort((a, b) => FRUITS[b[0]].chance - FRUITS[a[0]].chance);
+
+            container.innerHTML = sortedInventory.map(([fruit, count]) => `
+                <div class="inventory-item">
+                    <div class="fruit-name ${FRUITS[fruit].color}">
+                        ${FRUITS[fruit].emoji} ${fruit}
+                    </div>
+                    <div class="fruit-count">Количество: ${count}</div>
+                </div>
+            `).join('');
+        }
+
+        function updateCooldown() {
+            const cooldownText = document.getElementById('cooldownText');
+            const now = Date.now();
+            const remaining = COOLDOWN - (now - userData.lastSpin);
+
+            if (userData.isAdmin) {
+                cooldownText.textContent = '👑 Админ: крутить можно всегда!';
+                cooldownText.style.color = '#4ecdc4';
+            } else if (remaining > 0) {
+                const hours = Math.floor(remaining / (60 * 60 * 1000));
+                const minutes = Math.floor((remaining % (60 * 60 * 1000)) / (60 * 1000));
+                cooldownText.textContent = `⏰ До следующего кручения: ${hours}ч ${minutes}м`;
+                cooldownText.style.color = '#ff6b6b';
+            } else {
+                cooldownText.textContent = '✅ Можно крутить!';
+                cooldownText.style.color = '#4ecdc4';
+            }
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+        // ========== АДМИН ФУНКЦИИ ==========
+        function toggleAdmin() {
+            userData.isAdmin = !userData.isAdmin;
+            saveUserData();
+            updateCooldown();
+            alert(userData.isAdmin ? '👑 Режим админа включен!' : '👤 Режим админа выключен');
+        }
+
+        function resetData() {
+            if (confirm('Вы уверены? Все данные будут удалены!')) {
+                userData = {
+                    inventory: {},
+                    totalSpins: 0,
+                    lastSpin: 0,
+                    isAdmin: userData.isAdmin
+                };
+                saveUserData();
+                updateCooldown();
+                alert('Данные сброшены!');
+            }
+        }
+
+        // ========== ИНИЦИАЛИЗАЦИЯ ==========
+        document.addEventListener('DOMContentLoaded', function() {
+            loadUserData();
             
-            // Отрисовка врагов
-            for (const enemy of gameState.enemies) {
-                ctx.fillStyle = enemy.color;
-                ctx.fillRect(enemy.x, enemy.y, enemy.width, enemy.height);
+            // Скрываем loading после загрузки
+            setTimeout(() => {
+                document.getElementById('loading').style.display = 'none';
+            }, 1000);
+            
+            // Секретные комбинации для админа
+            let konamiCode = [];
+            const konamiSequence = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'KeyB', 'KeyA'];
+            
+            document.addEventListener('keydown', (e) => {
+                konamiCode.push(e.code);
+                if (konamiCode.length > konamiSequence.length) {
+                    konamiCode.shift();
+                }
                 
-                // Полоска здоровья
-                const healthPercent = enemy.health / enemy.maxHealth;
-                ctx.fillStyle = '#ff0000';
-                ctx.fillRect(enemy.x, enemy.y - 10, enemy.width, 5);
-                ctx.fillStyle = '#00ff00';
-                ctx.fillRect(enemy.x, enemy.y - 10, enemy.width * healthPercent, 5);
-            }
+                if (konamiCode.join() === konamiSequence.join()) {
+                    toggleAdmin();
+                    konamiCode = [];
+                }
+            });
+        });
+
+        // ========== ЭКСПОРТ ДЛЯ ИНТЕГРАЦИИ С ТЕЛЕГРАМ БОТОМ ==========
+        window.GachaAPI = {
+            // Получить данные пользователя для сохранения в основную базу
+            getUserData: () => userData,
             
-            // Отрисовка снарядов
-            ctx.fillStyle = '#ffff00';
-            for (const projectile of gameState.projectiles) {
-                ctx.fillRect(projectile.x, projectile.y, projectile.width, projectile.height);
-            }
+            // Загрузить данные из основной базы
+            setUserData: (data) => {
+                userData = { ...userData, ...data };
+                saveUserData();
+                updateCooldown();
+            },
             
-            // Отрисовка монет
-            ctx.fillStyle = '#ffcc00';
-            for (const coin of gameState.coins) {
-                ctx.beginPath();
-                ctx.arc(coin.x + coin.width/2, coin.y + coin.height/2, coin.width/2, 0, Math.PI * 2);
-                ctx.fill();
-            }
-        }
-        
-        // Запуск игры
-        init();
+            // Админ функции
+            setAdmin: (isAdmin) => {
+                userData.isAdmin = isAdmin;
+                saveUserData();
+                updateCooldown();
+            },
+            
+            // Добавить фрукты (для админов)
+            addFruit: (fruitName, count = 1) => {
+                if (FRUITS[fruitName]) {
+                    userData.inventory[fruitName] = (userData.inventory[fruitName] || 0) + count;
+                    saveUserData();
+                    return true;
+                }
+                return false;
+            },
+            
+            // Получить статистику для админ панели
+            getStats: () => ({
+                totalSpins: userData.totalSpins,
+                inventory: userData.inventory,
+                lastSpin: userData.lastSpin,
+                isAdmin: userData.isAdmin
+            })
+        };
     </script>
 </body>
-                        </html>
+    </html>
