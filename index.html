@@ -27,16 +27,16 @@
             gap: 16px;
         }
 
-        /* Редактор кода - УВЕЛИЧЕН */
+        /* Редактор кода */
         .editor-container {
-            flex: 2; /* Больше места */
+            flex: 2;
             background: #161b22;
             border-radius: 12px;
             border: 1px solid #30363d;
             display: flex;
             flex-direction: column;
             overflow: hidden;
-            min-height: 400px; /* Минимальная высота */
+            min-height: 400px;
         }
 
         .editor-header {
@@ -261,8 +261,9 @@
             </div>
             <div class="code-wrapper">
                 <div class="line-numbers" id="lineNumbers">1</div>
-                <textarea class="code-editor code-textarea" id="codeEditor" spellcheck="false" oninput="updateLineNumbers()">rectangle {id=1, place=350,250, side=100, color=255000000, borderline=2,255255255}
-triangular {id=2, place=500,300, side=80, color=000255000, borderline=1,000000000}</textarea>
+                <textarea class="code-editor code-textarea" id="codeEditor" spellcheck="false" oninput="updateLineNumbers()">rectangle {id=1; side=100,80; place=200,200; color=255,0,0; border=3; border_color=255,255,255; rotate=30}
+triangular {id=2; side=50,60,70; place=400,300; color=0,255,0; border=2; border_color=0,0,255; rotate=45}
+rectangle {id=3; side=120,60; place=600,400; color=0,0,255}</textarea>
             </div>
         </div>
 
@@ -336,11 +337,16 @@ triangular {id=2, place=500,300, side=80, color=000255000, borderline=1,00000000
                 const params = match[1];
                 const config = { type: 'rectangle' };
 
-                // Парсинг параметров - ИСПРАВЛЕННЫЙ ПАРСЕР
+                // Парсинг параметров
                 this.parseParams(params, config, lineNumber);
 
                 // Валидация обязательных параметров
-                this.validateRequiredParams(config, ['id', 'place', 'side', 'color'], lineNumber);
+                this.validateRequiredParams(config, ['id', 'side', 'place'], lineNumber);
+
+                // Проверка количества сторон для прямоугольника
+                if (config.side.length !== 2) {
+                    throw new Error('Прямоугольник должен иметь 2 стороны (ширина, высота)');
+                }
 
                 this.shapes.set(config.id, config);
             }
@@ -354,38 +360,22 @@ triangular {id=2, place=500,300, side=80, color=000255000, borderline=1,00000000
                 const params = match[1];
                 const config = { type: 'triangular' };
 
-                // Парсинг параметров - ИСПРАВЛЕННЫЙ ПАРСЕР
+                // Парсинг параметров
                 this.parseParams(params, config, lineNumber);
 
                 // Валидация обязательных параметров
-                this.validateRequiredParams(config, ['id', 'place', 'side', 'color'], lineNumber);
+                this.validateRequiredParams(config, ['id', 'side', 'place'], lineNumber);
+
+                // Проверка количества сторон для треугольника
+                if (config.side.length !== 3) {
+                    throw new Error('Треугольник должен иметь 3 стороны');
+                }
 
                 this.shapes.set(config.id, config);
             }
 
             parseParams(paramsString, config, lineNumber) {
-                // ИСПРАВЛЕННЫЙ ПАРСЕР - разбираем параметры правильно
-                const params = [];
-                let currentParam = '';
-                let bracketCount = 0;
-                
-                for (let i = 0; i < paramsString.length; i++) {
-                    const char = paramsString[i];
-                    
-                    if (char === '(') bracketCount++;
-                    if (char === ')') bracketCount--;
-                    
-                    if (char === ',' && bracketCount === 0) {
-                        params.push(currentParam.trim());
-                        currentParam = '';
-                    } else {
-                        currentParam += char;
-                    }
-                }
-                
-                if (currentParam.trim()) {
-                    params.push(currentParam.trim());
-                }
+                const params = paramsString.split(';').map(p => p.trim()).filter(p => p);
                 
                 for (const param of params) {
                     const equalsIndex = param.indexOf('=');
@@ -404,22 +394,34 @@ triangular {id=2, place=500,300, side=80, color=000255000, borderline=1,00000000
                         case 'id':
                             config.id = this.parseNumber(value, 'id', lineNumber);
                             break;
+                        case 'side':
+                            config.side = this.parseSide(value, lineNumber);
+                            break;
                         case 'place':
                             config.place = this.parsePlace(value, lineNumber);
-                            break;
-                        case 'side':
-                            config.side = this.parseNumber(value, 'side', lineNumber);
                             break;
                         case 'color':
                             config.color = this.parseColor(value, lineNumber);
                             break;
-                        case 'borderline':
-                            config.borderline = this.parseBorderline(value, lineNumber);
+                        case 'border':
+                            config.border = this.parseNumber(value, 'border', lineNumber);
+                            break;
+                        case 'border_color':
+                            config.border_color = this.parseColor(value, lineNumber);
+                            break;
+                        case 'rotate':
+                            config.rotate = this.parseNumber(value, 'rotate', lineNumber);
                             break;
                         default:
                             throw new Error(`Неизвестный параметр: ${key}`);
                     }
                 }
+
+                // Устанавливаем значения по умолчанию для необязательных параметров
+                if (!config.color) config.color = [255, 255, 255];
+                if (!config.border) config.border = 0;
+                if (!config.border_color) config.border_color = [0, 0, 0];
+                if (!config.rotate) config.rotate = 0;
             }
 
             parseNumber(value, paramName, lineNumber) {
@@ -430,8 +432,18 @@ triangular {id=2, place=500,300, side=80, color=000255000, borderline=1,00000000
                 return num;
             }
 
+            parseSide(value, lineNumber) {
+                const sides = value.split(',').map(side => {
+                    const num = parseInt(side.trim());
+                    if (isNaN(num) || num <= 0) {
+                        throw new Error(`Сторона должна быть положительным числом: ${side}`);
+                    }
+                    return num;
+                });
+                return sides;
+            }
+
             parsePlace(value, lineNumber) {
-                // ИСПРАВЛЕННЫЙ ПАРСЕР координат
                 const coords = value.split(',').map(coord => {
                     const num = parseInt(coord.trim());
                     if (isNaN(num)) {
@@ -447,32 +459,18 @@ triangular {id=2, place=500,300, side=80, color=000255000, borderline=1,00000000
             }
 
             parseColor(value, lineNumber) {
-                if (value.length !== 9 || !/^\d+$/.test(value)) {
-                    throw new Error('Цвет должен быть 9-значным числом (RGB)');
+                const colors = value.split(',').map(color => {
+                    const num = parseInt(color.trim());
+                    if (isNaN(num) || num < 0 || num > 255) {
+                        throw new Error(`Значение цвета должно быть от 0 до 255: ${color}`);
+                    }
+                    return num;
+                });
+                
+                if (colors.length !== 3) {
+                    throw new Error('Цвет должен содержать 3 значения RGB через запятую');
                 }
-                
-                const r = parseInt(value.substring(0, 3));
-                const g = parseInt(value.substring(3, 6));
-                const b = parseInt(value.substring(6, 9));
-                
-                if (r > 255 || g > 255 || b > 255) {
-                    throw new Error('Значения RGB не могут превышать 255');
-                }
-                
-                return `rgb(${r}, ${g}, ${b})`;
-            }
-
-            parseBorderline(value, lineNumber) {
-                // ИСПРАВЛЕННЫЙ ПАРСЕР borderline
-                const parts = value.split(',').map(p => p.trim());
-                if (parts.length !== 2) {
-                    throw new Error('Borderline должен содержать толщину и цвет через запятую');
-                }
-                
-                const width = this.parseNumber(parts[0], 'border width', lineNumber);
-                const color = this.parseColor(parts[1], lineNumber);
-                
-                return { width, color };
+                return colors;
             }
 
             validateRequiredParams(config, required, lineNumber) {
@@ -491,11 +489,21 @@ triangular {id=2, place=500,300, side=80, color=000255000, borderline=1,00000000
                 // Рендерим все фигуры
                 for (const [id, shape] of this.shapes) {
                     try {
+                        this.ctx.save();
+                        
+                        // Применяем поворот
+                        const [x, y] = shape.place;
+                        this.ctx.translate(x, y);
+                        this.ctx.rotate(shape.rotate * Math.PI / 180);
+                        this.ctx.translate(-x, -y);
+                        
                         if (shape.type === 'rectangle') {
                             this.renderRectangle(shape);
                         } else if (shape.type === 'triangular') {
                             this.renderTriangular(shape);
                         }
+                        
+                        this.ctx.restore();
                     } catch (error) {
                         this.errors.push({
                             line: 0,
@@ -508,34 +516,40 @@ triangular {id=2, place=500,300, side=80, color=000255000, borderline=1,00000000
 
             renderRectangle(shape) {
                 const [x, y] = shape.place;
-                const size = shape.side;
+                const [width, height] = shape.side;
+                const [r, g, b] = shape.color;
                 
                 // Рисуем заливку
-                this.ctx.fillStyle = shape.color;
-                this.ctx.fillRect(x - size/2, y - size/2, size, size);
+                this.ctx.fillStyle = `rgb(${r}, ${g}, ${b})`;
+                this.ctx.fillRect(x - width/2, y - height/2, width, height);
                 
                 // Рисуем обводку если есть
-                if (shape.borderline) {
-                    this.ctx.strokeStyle = shape.borderline.color;
-                    this.ctx.lineWidth = shape.borderline.width;
-                    this.ctx.strokeRect(x - size/2, y - size/2, size, size);
+                if (shape.border > 0) {
+                    const [br, bg, bb] = shape.border_color;
+                    this.ctx.strokeStyle = `rgb(${br}, ${bg}, ${bb})`;
+                    this.ctx.lineWidth = shape.border;
+                    this.ctx.strokeRect(x - width/2, y - height/2, width, height);
                 }
             }
 
             renderTriangular(shape) {
                 const [x, y] = shape.place;
-                const size = shape.side;
+                const [a, b, c] = shape.side;
+                const [r, g, bColor] = shape.color;
+                
+                // Для равностороннего треугольника используем первую сторону
+                const size = a;
                 const height = (Math.sqrt(3) / 2) * size;
                 
                 // Вершины равностороннего треугольника
                 const points = [
-                    [x, y - height/2],           // Верхняя вершина
-                    [x - size/2, y + height/2],  // Левая нижняя
-                    [x + size/2, y + height/2]   // Правая нижняя
+                    [x, y - height/2],
+                    [x - size/2, y + height/2],
+                    [x + size/2, y + height/2]
                 ];
                 
                 // Рисуем заливку
-                this.ctx.fillStyle = shape.color;
+                this.ctx.fillStyle = `rgb(${r}, ${g}, ${bColor})`;
                 this.ctx.beginPath();
                 this.ctx.moveTo(points[0][0], points[0][1]);
                 this.ctx.lineTo(points[1][0], points[1][1]);
@@ -544,9 +558,10 @@ triangular {id=2, place=500,300, side=80, color=000255000, borderline=1,00000000
                 this.ctx.fill();
                 
                 // Рисуем обводку если есть
-                if (shape.borderline) {
-                    this.ctx.strokeStyle = shape.borderline.color;
-                    this.ctx.lineWidth = shape.borderline.width;
+                if (shape.border > 0) {
+                    const [br, bg, bb] = shape.border_color;
+                    this.ctx.strokeStyle = `rgb(${br}, ${bg}, ${bb})`;
+                    this.ctx.lineWidth = shape.border;
                     this.ctx.stroke();
                 }
             }
