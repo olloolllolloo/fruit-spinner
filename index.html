@@ -23,32 +23,28 @@
             display: flex;
             flex-direction: column;
             height: 100vh;
-            padding: 0;
-            gap: 0;
         }
 
-        /* Редактор кода - ЗАНИМАЕТ ВСЮ ВЕРХНЮЮ ЧАСТЬ */
+        /* Редактор кода - 70% экрана */
         .editor-container {
-            flex: 1;
+            flex: 7; /* 70% высоты */
             background: #161b22;
             display: flex;
             flex-direction: column;
             overflow: hidden;
-            min-height: 0;
         }
 
         .editor-header {
-            padding: 12px 16px;
+            padding: 15px 20px;
             border-bottom: 1px solid #30363d;
             display: flex;
             justify-content: space-between;
             align-items: center;
             background: #1a1f29;
-            flex-shrink: 0;
         }
 
         .editor-title {
-            font-size: 14px;
+            font-size: 16px;
             font-weight: 600;
             color: #7ee787;
         }
@@ -56,9 +52,9 @@
         .run-button {
             background: #f2cc60;
             border: none;
-            width: 36px;
-            height: 36px;
-            border-radius: 6px;
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
             cursor: pointer;
             display: flex;
             align-items: center;
@@ -71,62 +67,80 @@
             transform: scale(1.05);
         }
 
-        .run-button:active {
-            transform: scale(0.95);
-        }
-
         .play-icon {
-            width: 16px;
-            height: 16px;
-            border-left: 6px solid #0d1117;
-            border-top: 4px solid transparent;
-            border-bottom: 4px solid transparent;
+            width: 20px;
+            height: 20px;
+            border-left: 8px solid #0d1117;
+            border-top: 6px solid transparent;
+            border-bottom: 6px solid transparent;
             margin-left: 2px;
         }
 
-        .code-editor {
+        .code-wrapper {
+            position: relative;
             flex: 1;
+            overflow: hidden;
+        }
+
+        .line-numbers {
+            position: absolute;
+            left: 0;
+            top: 0;
+            padding: 20px 12px;
+            background: #0d1117;
+            border-right: 1px solid #30363d;
+            height: 100%;
+            text-align: right;
+            color: #484f58;
+            font-size: 14px;
+            line-height: 1.5;
+            user-select: none;
+        }
+
+        .code-editor {
+            width: 100%;
+            height: 100%;
             background: #0d1117;
             color: #e6edf3;
             border: none;
-            padding: 16px;
+            padding: 20px 20px 20px 60px;
             font-family: 'Consolas', 'Monaco', monospace;
             font-size: 14px;
             line-height: 1.5;
             resize: none;
             outline: none;
             overflow-y: auto;
-            min-height: 0;
         }
 
-        /* Панель ошибок - ЗАНИМАЕТ НИЖНЮЮ ТРЕТЬ */
+        /* Панель ошибок - 30% экрана */
         .error-panel {
+            flex: 3; /* 30% высоты */
             background: #da3633;
             color: white;
-            padding: 12px 16px;
-            display: none;
-            max-height: 33vh;
+            padding: 15px 20px;
             overflow-y: auto;
-            flex-shrink: 0;
-            border-top: 1px solid #ff6b6b;
+            display: none; /* Сначала скрыта */
+            border-top: 2px solid #ff6b6b;
+        }
+
+        .error-panel.visible {
+            display: block; /* Показываем когда есть ошибки */
         }
 
         .error-title {
             font-weight: 600;
-            margin-bottom: 8px;
+            margin-bottom: 10px;
             display: flex;
             align-items: center;
             gap: 8px;
-            font-size: 14px;
         }
 
         .error-icon {
-            width: 14px;
-            height: 14px;
+            width: 16px;
+            height: 16px;
             background: white;
             border-radius: 50%;
             position: relative;
-            flex-shrink: 0;
         }
 
         .error-icon::before,
@@ -141,27 +155,30 @@
 
         .error-icon::before {
             width: 2px;
-            height: 6px;
+            height: 8px;
         }
 
         .error-icon::after {
-            width: 6px;
+            width: 8px;
             height: 2px;
         }
 
-        .error-line {
+        .error-item {
             background: rgba(255, 255, 255, 0.1);
-            padding: 6px 10px;
+            padding: 10px;
             border-radius: 4px;
-            margin-top: 6px;
+            margin-top: 8px;
+        }
+
+        .error-line {
             font-family: 'Consolas', monospace;
-            font-size: 12px;
+            font-size: 13px;
+            margin-bottom: 4px;
         }
 
         .error-message {
-            margin-top: 4px;
             opacity: 0.9;
-            font-size: 12px;
+            font-size: 13px;
         }
 
         /* Окно результата */
@@ -177,28 +194,30 @@
             flex-direction: column;
         }
 
+        .result-container.visible {
+            display: flex; /* Показываем результат */
+        }
+
         .result-header {
-            padding: 12px 16px;
+            padding: 15px 20px;
             border-bottom: 1px solid #30363d;
             display: flex;
             justify-content: space-between;
             align-items: center;
             background: #1a1f29;
-            flex-shrink: 0;
         }
 
         .back-button {
             background: #238636;
             border: none;
-            padding: 8px 16px;
+            padding: 10px 20px;
             border-radius: 6px;
             color: white;
             cursor: pointer;
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 8px;
             transition: background 0.2s ease;
-            font-size: 12px;
         }
 
         .back-button:hover {
@@ -206,10 +225,10 @@
         }
 
         .arrow {
-            width: 10px;
-            height: 10px;
-            border-left: 2px solid white;
-            border-top: 2px solid white;
+            width: 12px;
+            height: 12px;
+            border-left: 3px solid white;
+            border-top: 3px solid white;
             transform: rotate(-45deg);
         }
 
@@ -218,72 +237,19 @@
             background: #161b22;
             position: relative;
             overflow: hidden;
-            min-height: 0;
         }
 
         #renderCanvas {
             width: 100%;
             height: 100%;
             background: #0d1117;
-        }
-
-        /* Нумерация строк */
-        .line-numbers {
-            position: absolute;
-            left: 0;
-            top: 0;
-            padding: 16px 8px;
-            background: #0d1117;
-            border-right: 1px solid #30363d;
-            height: 100%;
-            text-align: right;
-            color: #484f58;
-            font-size: 12px;
-            line-height: 1.5;
-            user-select: none;
-        }
-
-        .code-wrapper {
-            position: relative;
-            flex: 1;
-            overflow: hidden;
-            min-height: 0;
-        }
-
-        .code-textarea {
-            padding-left: 50px !important;
-        }
-
-        /* Адаптивность для телефона */
-        @media (max-width: 768px) {
-            .editor-header {
-                padding: 10px 12px;
-            }
-            
-            .code-editor {
-                padding: 12px;
-                font-size: 13px;
-            }
-            
-            .error-panel {
-                padding: 10px 12px;
-                max-height: 30vh;
-            }
-            
-            .line-numbers {
-                padding: 12px 6px;
-                font-size: 11px;
-            }
-            
-            .code-textarea {
-                padding-left: 45px !important;
-            }
+            display: block;
         }
     </style>
 </head>
 <body>
     <div class="app">
-        <!-- Редактор кода -->
+        <!-- Редактор кода - 70% экрана -->
         <div class="editor-container">
             <div class="editor-header">
                 <div class="editor-title">geometry.gs</div>
@@ -293,17 +259,17 @@
             </div>
             <div class="code-wrapper">
                 <div class="line-numbers" id="lineNumbers">1</div>
-                <textarea class="code-editor code-textarea" id="codeEditor" spellcheck="false" oninput="updateLineNumbers()">rectangle {id=1; side=100,100; place=200,200; color=255,0,0; border=3; border_color=255,255,255; rotate=30}
+                <textarea class="code-editor" id="codeEditor" spellcheck="false" oninput="updateLineNumbers()">rectangle {id=1; side=100,100; place=200,200; color=255,0,0; border=3; border_color=255,255,255; rotate=30}
 triangular {id=2; side=80,80,80; place=400,300; color=0,255,0; border=2; border_color=0,0,255; rotate=45}
 oval {id=3; side=120,80; place=600,400; color=0,0,255; border=1; border_color=255,255,0; rotate=15}</textarea>
             </div>
         </div>
 
-        <!-- Панель ошибок -->
+        <!-- Панель ошибок - 30% экрана -->
         <div class="error-panel" id="errorPanel">
             <div class="error-title">
                 <div class="error-icon"></div>
-                Ошибка выполнения
+                Ошибки выполнения
             </div>
             <div id="errorContent"></div>
         </div>
@@ -312,10 +278,10 @@ oval {id=3; side=120,80; place=600,400; color=0,0,255; border=1; border_color=25
     <!-- Окно результата -->
     <div class="result-container" id="resultContainer">
         <div class="result-header">
-            <div style="color: #7ee787; font-size: 14px;">Результат выполнения</div>
+            <div style="color: #7ee787;">Результат выполнения</div>
             <button class="back-button" onclick="closeResult()">
                 <div class="arrow"></div>
-                Назад
+                Назад к редактору
             </button>
         </div>
         <div class="canvas-container">
@@ -334,16 +300,12 @@ oval {id=3; side=120,80; place=600,400; color=0,0,255; border=1; border_color=25
             }
 
             setupCanvas() {
-                // Устанавливаем одинаковые единичные отрезки
-                const dpr = window.devicePixelRatio || 1;
-                const rect = this.canvas.getBoundingClientRect();
+                // Устанавливаем правильные размеры canvas
+                const container = this.canvas.parentElement;
+                const rect = container.getBoundingClientRect();
                 
-                this.canvas.width = rect.width * dpr;
-                this.canvas.height = rect.height * dpr;
-                
-                this.ctx.scale(dpr, dpr);
-                this.canvas.style.width = rect.width + 'px';
-                this.canvas.style.height = rect.height + 'px';
+                this.canvas.width = rect.width;
+                this.canvas.height = rect.height;
             }
 
             parse(code) {
@@ -378,14 +340,10 @@ oval {id=3; side=120,80; place=600,400; color=0,0,255; border=1; border_color=25
 
             parseRectangle(line, lineNumber) {
                 const match = line.match(/rectangle\s*\{([^}]+)\}/);
-                if (!match) {
-                    throw new Error('Неправильный формат команды rectangle');
-                }
+                if (!match) throw new Error('Неправильный формат команды rectangle');
 
-                const params = match[1];
                 const config = { type: 'rectangle' };
-
-                this.parseParams(params, config, lineNumber);
+                this.parseParams(match[1], config, lineNumber);
                 this.validateRequiredParams(config, ['id', 'side', 'place'], lineNumber);
 
                 if (config.side.length !== 2) {
@@ -397,14 +355,10 @@ oval {id=3; side=120,80; place=600,400; color=0,0,255; border=1; border_color=25
 
             parseTriangular(line, lineNumber) {
                 const match = line.match(/triangular\s*\{([^}]+)\}/);
-                if (!match) {
-                    throw new Error('Неправильный формат команды triangular');
-                }
+                if (!match) throw new Error('Неправильный формат команды triangular');
 
-                const params = match[1];
                 const config = { type: 'triangular' };
-
-                this.parseParams(params, config, lineNumber);
+                this.parseParams(match[1], config, lineNumber);
                 this.validateRequiredParams(config, ['id', 'side', 'place'], lineNumber);
 
                 if (config.side.length !== 3) {
@@ -416,14 +370,10 @@ oval {id=3; side=120,80; place=600,400; color=0,0,255; border=1; border_color=25
 
             parseOval(line, lineNumber) {
                 const match = line.match(/oval\s*\{([^}]+)\}/);
-                if (!match) {
-                    throw new Error('Неправильный формат команды oval');
-                }
+                if (!match) throw new Error('Неправильный формат команды oval');
 
-                const params = match[1];
                 const config = { type: 'oval' };
-
-                this.parseParams(params, config, lineNumber);
+                this.parseParams(match[1], config, lineNumber);
                 this.validateRequiredParams(config, ['id', 'side', 'place'], lineNumber);
 
                 if (config.side.length !== 2) {
@@ -445,10 +395,6 @@ oval {id=3; side=120,80; place=600,400; color=0,0,255; border=1; border_color=25
                     const key = param.substring(0, equalsIndex).trim();
                     const value = param.substring(equalsIndex + 1).trim();
                     
-                    if (!key || !value) {
-                        throw new Error(`Неправильный формат параметра: ${param}`);
-                    }
-
                     switch (key) {
                         case 'id':
                             config.id = this.parseNumber(value, 'id', lineNumber);
@@ -541,39 +487,30 @@ oval {id=3; side=120,80; place=600,400; color=0,0,255; border=1; border_color=25
             }
 
             render() {
+                this.setupCanvas(); // Обновляем размеры canvas
+                
                 // Очищаем canvas
-                const rect = this.canvas.getBoundingClientRect();
-                this.ctx.clearRect(0, 0, rect.width, rect.height);
                 this.ctx.fillStyle = '#0d1117';
-                this.ctx.fillRect(0, 0, rect.width, rect.height);
+                this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
                 
                 // Рендерим все фигуры
                 for (const [id, shape] of this.shapes) {
-                    try {
-                        this.ctx.save();
-                        
-                        // Применяем поворот
-                        const [x, y] = shape.place;
-                        this.ctx.translate(x, y);
-                        this.ctx.rotate(shape.rotate * Math.PI / 180);
-                        this.ctx.translate(-x, -y);
-                        
-                        if (shape.type === 'rectangle') {
-                            this.renderRectangle(shape);
-                        } else if (shape.type === 'triangular') {
-                            this.renderTriangular(shape);
-                        } else if (shape.type === 'oval') {
-                            this.renderOval(shape);
-                        }
-                        
-                        this.ctx.restore();
-                    } catch (error) {
-                        this.errors.push({
-                            line: 0,
-                            message: `Ошибка отрисовки фигуры ${id}: ${error.message}`,
-                            code: ''
-                        });
+                    this.ctx.save();
+                    
+                    const [x, y] = shape.place;
+                    this.ctx.translate(x, y);
+                    this.ctx.rotate(shape.rotate * Math.PI / 180);
+                    this.ctx.translate(-x, -y);
+                    
+                    if (shape.type === 'rectangle') {
+                        this.renderRectangle(shape);
+                    } else if (shape.type === 'triangular') {
+                        this.renderTriangular(shape);
+                    } else if (shape.type === 'oval') {
+                        this.renderOval(shape);
                     }
+                    
+                    this.ctx.restore();
                 }
             }
 
@@ -582,11 +519,9 @@ oval {id=3; side=120,80; place=600,400; color=0,0,255; border=1; border_color=25
                 const [width, height] = shape.side;
                 const [r, g, b] = shape.color;
                 
-                // Рисуем заливку
                 this.ctx.fillStyle = `rgb(${r}, ${g}, ${b})`;
                 this.ctx.fillRect(x - width/2, y - height/2, width, height);
                 
-                // Рисуем обводку если есть
                 if (shape.border > 0) {
                     const [br, bg, bb] = shape.border_color;
                     this.ctx.strokeStyle = `rgb(${br}, ${bg}, ${bb})`;
@@ -597,24 +532,15 @@ oval {id=3; side=120,80; place=600,400; color=0,0,255; border=1; border_color=25
 
             renderTriangular(shape) {
                 const [x, y] = shape.place;
-                const [a, b, c] = shape.side;
-                const [r, g, bColor] = shape.color;
-                
-                // Для равностороннего треугольника используем первую сторону
-                const size = a;
+                const size = shape.side[0]; // Используем первую сторону для равностороннего
                 const height = (Math.sqrt(3) / 2) * size;
+                const [r, g, b] = shape.color;
                 
-                const points = [
-                    [x, y - height/2],
-                    [x - size/2, y + height/2],
-                    [x + size/2, y + height/2]
-                ];
-                
-                this.ctx.fillStyle = `rgb(${r}, ${g}, ${bColor})`;
+                this.ctx.fillStyle = `rgb(${r}, ${g}, ${b})`;
                 this.ctx.beginPath();
-                this.ctx.moveTo(points[0][0], points[0][1]);
-                this.ctx.lineTo(points[1][0], points[1][1]);
-                this.ctx.lineTo(points[2][0], points[2][1]);
+                this.ctx.moveTo(x, y - height/2);
+                this.ctx.lineTo(x - size/2, y + height/2);
+                this.ctx.lineTo(x + size/2, y + height/2);
                 this.ctx.closePath();
                 this.ctx.fill();
                 
@@ -631,13 +557,11 @@ oval {id=3; side=120,80; place=600,400; color=0,0,255; border=1; border_color=25
                 const [width, height] = shape.side;
                 const [r, g, b] = shape.color;
                 
-                // Рисуем эллипс
                 this.ctx.fillStyle = `rgb(${r}, ${g}, ${b})`;
                 this.ctx.beginPath();
                 this.ctx.ellipse(x, y, width/2, height/2, 0, 0, 2 * Math.PI);
                 this.ctx.fill();
                 
-                // Рисуем обводку если есть
                 if (shape.border > 0) {
                     const [br, bg, bb] = shape.border_color;
                     this.ctx.strokeStyle = `rgb(${br}, ${bg}, ${bb})`;
@@ -661,14 +585,6 @@ oval {id=3; side=120,80; place=600,400; color=0,0,255; border=1; border_color=25
             const canvas = document.getElementById('renderCanvas');
             engine = new GeometryEngine(canvas);
             updateLineNumbers();
-            
-            // Перерисовываем canvas при изменении размера
-            window.addEventListener('resize', () => {
-                if (engine) {
-                    engine.setupCanvas();
-                    engine.render();
-                }
-            });
         }
 
         function runCode() {
@@ -679,35 +595,34 @@ oval {id=3; side=120,80; place=600,400; color=0,0,255; border=1; border_color=25
             engine.parse(code);
             
             if (engine.hasErrors()) {
+                // ПОКАЗЫВАЕМ ошибки
                 errorContent.innerHTML = '';
                 engine.getErrors().forEach(error => {
                     const errorHTML = `
-                        <div class="error-line">
-                            Строка ${error.line}: ${error.code || ''}
+                        <div class="error-item">
+                            <div class="error-line">Строка ${error.line}: ${error.code}</div>
+                            <div class="error-message">${error.message}</div>
                         </div>
-                        <div class="error-message">${error.message}</div>
                     `;
                     errorContent.innerHTML += errorHTML;
                 });
-                errorPanel.style.display = 'block';
+                errorPanel.classList.add('visible'); // ДЕЛАЕМ ВИДИМОЙ
             } else {
-                errorPanel.style.display = 'none';
+                // Скрываем ошибки и ПОКАЗЫВАЕМ результат
+                errorPanel.classList.remove('visible');
                 engine.render();
                 showResult();
             }
         }
 
         function showResult() {
-            document.getElementById('resultContainer').style.display = 'flex';
-            // Перерисовываем canvas при показе результата
-            setTimeout(() => {
-                engine.setupCanvas();
-                engine.render();
-            }, 50);
+            // ПОКАЗЫВАЕМ результат
+            document.getElementById('resultContainer').classList.add('visible');
         }
 
         function closeResult() {
-            document.getElementById('resultContainer').style.display = 'none';
+            // Скрываем результат
+            document.getElementById('resultContainer').classList.remove('visible');
         }
 
         function updateLineNumbers() {
